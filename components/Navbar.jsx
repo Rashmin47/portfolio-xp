@@ -48,27 +48,33 @@ const Navbar = ({ isDarkMode, setIsDarkMode }) => {
           }  `}
         >
           <li>
-            <Link className="font-family-ovo" href="#top">
+            <Link className="font-[family-name:var(--font-ovo)]" href="#top">
               Home
             </Link>
           </li>
           <li>
-            <Link className="font-family-ovo" href="#about">
+            <Link className="font-[family-name:var(--font-ovo)]" href="#about">
               About Me
             </Link>
           </li>
           <li>
-            <Link className="font-family-ovo" href="#services">
+            <Link
+              className="font-[family-name:var(--font-ovo)]"
+              href="#services"
+            >
               Services
             </Link>
           </li>
           <li>
-            <Link className="font-family-ovo" href="#work">
+            <Link className="font-[family-name:var(--font-ovo)]" href="#work">
               My Work
             </Link>
           </li>
           <li>
-            <Link className="font-family-ovo" href="#contact">
+            <Link
+              className="font-[family-name:var(--font-ovo)]"
+              href="#contact"
+            >
               Contact Me
             </Link>
           </li>
@@ -115,18 +121,26 @@ const Navbar = ({ isDarkMode, setIsDarkMode }) => {
             />
           </div>
           <li>
-            <Link className="font-family-ovo" onClick={closeMenu} href="#top">
+            <Link
+              className="font-[family-name:var(--font-ovo)]"
+              onClick={closeMenu}
+              href="#top"
+            >
               Home
             </Link>
           </li>
           <li>
-            <Link className="font-family-ovo" onClick={closeMenu} href="#about">
+            <Link
+              className="font-[family-name:var(--font-ovo)]"
+              onClick={closeMenu}
+              href="#about"
+            >
               About Me
             </Link>
           </li>
           <li>
             <Link
-              className="font-family-ovo"
+              className="font-[family-name:var(--font-ovo)]"
               onClick={closeMenu}
               href="#services"
             >
@@ -134,13 +148,17 @@ const Navbar = ({ isDarkMode, setIsDarkMode }) => {
             </Link>
           </li>
           <li>
-            <Link className="font-family-ovo" onClick={closeMenu} href="#work">
+            <Link
+              className="font-[family-name:var(--font-ovo)]"
+              onClick={closeMenu}
+              href="#work"
+            >
               My Work
             </Link>
           </li>
           <li>
             <Link
-              className="font-family-ovo"
+              className="font-[family-name:var(--font-ovo)]"
               onClick={closeMenu}
               href="#contact"
             >

@@ -17,7 +17,7 @@ const Services = () => {
         initial={{ y: -20, opacity: 0 }}
         whileInView={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.3, delay: 0.5 }}
-        className="text-center mb-2 text-lg font-ovo"
+        className="text-center mb-2 text-lg font-[family-name:var(--font-ovo)]"
       >
         What I Offer
       </motion.h4>
@@ -25,7 +25,7 @@ const Services = () => {
         initial={{ y: -20, opacity: 0 }}
         whileInView={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, delay: 0.5 }}
-        className="text-center text-5xl font-ovo"
+        className="text-center text-5xl font-[family-name:var(--font-ovo)]"
       >
         My Services{" "}
       </motion.h2>
@@ -33,7 +33,7 @@ const Services = () => {
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         transition={{ duration: 0.5, delay: 0.7 }}
-        className="text-center max-w-2xl mx-auto mt-b mb-12 font-family-ovo"
+        className="text-center max-w-2xl mx-auto mt-b mb-12 font-[family-name:var(--font-ovo)]"
       >
         I am a Fullstack Developer from Nepal with 2 years of experience in
         multiple companies.

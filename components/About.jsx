@@ -16,7 +16,7 @@ const About = ({ isDarkMode }) => {
         initial={{ y: -20, opacity: 0 }}
         whileInView={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, delay: 0.3 }}
-        className="text-center mb-2 text-lg font-ovo"
+        className="text-center mb-2 text-lg font-[family-name:var(--font-ovo)]"
       >
         Introduction
       </motion.h4>
@@ -24,7 +24,7 @@ const About = ({ isDarkMode }) => {
         initial={{ y: -20, opacity: 0 }}
         whileInView={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, delay: 0.5 }}
-        className="text-center text-5xl font-ovo"
+        className="text-center text-5xl font-[family-name:var(--font-ovo)]"
       >
         About Me{" "}
       </motion.h2>
@@ -48,7 +48,7 @@ const About = ({ isDarkMode }) => {
           transition={{ duration: 0.6, delay: 0.8 }}
           className="flex-1"
         >
-          <p className="mb-10 max-w-2xl font-ovo">
+          <p className="mb-10 max-w-2xl font-[family-name:var(--font-ovo)]">
             hey, there I'm the Swiss Army knife of the digital world – app
             developer by day, graphic designer by night, and a website wizard
             all the time! It's me who can make your app run smoother than your
@@ -89,7 +89,7 @@ const About = ({ isDarkMode }) => {
             initial={{ y: 20, opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
             transition={{ duration: 1.3, delay: 0.5 }}
-            className="my-6 text-gray-700 font-family-ovo dark:text-white/80"
+            className="my-6 text-gray-700 font-[family-name:var(--font-ovo)] dark:text-white/80"
           >
             Tools I use
           </motion.h4>

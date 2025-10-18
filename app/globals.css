@@ -1,9 +1,14 @@
 @import "tailwindcss";
 
 @variant dark (&:where(.dark, .dark *));
-
-* {
+html,
+body {
   font-family: var(--font-outfit), sans-serif;
+}
+
+/* Now define a reusable Ovo class */
+.font-ovo {
+  font-family: var(--font-ovo), serif;
 }
 
 @theme {
