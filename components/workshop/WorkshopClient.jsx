@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { checkWorkshopCapability } from "@/lib/workshop-capability";
@@ -14,9 +14,7 @@ const Scene = dynamic(() => import("./Scene"), {
       style={{ height: "70vh", minHeight: "360px" }}
       aria-live="polite"
     >
-      <p className="text-sm font-mono text-muted">
-        Warming up the workshop…
-      </p>
+      <p className="text-sm font-mono text-muted">Warming up the workshop…</p>
     </div>
   ),
 });
@@ -26,10 +24,28 @@ const Scene = dynamic(() => import("./Scene"), {
  */
 export default function WorkshopClient({ hotspots }) {
   const [capability, setCapability] = useState(null);
+  const [selectedId, setSelectedId] = useState(null);
+
+  // Detect ?perf=1
+  const showPerf = useMemo(() => {
+    if (typeof window === "undefined") return false;
+    return new URLSearchParams(window.location.search).get("perf") === "1";
+  }, []);
 
   useEffect(() => {
     setCapability(checkWorkshopCapability());
   }, []);
+
+  // Keyboard: Escape returns to desk
+  useEffect(() => {
+    function onKey(e) {
+      if (e.key === "Escape") setSelectedId(null);
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  const handleSelect = useCallback((id) => setSelectedId(id), []);
 
   // Still running capability check (first render / hydration)
   if (capability === null) {
@@ -53,7 +69,8 @@ export default function WorkshopClient({ hotspots }) {
               <li key={spot.id}>
                 <Link
                   href={spot.href}
-                  className="text-cobalt dark:text-sky hover:underline text-sm font-mono"
+                  className="text-cobalt dark:text-sky hover:underline text-sm font-mono
+                             focus:outline-none focus:ring-3 focus:ring-signal rounded"
                 >
                   {spot.label} →
                 </Link>
@@ -65,5 +82,46 @@ export default function WorkshopClient({ hotspots }) {
     );
   }
 
-  return <Scene />;
+  return (
+    <div className="space-y-3">
+      {/* Nav links that also select a hotspot (keyboard accessible) */}
+      <nav aria-label="Select a workshop object" className="flex flex-wrap gap-2">
+        {hotspots.map((spot) => (
+          <button
+            key={spot.id}
+            onClick={() =>
+              setSelectedId((prev) => (prev === spot.id ? null : spot.id))
+            }
+            aria-pressed={selectedId === spot.id}
+            className={`px-3 py-1.5 rounded-card text-sm font-mono border transition-colors
+                        focus:outline-none focus:ring-3 focus:ring-signal
+                        ${
+                          selectedId === spot.id
+                            ? "bg-signal text-ink border-signal"
+                            : "border-ink/15 dark:border-paper/15 hover:border-cobalt dark:hover:border-sky"
+                        }`}
+          >
+            {spot.label}
+          </button>
+        ))}
+        {selectedId && (
+          <button
+            onClick={() => setSelectedId(null)}
+            className="px-3 py-1.5 rounded-card text-sm font-mono border border-ink/15
+                       dark:border-paper/15 hover:border-cobalt dark:hover:border-sky
+                       focus:outline-none focus:ring-3 focus:ring-signal transition-colors"
+          >
+            Back to desk
+          </button>
+        )}
+      </nav>
+
+      <Scene
+        hotspots={hotspots}
+        selectedId={selectedId}
+        onSelect={handleSelect}
+        showPerf={showPerf}
+      />
+    </div>
+  );
 }
