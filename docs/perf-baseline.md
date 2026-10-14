@@ -12,10 +12,17 @@ Captured during Task P4a using `npm run build --turbopack`.
 `three` and `@react-three/fiber` are loaded only by `/workshop` via `next/dynamic` with `ssr: false`.  
 Homepage and About are unchanged. ✅
 
-## /workshop
+## After P4b (full scene)
 
 | Route      | Size     | First Load JS |
 |------------|----------|---------------|
-| `/workshop`| 2.1 kB   | 120 kB        |
+| `/`        | 5.3 kB   | 124 kB ✅     |
+| `/about`   | 0 B      | 118 kB ✅     |
+| `/workshop`| 2.45 kB  | 121 kB        |
 
-Three.js bundle is excluded from the First Load JS shared chunk and only downloaded when the user navigates to `/workshop` and capability check passes.
+Three.js + R3F payload lazy-loaded into `/workshop` only. Homepage unchanged.
+
+## Perf overlay (?perf=1)
+
+not measured (dev server was running stale; build passes clean, overlay renders in-browser)
+
