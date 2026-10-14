@@ -28,7 +28,7 @@
 export const siteConfig = {
   name: "Rashmin Sharma",
   role: "Software developer",
-  location: "Nepal",
+  location: "Kathmandu, Nepal",
   github: "https://github.com/Rashmin47",
   linkedin: "https://www.linkedin.com/in/rashmin-sharma-656bb332a/",
   hero: {
@@ -42,8 +42,8 @@ export const siteConfig = {
         href: "/projects",
       },
       {
-        label: "Contact",
-        href: "/contact",
+        label: "The Workshop",
+        href: "/workshop",
       },
     ],
   },

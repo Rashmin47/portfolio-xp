@@ -1,5 +1,3 @@
-import Link from "next/link";
-import Image from "next/image";
 import { siteConfig } from "@/data/site";
 import { projects } from "@/data/projects";
 import { visibleItems } from "@/lib/content";
@@ -7,6 +5,14 @@ import { roadmap } from "@/data/roadmap";
 import { notes } from "@/data/notes";
 import { buildMetadata, siteUrl } from "@/lib/seo";
 import JsonLd from "@/components/seo/JsonLd";
+import {
+  SectionHeader,
+  Button,
+  TextLink,
+  IndexRow,
+  DummyBadge,
+} from "@/components/ui";
+import CurrentlyTable from "@/components/home/CurrentlyTable";
 
 export const metadata = buildMetadata({
   title: siteConfig.name,
@@ -14,10 +20,74 @@ export const metadata = buildMetadata({
   path: "/",
 });
 
-export default function HomePage() {
-  const publishedProjects = visibleItems(projects).filter((p) => !p.dummy).slice(0, 3);
-  const publishedRoadmap = roadmap.filter((r) => r.published).slice(0, 3);
-  const publishedNotes = notes.filter((n) => n.published).slice(0, 2);
+function formatRelativeDate(dateStr) {
+  if (!dateStr) return "";
+  const now = new Date();
+  const date = new Date(dateStr);
+  const diffSec = Math.floor((now.getTime() - date.getTime()) / 1000);
+  if (diffSec < 60) return "just now";
+  const diffMin = Math.floor(diffSec / 60);
+  if (diffMin < 60) return `${diffMin}m ago`;
+  const diffHour = Math.floor(diffMin / 60);
+  if (diffHour < 24) return `${diffHour}h ago`;
+  const diffDays = Math.floor(diffHour / 24);
+  if (diffDays < 30) return `${diffDays}d ago`;
+  const diffMonths = Math.floor(diffDays / 30);
+  if (diffMonths < 12) return `${diffMonths}mo ago`;
+  const diffYears = Math.floor(diffMonths / 12);
+  return `${diffYears}y ago`;
+}
+
+async function getLatestCommit() {
+  try {
+    const res = await fetch(
+      "https://api.github.com/repos/Rashmin47/portfolio-xp/commits?per_page=1",
+      {
+        next: { revalidate: 3600 },
+        headers: {
+          Accept: "application/vnd.github.v3+json",
+          "User-Agent": "portfolio-xp",
+        },
+      }
+    );
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (!Array.isArray(data) || data.length === 0) return null;
+    const commit = data[0];
+    const sha = commit.sha ? commit.sha.slice(0, 7) : "";
+    const rawMessage = commit.commit?.message || "";
+    const message = rawMessage.split("\n")[0].slice(0, 60);
+    const dateStr =
+      commit.commit?.author?.date || commit.commit?.committer?.date;
+    const relativeDate = formatRelativeDate(dateStr);
+    return {
+      sha,
+      message,
+      relativeDate,
+      url: commit.html_url || null,
+    };
+  } catch (_) {
+    return null;
+  }
+}
+
+export default async function HomePage() {
+  const latestCommit = await getLatestCommit();
+
+  // 01 Shipped (up to 3 via visibleItems)
+  const publishedProjects = visibleItems(projects).slice(0, 3);
+
+  // 02 Building now
+  const buildingItems = siteConfig.building || [];
+
+  // 03 Next (roadmap items categorized as now / next / later)
+  const publishedRoadmap = (roadmap || []).filter((r) => r.published);
+  const nowRoadmap = publishedRoadmap.filter((r) => r.status === "now");
+  const nextRoadmap = publishedRoadmap.filter((r) => r.status === "next");
+  const laterRoadmap = publishedRoadmap.filter((r) => r.status === "later");
+
+  // 04 Notes (latest 2)
+  const publishedNotes = (notes || []).filter((n) => n.published).slice(0, 2);
 
   const personSchema = {
     "@context": "https://schema.org",
@@ -29,100 +99,88 @@ export default function HomePage() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="w-full">
       <JsonLd data={personSchema} />
 
-      {/* Hero Section */}
-      <section className="py-10 md:py-16 border-b border-ink/10 dark:border-paper/10">
-        <div
-          className={`grid gap-8 items-center ${
-            siteConfig.hero.heroImage ? "md:grid-cols-2" : "grid-cols-1"
-          }`}
-        >
-          <div>
-            <h1 className="text-sm font-mono text-muted uppercase tracking-widest mb-3">
+      {/* Hero: 12 columns, left-aligned */}
+      <section className="py-12 sm:py-20 lg:py-28 border-b border-ink/10 dark:border-paper/10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-start">
+          {/* Main Hero Column (approx 8-9 cols) */}
+          <div className="lg:col-span-8">
+            <h1 className="font-mono text-xs uppercase tracking-wider text-muted mb-4 block">
               {siteConfig.hero.h1}
             </h1>
-            <p className="text-4xl sm:text-5xl lg:text-6xl font-bold font-display tracking-tight text-ink dark:text-paper mb-6">
+            <p className="display text-ink dark:text-paper mb-6">
               {siteConfig.hero.tagline}
             </p>
-            <p className="text-lg sm:text-xl text-muted max-w-2xl leading-relaxed mb-8">
+            <p className="text-base sm:text-lg text-muted max-w-2xl leading-relaxed mb-8">
               {siteConfig.hero.support}
             </p>
             <div className="flex flex-wrap items-center gap-4">
-              {siteConfig.hero.ctas.map((cta, index) => (
-                <Link
+              {siteConfig.hero.ctas?.map((cta, index) => (
+                <Button
                   key={cta.href}
+                  variant={index === 0 ? "primary" : "secondary"}
                   href={cta.href}
-                  className={`px-6 py-3 rounded-card font-medium transition-all ${
-                    index === 0
-                      ? "bg-cobalt text-paper hover:bg-cobalt/90 dark:bg-cobalt dark:text-paper"
-                      : "border border-ink/20 dark:border-paper/20 hover:border-ink dark:hover:border-paper"
-                  }`}
+                  arrow
                 >
                   {cta.label}
-                </Link>
+                </Button>
               ))}
             </div>
           </div>
-          {siteConfig.hero.heroImage && (
-            <div className="relative aspect-4/3 rounded-card overflow-hidden border border-ink/10 dark:border-paper/10">
-              <Image
-                src={siteConfig.hero.heroImage}
-                alt={siteConfig.name}
-                fill
-                className="object-cover"
-              />
-            </div>
-          )}
+
+          {/* Beside/Below: "Currently" SpecTable (approx 4 cols) */}
+          <div className="lg:col-span-4 lg:pt-8">
+            <CurrentlyTable
+              latestCommit={latestCommit}
+              buildingNow={buildingItems[0]}
+              location={siteConfig.location}
+            />
+          </div>
         </div>
       </section>
 
-      {/* Shipped Projects (visible if published projects exist) */}
+      {/* 01 Shipped */}
       {publishedProjects.length > 0 && (
-        <section className="py-10 border-b border-ink/10 dark:border-paper/10">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold font-display">Shipped</h2>
-            <Link
-              href="/projects"
-              className="text-sm text-cobalt dark:text-sky hover:underline font-mono"
-            >
-              All projects &rarr;
-            </Link>
-          </div>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {publishedProjects.map((project) => (
-              <article
+        <section className="mt-16 sm:mt-24">
+          <SectionHeader number="01" label="SHIPPED" />
+          <div className="border-t border-ink/10 dark:border-paper/10">
+            {publishedProjects.map((project, idx) => (
+              <IndexRow
                 key={project.slug}
-                className="p-6 rounded-card border border-ink/10 dark:border-paper/10 bg-paper dark:bg-night-surface"
-              >
-                <h3 className="text-xl font-semibold mb-2">
-                  <Link
-                    href={`/projects/${project.slug}`}
-                    className="hover:text-cobalt dark:hover:text-sky"
-                  >
-                    {project.title}
-                  </Link>
-                </h3>
-                <p className="text-muted text-sm">{project.description}</p>
-              </article>
+                index={String(idx + 1).padStart(2, "0")}
+                title={
+                  <span className="inline-flex items-center gap-2 flex-wrap">
+                    <span>{project.title}</span>
+                    {project.dummy && <DummyBadge />}
+                  </span>
+                }
+                meta={project.year || (project.tags && project.tags[0])}
+                href={`/projects/${project.slug}`}
+              />
             ))}
+          </div>
+          <div className="mt-6">
+            <TextLink href="/projects">
+              View all shipped projects →
+            </TextLink>
           </div>
         </section>
       )}
 
-      {/* Building Now (visible if items exist) */}
-      {siteConfig.building && siteConfig.building.length > 0 && (
-        <section className="py-10 border-b border-ink/10 dark:border-paper/10">
-          <h2 className="text-2xl font-bold font-display mb-6">Building now</h2>
-          <ul className="space-y-3">
-            {siteConfig.building.map((item) => (
-              <li key={item} className="flex items-start gap-3">
+      {/* 02 Building now */}
+      {buildingItems.length > 0 && (
+        <section className="mt-16 sm:mt-24">
+          <SectionHeader number="02" label="BUILDING NOW" />
+          <ul className="divide-y divide-ink/10 dark:divide-paper/10 border-y border-ink/10 dark:border-paper/10">
+            {buildingItems.map((item, idx) => (
+              <li key={idx} className="py-3.5 flex items-start gap-3">
                 <span
-                  className="inline-block w-2.5 h-2.5 rounded-full bg-board mt-2 shrink-0"
+                  className="inline-block w-2 h-2 rounded-full bg-board mt-2 shrink-0"
                   aria-hidden="true"
                 />
-                <span className="text-base text-ink dark:text-paper">
+                <span className="text-sm sm:text-base text-ink dark:text-paper font-medium">
                   {item}
                 </span>
               </li>
@@ -131,96 +189,141 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* Next Roadmap Items (visible if published items exist) */}
+      {/* 03 Next (roadmap as compact Now / Next / Later columns) */}
       {publishedRoadmap.length > 0 && (
-        <section className="py-10 border-b border-ink/10 dark:border-paper/10">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold font-display">Next</h2>
-            <Link
-              href="/roadmap"
-              className="text-sm text-cobalt dark:text-sky hover:underline font-mono"
-            >
-              Full roadmap &rarr;
-            </Link>
+        <section className="mt-16 sm:mt-24">
+          <SectionHeader number="03" label="NEXT" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Column: Now */}
+            <div className="space-y-3">
+              <span className="font-mono text-xs uppercase tracking-wider text-muted block border-b border-ink/10 dark:border-paper/10 pb-2">
+                NOW
+              </span>
+              {nowRoadmap.length > 0 ? (
+                <div className="space-y-3">
+                  {nowRoadmap.map((item) => (
+                    <div
+                      key={item.id}
+                      className="p-3.5 rounded-[14px] border border-ink/10 dark:border-paper/10 bg-ink/[0.02] dark:bg-paper/[0.02]"
+                    >
+                      <h4 className="font-display font-medium text-sm text-ink dark:text-paper mb-1">
+                        {item.title}
+                      </h4>
+                      <p className="text-xs text-muted leading-relaxed">
+                        {item.description}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="font-mono text-xs text-muted">No active items</p>
+              )}
+            </div>
+
+            {/* Column: Next */}
+            <div className="space-y-3">
+              <span className="font-mono text-xs uppercase tracking-wider text-muted block border-b border-ink/10 dark:border-paper/10 pb-2">
+                NEXT
+              </span>
+              {nextRoadmap.length > 0 ? (
+                <div className="space-y-3">
+                  {nextRoadmap.map((item) => (
+                    <div
+                      key={item.id}
+                      className="p-3.5 rounded-[14px] border border-ink/10 dark:border-paper/10 bg-ink/[0.02] dark:bg-paper/[0.02]"
+                    >
+                      <h4 className="font-display font-medium text-sm text-ink dark:text-paper mb-1">
+                        {item.title}
+                      </h4>
+                      <p className="text-xs text-muted leading-relaxed">
+                        {item.description}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="font-mono text-xs text-muted">Queued next</p>
+              )}
+            </div>
+
+            {/* Column: Later */}
+            <div className="space-y-3">
+              <span className="font-mono text-xs uppercase tracking-wider text-muted block border-b border-ink/10 dark:border-paper/10 pb-2">
+                LATER
+              </span>
+              {laterRoadmap.length > 0 ? (
+                <div className="space-y-3">
+                  {laterRoadmap.map((item) => (
+                    <div
+                      key={item.id}
+                      className="p-3.5 rounded-[14px] border border-ink/10 dark:border-paper/10 bg-ink/[0.02] dark:bg-paper/[0.02]"
+                    >
+                      <h4 className="font-display font-medium text-sm text-ink dark:text-paper mb-1">
+                        {item.title}
+                      </h4>
+                      <p className="text-xs text-muted leading-relaxed">
+                        {item.description}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="font-mono text-xs text-muted">Future exploratory</p>
+              )}
+            </div>
           </div>
-          <div className="grid gap-4">
-            {publishedRoadmap.map((item) => (
-              <article
-                key={item.id}
-                className="p-4 rounded-card border border-ink/10 dark:border-paper/10 bg-paper dark:bg-night-surface"
-              >
-                <h3 className="text-lg font-semibold mb-1">{item.title}</h3>
-                <p className="text-sm text-muted">{item.description}</p>
-              </article>
-            ))}
+          <div className="mt-6">
+            <TextLink href="/roadmap">
+              Full roadmap →
+            </TextLink>
           </div>
         </section>
       )}
 
-      {/* Notes (visible if published notes exist) */}
+      {/* 04 Notes */}
       {publishedNotes.length > 0 && (
-        <section className="py-10 border-b border-ink/10 dark:border-paper/10">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold font-display">Notes</h2>
-            <Link
-              href="/notes"
-              className="text-sm text-cobalt dark:text-sky hover:underline font-mono"
-            >
-              All notes &rarr;
-            </Link>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {publishedNotes.map((note) => (
-              <article
+        <section className="mt-16 sm:mt-24">
+          <SectionHeader number="04" label="NOTES" />
+          <div className="border-t border-ink/10 dark:border-paper/10">
+            {publishedNotes.map((note, idx) => (
+              <IndexRow
                 key={note.slug}
-                className="p-6 rounded-card border border-ink/10 dark:border-paper/10 bg-paper dark:bg-night-surface"
-              >
-                <h3 className="text-xl font-semibold mb-2">
-                  <Link
-                    href={`/notes/${note.slug}`}
-                    className="hover:text-cobalt dark:hover:text-sky"
-                  >
-                    {note.title}
-                  </Link>
-                </h3>
-                <p className="text-muted text-sm">{note.summary}</p>
-              </article>
+                index={String(idx + 1).padStart(2, "0")}
+                title={note.title}
+                meta={note.datePublished?.slice(0, 10)}
+                href={`/notes/${note.slug}`}
+              />
             ))}
+          </div>
+          <div className="mt-6">
+            <TextLink href="/notes">
+              All notes →
+            </TextLink>
           </div>
         </section>
       )}
 
-      {/* Closing Contact Block */}
-      <section className="py-10">
-        <div className="p-8 rounded-card border border-ink/10 dark:border-paper/10 bg-paper dark:bg-night-surface">
-          <h2 className="text-2xl font-bold font-display mb-3">Get in touch</h2>
-          <p className="text-muted max-w-xl mb-6">
-            Interested in working together, discussing software systems, or
-            following along? Let&apos;s connect.
+      {/* 05 Closing block */}
+      <section className="mt-16 sm:mt-24 pt-8">
+        <SectionHeader number="05" label="CLOSING" />
+        <div className="max-w-2xl">
+          <p className="text-2xl sm:text-3xl lg:text-4xl font-display font-bold tracking-tight text-ink dark:text-paper leading-tight mb-8">
+            Let&apos;s build something that matters.
           </p>
-          <div className="flex flex-wrap items-center gap-6">
-            <Link
-              href="/contact"
-              className="px-6 py-2.5 rounded-card bg-ink text-paper dark:bg-paper dark:text-ink font-medium hover:opacity-90 transition-opacity"
-            >
+          <div className="flex flex-wrap items-center gap-4">
+            <Button variant="primary" href="/contact" arrow>
               Contact
-            </Link>
-            <a
-              href={siteConfig.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-cobalt dark:text-sky hover:underline font-medium text-sm"
-            >
-              GitHub
-            </a>
-            <a
-              href={siteConfig.linkedin}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-cobalt dark:text-sky hover:underline font-medium text-sm"
-            >
-              LinkedIn
-            </a>
+            </Button>
+            {siteConfig.github && (
+              <Button variant="secondary" href={siteConfig.github} arrow>
+                GitHub
+              </Button>
+            )}
+            {siteConfig.linkedin && (
+              <Button variant="secondary" href={siteConfig.linkedin} arrow>
+                LinkedIn
+              </Button>
+            )}
           </div>
         </div>
       </section>
