@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { siteConfig } from "@/data/site";
 import { projects } from "@/data/projects";
+import { visibleItems } from "@/lib/content";
 import { roadmap } from "@/data/roadmap";
 import { notes } from "@/data/notes";
 import { buildMetadata, siteUrl } from "@/lib/seo";
@@ -14,7 +15,7 @@ export const metadata = buildMetadata({
 });
 
 export default function HomePage() {
-  const publishedProjects = projects.filter((p) => p.published).slice(0, 3);
+  const publishedProjects = visibleItems(projects).filter((p) => !p.dummy).slice(0, 3);
   const publishedRoadmap = roadmap.filter((r) => r.published).slice(0, 3);
   const publishedNotes = notes.filter((n) => n.published).slice(0, 2);
 
