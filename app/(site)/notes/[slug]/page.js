@@ -1,21 +1,31 @@
 import { notes } from "@/data/notes";
+import { siteConfig } from "@/data/site";
+import { buildMetadata, siteUrl } from "@/lib/seo";
+import JsonLd from "@/components/seo/JsonLd";
+
+export async function generateStaticParams() {
+  return notes.filter((n) => n.published).map((n) => ({ slug: n.slug }));
+}
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const note = notes.find((n) => n.slug === slug && n.published);
 
   if (!note) {
-    return {
-      title: "Note In Progress | Rashmin Sharma",
+    return buildMetadata({
+      title: "Note Not Found",
       description: "Note details are in progress.",
-      robots: { index: false },
-    };
+      path: `/notes/${slug}`,
+      noindex: true,
+    });
   }
 
-  return {
-    title: `${note.title} | Rashmin Sharma`,
+  return buildMetadata({
+    title: note.title,
     description: note.summary || "Technical note",
-  };
+    path: `/notes/${slug}`,
+    noindex: false,
+  });
 }
 
 export default async function NoteDetailPage({ params }) {
@@ -35,8 +45,23 @@ export default async function NoteDetailPage({ params }) {
     );
   }
 
+  const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: note.title,
+    ...(note.summary ? { description: note.summary } : {}),
+    ...(note.datePublished ? { datePublished: note.datePublished } : {}),
+    ...(note.dateModified ? { dateModified: note.dateModified } : {}),
+    author: {
+      "@type": "Person",
+      name: siteConfig.name,
+      url: `${siteUrl}/about`,
+    },
+  };
+
   return (
     <article>
+      <JsonLd data={articleSchema} />
       <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-6">
         {note.title}
       </h1>

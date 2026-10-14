@@ -1,12 +1,14 @@
 import { lab } from "@/data/lab";
+import { buildMetadata } from "@/lib/seo";
 
 const publishedLab = lab.filter((item) => item.published);
 
-export const metadata = {
-  title: "The Lab | Rashmin Sharma",
+export const metadata = buildMetadata({
+  title: "The Lab",
   description: "Hardware, AI, and code experiments by Rashmin Sharma.",
-  ...(publishedLab.length === 0 ? { robots: { index: false } } : {}),
-};
+  path: "/lab",
+  noindex: publishedLab.length === 0,
+});
 
 export default function LabPage() {
   return (

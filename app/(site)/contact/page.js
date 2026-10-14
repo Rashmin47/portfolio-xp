@@ -1,10 +1,12 @@
 import ContactForm from "@/components/site/ContactForm";
 import { siteConfig } from "@/data/site";
+import { buildMetadata } from "@/lib/seo";
 
-export const metadata = {
-  title: "Contact | Rashmin Sharma",
+export const metadata = buildMetadata({
+  title: "Contact",
   description: "Get in touch with Rashmin Sharma.",
-};
+  path: "/contact",
+});
 
 export default function ContactPage() {
   return (

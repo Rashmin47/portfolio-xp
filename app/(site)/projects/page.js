@@ -1,13 +1,15 @@
 import Link from "next/link";
 import { projects } from "@/data/projects";
+import { buildMetadata } from "@/lib/seo";
 
 const publishedProjects = projects.filter((item) => item.published);
 
-export const metadata = {
-  title: "Projects | Rashmin Sharma",
+export const metadata = buildMetadata({
+  title: "Projects",
   description: "Shipped software projects and systems by Rashmin Sharma.",
-  ...(publishedProjects.length === 0 ? { robots: { index: false } } : {}),
-};
+  path: "/projects",
+  noindex: publishedProjects.length === 0,
+});
 
 export default function ProjectsPage() {
   return (

@@ -4,6 +4,7 @@ import {
   JetBrains_Mono,
 } from "next/font/google";
 import "./globals.css";
+import { siteUrl } from "@/lib/seo";
 
 const bricolage = Bricolage_Grotesque({
   subsets: ["latin"],
@@ -22,8 +23,13 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata = {
-  title: "Rashmin's Portfolio",
-  description: "Full Stack Developer",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "Rashmin Sharma | Software Developer, Nepal",
+    template: "%s | Rashmin Sharma",
+  },
+  description:
+    "Portfolio of Rashmin Sharma, a software developer in Nepal: projects, experiments, roadmap and notes.",
 };
 
 export default function RootLayout({ children }) {

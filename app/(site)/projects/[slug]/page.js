@@ -1,21 +1,29 @@
 import { projects } from "@/data/projects";
+import { buildMetadata } from "@/lib/seo";
+
+export async function generateStaticParams() {
+  return projects.filter((p) => p.published).map((p) => ({ slug: p.slug }));
+}
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const project = projects.find((p) => p.slug === slug && p.published);
 
   if (!project) {
-    return {
-      title: "Project In Progress | Rashmin Sharma",
+    return buildMetadata({
+      title: "Project Not Found",
       description: "Project details are in progress.",
-      robots: { index: false },
-    };
+      path: `/projects/${slug}`,
+      noindex: true,
+    });
   }
 
-  return {
-    title: `${project.title} | Rashmin Sharma`,
+  return buildMetadata({
+    title: project.title,
     description: project.description || "Project details",
-  };
+    path: `/projects/${slug}`,
+    noindex: false,
+  });
 }
 
 export default async function ProjectDetailPage({ params }) {

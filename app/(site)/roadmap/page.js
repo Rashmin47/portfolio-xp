@@ -1,12 +1,14 @@
 import { roadmap } from "@/data/roadmap";
+import { buildMetadata } from "@/lib/seo";
 
 const publishedRoadmap = roadmap.filter((item) => item.published);
 
-export const metadata = {
-  title: "Roadmap | Rashmin Sharma",
+export const metadata = buildMetadata({
+  title: "Roadmap",
   description: "Now, next, and later roadmap for Rashmin Sharma.",
-  ...(publishedRoadmap.length === 0 ? { robots: { index: false } } : {}),
-};
+  path: "/roadmap",
+  noindex: publishedRoadmap.length === 0,
+});
 
 export default function RoadmapPage() {
   return (

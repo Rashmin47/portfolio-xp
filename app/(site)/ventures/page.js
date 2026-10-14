@@ -1,12 +1,14 @@
 import { ventures } from "@/data/ventures";
+import { buildMetadata } from "@/lib/seo";
 
 const publishedVentures = ventures.filter((item) => item.published);
 
-export const metadata = {
-  title: "Ventures | Rashmin Sharma",
+export const metadata = buildMetadata({
+  title: "Ventures",
   description: "Venture initiatives and products by Rashmin Sharma.",
-  ...(publishedVentures.length === 0 ? { robots: { index: false } } : {}),
-};
+  path: "/ventures",
+  noindex: publishedVentures.length === 0,
+});
 
 export default function VenturesPage() {
   return (

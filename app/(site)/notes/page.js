@@ -1,13 +1,15 @@
 import Link from "next/link";
 import { notes } from "@/data/notes";
+import { buildMetadata } from "@/lib/seo";
 
 const publishedNotes = notes.filter((item) => item.published);
 
-export const metadata = {
-  title: "Notes | Rashmin Sharma",
+export const metadata = buildMetadata({
+  title: "Notes",
   description: "Technical notes, learnings, and writeups by Rashmin Sharma.",
-  ...(publishedNotes.length === 0 ? { robots: { index: false } } : {}),
-};
+  path: "/notes",
+  noindex: publishedNotes.length === 0,
+});
 
 export default function NotesPage() {
   return (
