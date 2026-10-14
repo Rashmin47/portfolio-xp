@@ -1,35 +1,98 @@
 import { ventures } from "@/data/ventures";
 import { buildMetadata } from "@/lib/seo";
+import { visibleItems } from "@/lib/content";
+import SectionHeader from "@/components/ui/SectionHeader";
+import SpecTable, { SpecRow } from "@/components/ui/SpecTable";
+import DummyBadge from "@/components/ui/DummyBadge";
 
-const publishedVentures = ventures.filter((item) => item.published);
-
-export const metadata = buildMetadata({
-  title: "Ventures",
-  description: "Venture initiatives and products by Rashmin Sharma.",
-  path: "/ventures",
-  noindex: publishedVentures.length === 0,
-});
+export async function generateMetadata() {
+  const publishedVentures = visibleItems(ventures);
+  return buildMetadata({
+    title: "Ventures",
+    description: "Venture initiatives, product explorations, and companies in progress by Rashmin Sharma.",
+    path: "/ventures",
+    noindex: publishedVentures.length === 0,
+  });
+}
 
 export default function VenturesPage() {
+  const publishedVentures = visibleItems(ventures);
+
   return (
-    <section>
-      <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-6">
-        Ventures
-      </h1>
-      {publishedVentures.length === 0 ? (
-        <p className="text-muted">
-          In progress. Venture information is currently being documented.
+    <div className="w-full">
+      <SectionHeader number="01" label="VENTURES" />
+
+      <div className="mb-12">
+        <h1 className="text-3xl sm:text-4xl font-display font-bold tracking-tight text-ink dark:text-paper mb-3">
+          Ventures &amp; Initiatives
+        </h1>
+        <p className="text-muted text-base sm:text-lg max-w-2xl leading-relaxed">
+          Companies, independent products, and business experiments in progress.
         </p>
+      </div>
+
+      {publishedVentures.length === 0 ? (
+        <div className="py-12 border-t border-ink/10 dark:border-paper/10">
+          <p className="font-mono text-xs uppercase tracking-wider text-muted">
+            In progress · Venture information and case studies are currently being documented.
+          </p>
+        </div>
       ) : (
-        <div className="space-y-6">
-          {publishedVentures.map((item) => (
-            <article key={item.id} className="p-4 rounded-card border border-ink/10 dark:border-paper/10">
-              <h2 className="text-xl font-semibold mb-2">{item.title}</h2>
-              <p className="text-muted">{item.description}</p>
-            </article>
-          ))}
+        <div className="space-y-12">
+          {publishedVentures.map((venture) => {
+            const name = venture.name || venture.title;
+            return (
+              <article
+                key={venture.id}
+                className="border-t border-ink/10 dark:border-paper/10 pt-6"
+              >
+                <div className="flex items-center gap-3 flex-wrap mb-3">
+                  <h2 className="text-2xl font-display font-bold text-ink dark:text-paper">
+                    {name}
+                  </h2>
+                  {venture.dummy && <DummyBadge />}
+                </div>
+
+                {venture.problem && (
+                  <p className="text-base sm:text-lg text-ink/90 dark:text-paper/90 leading-relaxed mb-6 max-w-3xl">
+                    {venture.problem}
+                  </p>
+                )}
+
+                <div className="max-w-xl">
+                  <SpecTable>
+                    {venture.role && (
+                      <SpecRow label="MY ROLE" value={venture.role} />
+                    )}
+                    {venture.stage && (
+                      <SpecRow label="STAGE" value={venture.stage} />
+                    )}
+                    {venture.status && (
+                      <SpecRow label="STATUS" value={venture.status} />
+                    )}
+                    {venture.url && (
+                      <SpecRow
+                        label="LINK"
+                        value={
+                          <a
+                            href={venture.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-cobalt dark:text-sky hover:underline inline-flex items-center gap-1"
+                          >
+                            <span>Visit website</span>
+                            <span aria-hidden="true">↗</span>
+                          </a>
+                        }
+                      />
+                    )}
+                  </SpecTable>
+                </div>
+              </article>
+            );
+          })}
         </div>
       )}
-    </section>
+    </div>
   );
 }
