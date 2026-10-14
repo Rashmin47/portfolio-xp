@@ -13,11 +13,13 @@ import {
   DummyBadge,
 } from "@/components/ui";
 import CurrentlyTable from "@/components/home/CurrentlyTable";
+import Link from "next/link";
 
 export const metadata = buildMetadata({
-  title: siteConfig.name,
+  title: "Classic View",
   description: siteConfig.hero.support,
-  path: "/",
+  path: "/home",
+  noindex: true,
 });
 
 function formatRelativeDate(dateStr) {
@@ -74,19 +76,12 @@ async function getLatestCommit() {
 export default async function HomePage() {
   const latestCommit = await getLatestCommit();
 
-  // 01 Shipped (up to 3 via visibleItems)
   const publishedProjects = visibleItems(projects).slice(0, 3);
-
-  // 02 Building now
   const buildingItems = siteConfig.building || [];
-
-  // 03 Next (roadmap items categorized as now / next / later)
   const publishedRoadmap = (roadmap || []).filter((r) => r.published);
   const nowRoadmap = publishedRoadmap.filter((r) => r.status === "now");
   const nextRoadmap = publishedRoadmap.filter((r) => r.status === "next");
   const laterRoadmap = publishedRoadmap.filter((r) => r.status === "later");
-
-  // 04 Notes (latest 2)
   const publishedNotes = (notes || []).filter((n) => n.published).slice(0, 2);
 
   const personSchema = {
@@ -102,10 +97,22 @@ export default async function HomePage() {
     <div className="w-full">
       <JsonLd data={personSchema} />
 
-      {/* Hero: 12 columns, left-aligned */}
+      {/* Banner: link back to 3D experience */}
+      <div className="mb-8 p-3 rounded-card border border-cobalt/20 bg-cobalt/5 flex items-center justify-between gap-4">
+        <span className="text-sm text-muted font-mono">
+          You&apos;re in classic view.
+        </span>
+        <Link
+          href="/"
+          className="text-sm font-mono text-cobalt dark:text-sky hover:underline"
+        >
+          ← Enter the Workshop (3D)
+        </Link>
+      </div>
+
+      {/* Hero */}
       <section className="py-12 sm:py-20 lg:py-28 border-b border-ink/10 dark:border-paper/10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-start">
-          {/* Main Hero Column (approx 8-9 cols) */}
           <div className="lg:col-span-8">
             <h1 className="font-mono text-xs uppercase tracking-wider text-muted mb-4 block">
               {siteConfig.hero.h1}
@@ -129,8 +136,6 @@ export default async function HomePage() {
               ))}
             </div>
           </div>
-
-          {/* Beside/Below: "Currently" SpecTable (approx 4 cols) */}
           <div className="lg:col-span-4 lg:pt-8">
             <CurrentlyTable
               latestCommit={latestCommit}
@@ -162,9 +167,7 @@ export default async function HomePage() {
             ))}
           </div>
           <div className="mt-6">
-            <TextLink href="/projects">
-              View all shipped projects →
-            </TextLink>
+            <TextLink href="/projects">View all shipped projects →</TextLink>
           </div>
         </section>
       )}
@@ -189,93 +192,44 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* 03 Next (roadmap as compact Now / Next / Later columns) */}
+      {/* 03 Next */}
       {publishedRoadmap.length > 0 && (
         <section className="mt-16 sm:mt-24">
           <SectionHeader number="03" label="NEXT" />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Column: Now */}
-            <div className="space-y-3">
-              <span className="font-mono text-xs uppercase tracking-wider text-muted block border-b border-ink/10 dark:border-paper/10 pb-2">
-                NOW
-              </span>
-              {nowRoadmap.length > 0 ? (
-                <div className="space-y-3">
-                  {nowRoadmap.map((item) => (
-                    <div
-                      key={item.id}
-                      className="p-3.5 rounded-[14px] border border-ink/10 dark:border-paper/10 bg-ink/[0.02] dark:bg-paper/[0.02]"
-                    >
-                      <h4 className="font-display font-medium text-sm text-ink dark:text-paper mb-1">
-                        {item.title}
-                      </h4>
-                      <p className="text-xs text-muted leading-relaxed">
-                        {item.description}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="font-mono text-xs text-muted">No active items</p>
-              )}
-            </div>
-
-            {/* Column: Next */}
-            <div className="space-y-3">
-              <span className="font-mono text-xs uppercase tracking-wider text-muted block border-b border-ink/10 dark:border-paper/10 pb-2">
-                NEXT
-              </span>
-              {nextRoadmap.length > 0 ? (
-                <div className="space-y-3">
-                  {nextRoadmap.map((item) => (
-                    <div
-                      key={item.id}
-                      className="p-3.5 rounded-[14px] border border-ink/10 dark:border-paper/10 bg-ink/[0.02] dark:bg-paper/[0.02]"
-                    >
-                      <h4 className="font-display font-medium text-sm text-ink dark:text-paper mb-1">
-                        {item.title}
-                      </h4>
-                      <p className="text-xs text-muted leading-relaxed">
-                        {item.description}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="font-mono text-xs text-muted">Queued next</p>
-              )}
-            </div>
-
-            {/* Column: Later */}
-            <div className="space-y-3">
-              <span className="font-mono text-xs uppercase tracking-wider text-muted block border-b border-ink/10 dark:border-paper/10 pb-2">
-                LATER
-              </span>
-              {laterRoadmap.length > 0 ? (
-                <div className="space-y-3">
-                  {laterRoadmap.map((item) => (
-                    <div
-                      key={item.id}
-                      className="p-3.5 rounded-[14px] border border-ink/10 dark:border-paper/10 bg-ink/[0.02] dark:bg-paper/[0.02]"
-                    >
-                      <h4 className="font-display font-medium text-sm text-ink dark:text-paper mb-1">
-                        {item.title}
-                      </h4>
-                      <p className="text-xs text-muted leading-relaxed">
-                        {item.description}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="font-mono text-xs text-muted">Future exploratory</p>
-              )}
-            </div>
+            {[
+              { label: "NOW", items: nowRoadmap, empty: "No active items" },
+              { label: "NEXT", items: nextRoadmap, empty: "Queued next" },
+              { label: "LATER", items: laterRoadmap, empty: "Future exploratory" },
+            ].map(({ label, items, empty }) => (
+              <div key={label} className="space-y-3">
+                <span className="font-mono text-xs uppercase tracking-wider text-muted block border-b border-ink/10 dark:border-paper/10 pb-2">
+                  {label}
+                </span>
+                {items.length > 0 ? (
+                  <div className="space-y-3">
+                    {items.map((item) => (
+                      <div
+                        key={item.id}
+                        className="p-3.5 rounded-[14px] border border-ink/10 dark:border-paper/10 bg-ink/[0.02] dark:bg-paper/[0.02]"
+                      >
+                        <h4 className="font-display font-medium text-sm text-ink dark:text-paper mb-1">
+                          {item.title}
+                        </h4>
+                        <p className="text-xs text-muted leading-relaxed">
+                          {item.description}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="font-mono text-xs text-muted">{empty}</p>
+                )}
+              </div>
+            ))}
           </div>
           <div className="mt-6">
-            <TextLink href="/roadmap">
-              Full roadmap →
-            </TextLink>
+            <TextLink href="/roadmap">Full roadmap →</TextLink>
           </div>
         </section>
       )}
@@ -296,14 +250,12 @@ export default async function HomePage() {
             ))}
           </div>
           <div className="mt-6">
-            <TextLink href="/notes">
-              All notes →
-            </TextLink>
+            <TextLink href="/notes">All notes →</TextLink>
           </div>
         </section>
       )}
 
-      {/* 05 Closing block */}
+      {/* 05 Closing */}
       <section className="mt-16 sm:mt-24 pt-8">
         <SectionHeader number="05" label="CLOSING" />
         <div className="max-w-2xl">
