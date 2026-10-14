@@ -8,7 +8,8 @@ Concept: **The Workshop**, a 3D desk where each object is a module. Full spec: `
 - Every 3D hotspot links to a real page (`/projects`, `/lab`, `/roadmap`, `/notes`, `/contact`, `/ventures`, `/about`).
 - Always provide a visible "Classic view" fast lane. Auto-fallback to classic on reduced motion, data saver, low memory or no WebGL.
 - 3D code (three, @react-three/fiber, drei) is loaded with `dynamic(() => import(...), { ssr: false })` and only after the user enters the Workshop. It must never enter the homepage's initial bundle.
-- No new dependency without asking. Prefer plain CSS and React. No animation library unless approved.
+- Stack: Next.js App Router, JavaScript (.js/.jsx), Tailwind v4 with tokens in `@theme` (globals.css). No new dependency without asking. `motion` is approved for UI transitions only (LazyMotion + `m`, MotionConfig reducedMotion="user").
+- Content (projects, roadmap, notes, ventures) lives in `data/*.js`; pages and 3D hotspots both read from it.
 - Never print, log or commit secret values. Env vars: reference names only.
 - No placeholder content, lorem ipsum, fake dashboards or invented facts. Unknown facts stay marked `[verify]`.
 

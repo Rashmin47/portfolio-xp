@@ -32,7 +32,7 @@ const Footer = ({ isDarkMode }) => {
           <li>
             <Link
               target="_blank"
-              href="https://github.https://www.linkedin.com/in/rashmin-sharma-656bb332a/"
+              href="https://www.linkedin.com/in/rashmin-sharma-656bb332a/"
             >
               LinkedIn
             </Link>
