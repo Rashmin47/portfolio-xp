@@ -3,15 +3,34 @@
 import { useState } from "react";
 
 export default function ContactForm() {
-  const [result, setResult] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [status, setStatus] = useState({
+    type: "idle", // "idle" | "loading" | "success" | "error"
+    message: "",
+  });
 
   const onSubmit = async (event) => {
     event.preventDefault();
-    setIsSubmitting(true);
-    setResult("Sending...");
-    const formData = new FormData(event.target);
-    formData.append("access_key", process.env.WEB3ACCESSKEY);
+
+    const accessKey = process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY;
+    if (!accessKey) {
+      setStatus({
+        type: "error",
+        message:
+          "The contact form is currently unconfigured. Please connect via LinkedIn or GitHub instead.",
+      });
+      return;
+    }
+
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+
+    // Bot honeypot check
+    if (formData.get("botcheck")) {
+      return;
+    }
+
+    setStatus({ type: "loading", message: "Sending your message..." });
+    formData.append("access_key", accessKey);
 
     try {
       const response = await fetch("https://api.web3forms.com/submit", {
@@ -21,63 +40,97 @@ export default function ContactForm() {
 
       const data = await response.json();
       if (data.success) {
-        setResult("Form Submitted Successfully!");
-        event.target.reset();
+        setStatus({
+          type: "success",
+          message: "Thank you! Your message has been sent successfully.",
+        });
+        form.reset();
       } else {
-        console.log("Error", data);
-        setResult(data.message || "An error occurred.");
+        setStatus({
+          type: "error",
+          message: data.message || "Failed to send message. Please try again.",
+        });
       }
-    } catch (error) {
-      console.error("Submission failed", error);
-      setResult("Submission failed. Please try again.");
-    } finally {
-      setIsSubmitting(false);
+    } catch {
+      setStatus({
+        type: "error",
+        message:
+          "Network error while sending message. Please try again or reach out directly.",
+      });
     }
   };
 
+  const isSubmitting = status.type === "loading";
+
   return (
     <form onSubmit={onSubmit} className="space-y-6">
+      {/* Honeypot field for bot protection */}
+      <input
+        type="checkbox"
+        name="botcheck"
+        id="botcheck"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        className="hidden"
+        style={{ display: "none" }}
+      />
+      <label htmlFor="botcheck" className="sr-only" aria-hidden="true">
+        Do not check this box
+      </label>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label htmlFor="name" className="block text-sm font-medium mb-1">
+          <label
+            htmlFor="contact-name"
+            className="block text-sm font-medium mb-1"
+          >
             Name
           </label>
           <input
-            id="name"
+            id="contact-name"
             name="name"
             type="text"
             required
-            placeholder="Enter your name"
+            placeholder="Your name"
             className="w-full px-4 py-2 rounded-lg border border-ink/20 dark:border-paper/20 bg-paper dark:bg-night-surface text-ink dark:text-paper focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
           />
         </div>
         <div>
-          <label htmlFor="email" className="block text-sm font-medium mb-1">
+          <label
+            htmlFor="contact-email"
+            className="block text-sm font-medium mb-1"
+          >
             Email
           </label>
           <input
-            id="email"
+            id="contact-email"
             name="email"
             type="email"
             required
-            placeholder="Enter your email"
+            placeholder="you@example.com"
             className="w-full px-4 py-2 rounded-lg border border-ink/20 dark:border-paper/20 bg-paper dark:bg-night-surface text-ink dark:text-paper focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
           />
         </div>
       </div>
+
       <div>
-        <label htmlFor="message" className="block text-sm font-medium mb-1">
+        <label
+          htmlFor="contact-message"
+          className="block text-sm font-medium mb-1"
+        >
           Message
         </label>
         <textarea
-          id="message"
+          id="contact-message"
           name="message"
           rows={5}
           required
-          placeholder="Enter your message"
+          placeholder="What would you like to discuss?"
           className="w-full px-4 py-2 rounded-lg border border-ink/20 dark:border-paper/20 bg-paper dark:bg-night-surface text-ink dark:text-paper focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
         />
       </div>
+
       <div>
         <button
           type="submit"
@@ -87,7 +140,22 @@ export default function ContactForm() {
           {isSubmitting ? "Sending..." : "Send Message"}
         </button>
       </div>
-      {result && <p className="text-sm font-medium mt-2">{result}</p>}
+
+      <div aria-live="polite" role="status">
+        {status.message && (
+          <div
+            className={`p-3 rounded-lg text-sm font-medium ${
+              status.type === "success"
+                ? "bg-board/15 text-board border border-board/30"
+                : status.type === "error"
+                ? "bg-signal text-ink border border-ink/20"
+                : "text-muted"
+            }`}
+          >
+            {status.message}
+          </div>
+        )}
+      </div>
     </form>
   );
 }
