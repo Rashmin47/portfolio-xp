@@ -36,10 +36,18 @@ export default function RootLayout({ children }) {
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${bricolage.variable} ${instrument.variable} ${jetbrains.variable} scroll-smooth`}
     >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var s=localStorage.getItem("theme");var d=s?s==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;if(d){document.documentElement.classList.add("dark")}else{document.documentElement.classList.remove("dark")}}catch(e){}})();`,
+          }}
+        />
+      </head>
       <body
-        className={`antialiased leading-8 overflow-x-hidden dark:bg-darkTheme dark:text-white`}
+        className="antialiased leading-8 overflow-x-hidden bg-paper text-ink dark:bg-night dark:text-paper"
       >
         {children}
       </body>
