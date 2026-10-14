@@ -1,15 +1,24 @@
-import { Outfit, Ovo } from "next/font/google";
+import {
+  Bricolage_Grotesque,
+  Instrument_Sans,
+  JetBrains_Mono,
+} from "next/font/google";
 import "./globals.css";
 
-const outfit = Outfit({
+const bricolage = Bricolage_Grotesque({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-outfit",
+  display: "swap",
+  variable: "--font-display",
 });
-const ovo = Ovo({
+const instrument = Instrument_Sans({
   subsets: ["latin"],
-  weight: ["400"],
-  variable: "--font-ovo",
+  display: "swap",
+  variable: "--font-body",
+});
+const jetbrains = JetBrains_Mono({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-mono",
 });
 
 export const metadata = {
@@ -19,9 +28,12 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className="scroll-smooth">
+    <html
+      lang="en"
+      className={`${bricolage.variable} ${instrument.variable} ${jetbrains.variable} scroll-smooth`}
+    >
       <body
-        className={`${outfit.variable} ${ovo.variable} antialiased leading-8 overflow-x-hidden dark:bg-darkTheme dark:text-white`}
+        className={`antialiased leading-8 overflow-x-hidden dark:bg-darkTheme dark:text-white`}
       >
         {children}
       </body>

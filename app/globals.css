@@ -1,24 +1,77 @@
 @import "tailwindcss";
 
 @variant dark (&:where(.dark, .dark *));
-html,
-body {
-  font-family: var(--font-outfit), sans-serif;
-}
-
-/* Now define a reusable Ovo class */
-.font-ovo {
-  font-family: var(--font-ovo), serif;
-}
 
 @theme {
+  /* — Colour tokens — */
+  --color-ink: #0E1726;
+  --color-paper: #F4F6FB;
+  --color-cobalt: #2F5BEA;
+  --color-sky: #62C0FF;
+  --color-signal: #F2C81F;
+  --color-board: #2EA84B;
+  --color-night: #0B1220;
+  --color-night-surface: #131D33;
+  --color-muted: #5B6578;
+
+  /* — Legacy colour tokens (used by existing components) — */
   --color-lightHover: #fcf4ff;
   --color-darkHover: #2a004a;
   --color-darkTheme: #11001f;
 
+  /* — Shadows (legacy) — */
   --shadow-black: 4px 4px 0 #000;
   --shadow-white: 4px 4px 0 #fff;
 
-  --font-family-outfit: var(--font-outfit), sans-serif;
-  --font-family-ovo: var(--font-ovo), serif;
+  /* — Spacing — */
+  --radius-card: 14px;
+
+  /* — Font families — */
+  --font-family-display: var(--font-display), system-ui, sans-serif;
+  --font-family-body: var(--font-body), system-ui, sans-serif;
+  --font-family-mono: var(--font-mono), ui-monospace, monospace;
+
+  /* — Legacy font aliases (keep existing components compiling) — */
+  --font-family-ovo: var(--font-display), system-ui, sans-serif;
+  --font-family-outfit: var(--font-body), system-ui, sans-serif;
+}
+
+/* ——— Base styles ——— */
+
+body {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-family-body);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-family-display);
+}
+
+code, kbd, samp, pre,
+[data-label], .label {
+  font-family: var(--font-family-mono);
+}
+
+/* Legacy utility (used by existing components via className="font-ovo") */
+.font-ovo {
+  font-family: var(--font-family-display);
+}
+
+/* ——— Focus ring ——— */
+
+:focus-visible {
+  outline: 3px solid var(--color-signal);
+  outline-offset: 2px;
+}
+
+/* ——— Reduced motion ——— */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
