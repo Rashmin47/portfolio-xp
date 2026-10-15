@@ -72,9 +72,9 @@ export default function ContactForm() {
   const isSubmitting = status.type === "loading";
 
   const labelClass =
-    "w-20 shrink-0 font-mono text-[11px] uppercase tracking-wider font-bold text-paper/70";
+    "w-20 shrink-0 font-mono text-[11px] uppercase tracking-wider font-bold text-chrome-text/70";
   const fieldClass =
-    "min-w-0 flex-1 bg-paper/5 border border-paper/10 rounded-md px-3 py-2 text-paper placeholder:text-paper/35 focus:outline-none focus:border-signal focus:ring-1 focus:ring-signal transition-colors";
+    "min-w-0 flex-1 bg-chrome-text/5 border border-chrome-text/10 rounded-md px-3 py-2 text-chrome-text placeholder:text-chrome-text/35 focus:outline-none focus:border-focus-ring focus:ring-1 focus:ring-focus-ring transition-colors";
 
   return (
     <form onSubmit={onSubmit} className="font-mono text-xs">
@@ -91,10 +91,10 @@ export default function ContactForm() {
       />
 
       {/* ── Compose header: one labelled row per field ─────────────────── */}
-      <div className="divide-y divide-paper/10 border-y border-paper/10">
+      <div className="divide-y divide-chrome-text/10 border-y border-chrome-text/10">
         <div className="flex items-center gap-3 py-3">
           <span className={labelClass}>To</span>
-          <span className="min-w-0 flex-1 truncate rounded-md border border-sky/25 bg-sky/10 px-3 py-2 font-medium text-sky">
+          <span className="min-w-0 flex-1 truncate rounded-md border border-sky/25 bg-sky/10 px-3 py-2 font-medium text-accent-sky">
             {siteConfig.name} &lt;rashminsharma47@gmail.com&gt;
           </span>
         </div>
@@ -153,7 +153,7 @@ export default function ContactForm() {
           required
           rows={8}
           placeholder="Write your message here..."
-          className="min-h-[220px] w-full resize-y rounded-lg border border-paper/10 bg-paper/5 p-4 text-sm leading-relaxed text-paper placeholder:text-paper/35 focus:outline-none focus:border-signal focus:ring-1 focus:ring-signal"
+          className="min-h-[220px] w-full resize-y rounded-lg border border-chrome-text/10 bg-chrome-text/5 p-4 text-sm leading-relaxed text-chrome-text placeholder:text-chrome-text/35 focus:outline-none focus:border-focus-ring focus:ring-1 focus:ring-focus-ring"
         />
       </div>
 
@@ -161,12 +161,12 @@ export default function ContactForm() {
       {status.message && (
         <div
           role="status"
-          className={`mt-4 rounded-lg border p-3 text-xs leading-relaxed text-paper ${
+          className={`mt-4 rounded-lg border p-3 text-xs leading-relaxed text-chrome-text ${
             status.type === "success"
               ? "border-board/40 bg-board/15"
               : status.type === "error"
               ? "border-red-500/40 bg-red-500/15"
-              : "border-paper/15 bg-paper/10"
+              : "border-chrome-text/15 bg-chrome-text/10"
           }`}
         >
           {status.message}
@@ -174,8 +174,8 @@ export default function ContactForm() {
       )}
 
       {/* ── Action Bar ──────────────────────────────────────────────────── */}
-      <div className="mt-4 flex flex-col gap-3 border-t border-paper/10 pt-4 sm:flex-row sm:items-center sm:justify-between">
-        <span className="text-[11px] text-paper/60">
+      <div className="mt-4 flex flex-col gap-3 border-t border-chrome-text/10 pt-4 sm:flex-row sm:items-center sm:justify-between">
+        <span className="text-[11px] text-chrome-text/60">
           Sent directly to Rashmin&apos;s inbox.
         </span>
 

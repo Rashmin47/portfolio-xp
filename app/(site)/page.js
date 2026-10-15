@@ -110,7 +110,7 @@ export default async function HomePage() {
         {publishedProjects.length > 0 && (
           <section>
             <SectionHeader number="01" label="PROJECTS" />
-            <div className="border-t border-paper/10">
+            <div className="border-t border-chrome-text/10">
               {publishedProjects.map((project, idx) => (
                 <IndexRow
                   key={project.slug}
@@ -136,14 +136,14 @@ export default async function HomePage() {
         {buildingItems.length > 0 && (
           <section>
             <SectionHeader number="02" label="BUILDING NOW" />
-            <ul className="divide-y divide-paper/10 border-y border-paper/10">
+            <ul className="divide-y divide-chrome-text/10 border-y border-chrome-text/10">
               {buildingItems.map((item, idx) => (
                 <li key={idx} className="py-3 flex items-start gap-3">
                   <span
                     className="inline-block w-2 h-2 rounded-full bg-board mt-2 shrink-0"
                     aria-hidden="true"
                   />
-                  <span className="text-sm text-paper font-medium">{item}</span>
+                  <span className="text-sm text-chrome-text font-medium">{item}</span>
                 </li>
               ))}
             </ul>
@@ -161,7 +161,7 @@ export default async function HomePage() {
                 { label: "LATER", items: laterRoadmap, empty: "Future exploratory" },
               ].map(({ label, items, empty }) => (
                 <div key={label} className="space-y-2">
-                  <span className="font-mono text-xs uppercase tracking-wider text-muted block border-b border-paper/10 pb-2">
+                  <span className="font-mono text-xs uppercase tracking-wider text-muted block border-b border-chrome-text/10 pb-2">
                     {label}
                   </span>
                   {items.length > 0 ? (
@@ -169,9 +169,9 @@ export default async function HomePage() {
                       {items.map((item) => (
                         <div
                           key={item.id}
-                          className="p-3 rounded-[14px] border border-paper/10 bg-paper/[0.03]"
+                          className="p-3 rounded-[14px] border border-chrome-text/10 bg-chrome-text/[0.03]"
                         >
-                          <h4 className="font-display font-medium text-sm text-paper mb-1">
+                          <h4 className="font-display font-medium text-sm text-chrome-text mb-1">
                             {item.title}
                           </h4>
                           <p className="text-xs text-muted leading-relaxed">
@@ -196,7 +196,7 @@ export default async function HomePage() {
         {publishedNotes.length > 0 && (
           <section>
             <SectionHeader number="04" label="NOTES" />
-            <div className="border-t border-paper/10">
+            <div className="border-t border-chrome-text/10">
               {publishedNotes.map((note, idx) => (
                 <IndexRow
                   key={note.slug}
@@ -214,10 +214,10 @@ export default async function HomePage() {
         )}
 
         {/* 05 Closing */}
-        <section className="pt-4 border-t border-paper/10">
+        <section className="pt-4 border-t border-chrome-text/10">
           <SectionHeader number="05" label="CLOSING" />
           <div className="max-w-lg">
-            <p className="text-xl sm:text-2xl font-display font-bold text-paper leading-tight mb-6">
+            <p className="text-xl sm:text-2xl font-display font-bold text-chrome-text leading-tight mb-6">
               Let&apos;s build something that matters.
             </p>
             <div className="flex flex-wrap items-center gap-3">

@@ -31,7 +31,7 @@ export default function ContactPage() {
           </div>
 
           <div className="space-y-3">
-            <span className="font-mono text-[11px] uppercase tracking-wider text-paper/70 block font-semibold">
+            <span className="font-mono text-[11px] uppercase tracking-wider text-chrome-text/70 block font-semibold">
               Direct networks
             </span>
             <div className="flex flex-col sm:flex-row gap-3">

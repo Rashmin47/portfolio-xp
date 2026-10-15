@@ -32,7 +32,7 @@ export default function HotspotBeacons({ hotspots, beaconRefs, onHover, onSelect
           aria-label={`${hotspot.label} — open details`}
           aria-haspopup="dialog"
           data-beacon={hotspot.id}
-          className="group absolute top-0 left-0 flex h-11 w-11 items-center justify-center rounded-full opacity-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-signal/70"
+          className="group absolute top-0 left-0 flex h-11 w-11 items-center justify-center rounded-full opacity-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring/70"
           style={{
             pointerEvents: "auto",
             // Parked off-screen until the projector positions it
@@ -61,7 +61,7 @@ export default function HotspotBeacons({ hotspots, beaconRefs, onHover, onSelect
           {/* Label chip */}
           <span
             aria-hidden="true"
-            className="pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-1/2 whitespace-nowrap rounded-md border border-paper/15 bg-night-surface/95 px-2 py-1 font-mono text-[10px] font-semibold tracking-wide text-paper opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100 group-active:opacity-100"
+            className="pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-1/2 whitespace-nowrap rounded-md border border-chrome-text/15 bg-chrome px-2 py-1 font-mono text-[10px] font-semibold tracking-wide text-chrome-text opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100 group-active:opacity-100"
           >
             {hotspot.label}
           </span>

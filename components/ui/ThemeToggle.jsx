@@ -39,12 +39,12 @@ export default function ThemeToggle({ className = "" }) {
             : "Switch to dark theme"
           : "Toggle theme"
       }
-      className={`font-mono text-xs uppercase tracking-wider px-2.5 py-1.5 rounded-[14px] border border-ink/15 dark:border-paper/15 text-muted hover:text-ink dark:hover:text-paper hover:bg-ink/[0.04] dark:hover:bg-paper/[0.04] transition-colors focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-signal select-none cursor-pointer flex items-center gap-1.5 ${className}`}
+      className={`font-mono text-xs uppercase tracking-wider px-2.5 py-1.5 rounded-[14px] border border-ink/15 dark:border-paper/15 text-muted hover:text-ink dark:hover:text-paper hover:bg-ink/[0.04] dark:hover:bg-paper/[0.04] transition-colors focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-focus-ring select-none cursor-pointer flex items-center gap-1.5 ${className}`}
     >
       <span
         aria-hidden="true"
         className={`w-2 h-2 rounded-full transition-colors ${
-          mounted && isDark ? "bg-sky" : "bg-signal"
+          mounted && isDark ? "bg-accent-sky" : "bg-accent-signal"
         }`}
       />
       <span>{mounted ? (isDark ? "DARK" : "LIGHT") : "THEME"}</span>

@@ -36,6 +36,51 @@
   --font-family-outfit: var(--font-body), system-ui, sans-serif;
 }
 
+/* ——— Interface (chrome) tokens ———
+   Only the macOS shell + UI surfaces use these; the 3D workshop keeps its own
+   palette. Light values are the base, `html.dark` overrides below.
+   `static` keeps every variable in the output even when only referenced from
+   plain CSS (e.g. the spot-card arrow). */
+
+@theme static {
+  /* Window body, title bar, toolbars, dock, canvas behind the document sheet */
+  --color-chrome:        rgb(255 255 255 / 0.96);
+  --color-chrome-bar:    rgb(243 245 250 / 0.94);
+  --color-chrome-canvas: #FFFFFF;
+  --color-chrome-inset:  #E9EDF6;
+  --color-chrome-dock:   rgb(255 255 255 / 0.90);
+
+  /* Chrome text: fill/border/divide use opacity modifiers on this token */
+  --color-chrome-text: #0E1726;
+
+  /* Accent TEXT colours, tuned per theme for AA contrast */
+  --color-accent-sky:    #1A5FBF;
+  --color-accent-signal: #7F6100;
+  --color-accent-board:  #1B7A36;
+
+  /* Focus ring */
+  --color-focus-ring: #1F52D8;
+}
+
+html.dark {
+  --color-chrome:        rgb(15 23 42 / 0.94);
+  --color-chrome-bar:    rgb(19 29 51 / 0.90);
+  --color-chrome-canvas: rgb(19 29 51 / 0.95);
+  --color-chrome-inset:  rgb(15 23 42 / 0.80);
+  --color-chrome-dock:   rgb(15 23 42 / 0.85);
+
+  --color-chrome-text: #F4F6FB;
+
+  --color-accent-sky:    #62C0FF;
+  --color-accent-signal: #F2C81F;
+  --color-accent-board:  #3FBE63;
+
+  --color-focus-ring: #F2C81F;
+
+  /* Secondary page text on dark surfaces (AA: 6.5:1 on night-surface) */
+  --color-muted: #98A2B6;
+}
+
 /* ——— Base styles ———
    These live in @layer base on purpose: unlayered rules beat every Tailwind
    utility, which made the fluid h1/h2/h3 sizes override the explicit
@@ -93,8 +138,18 @@
 /* ——— Focus ring ——— */
 
 :focus-visible {
-  outline: 3px solid var(--color-signal);
+  outline: 3px solid var(--color-focus-ring);
   outline-offset: 2px;
+}
+
+/* ——— Theme-aware native UI (scrollbars, inputs, autofill) ——— */
+
+:root {
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
 }
 
 /* ——— Reduced motion ——— */
@@ -176,21 +231,21 @@
   top: var(--arrow);
   width: 11px;
   height: 11px;
-  background: rgba(15, 23, 42, 0.96);
+  background: var(--color-chrome);
   pointer-events: none;
 }
 
 .spot-card[data-arrow][data-side="right"]::after {
   left: -6px;
-  border-left: 1px solid rgba(255, 255, 255, 0.15);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  border-left: 1px solid color-mix(in srgb, var(--color-chrome-text) 15%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-chrome-text) 15%, transparent);
   transform: rotate(45deg);
 }
 
 .spot-card[data-arrow][data-side="left"]::after {
   right: -6px;
-  border-right: 1px solid rgba(255, 255, 255, 0.15);
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  border-right: 1px solid color-mix(in srgb, var(--color-chrome-text) 15%, transparent);
+  border-top: 1px solid color-mix(in srgb, var(--color-chrome-text) 15%, transparent);
   transform: rotate(45deg);
 }
 

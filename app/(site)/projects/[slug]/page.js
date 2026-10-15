@@ -256,7 +256,7 @@ export default async function ProjectDetailPage({ params }) {
                     <div className="grid grid-cols-1 @3xl:grid-cols-3 gap-4">
                       {/* Chose */}
                       <div className="p-3.5 rounded-[10px] bg-board/10 border border-board/20">
-                        <span className="font-mono text-[11px] uppercase tracking-wider text-board font-bold block mb-1.5">
+                        <span className="font-mono text-[11px] uppercase tracking-wider text-accent-board font-bold block mb-1.5">
                           CHOSE
                         </span>
                         <p className="text-sm text-ink dark:text-paper font-sans leading-relaxed">

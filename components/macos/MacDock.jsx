@@ -37,21 +37,23 @@ export default function MacDock({ onOpenAI, onOpenTerminal }) {
       aria-label="Application dock"
     >
       <div
-        className="flex flex-wrap items-end justify-center gap-1 sm:gap-2 px-2 py-1.5 sm:px-3 sm:py-2 rounded-2xl border border-paper/15 shadow-2xl backdrop-blur-xl"
+        className="flex flex-wrap items-end justify-center gap-1 sm:gap-2 px-2 py-1.5 sm:px-3 sm:py-2 rounded-2xl border border-chrome-text/15 bg-chrome-dock shadow-2xl backdrop-blur-xl"
         style={{
-          background: "rgba(15, 23, 42, 0.85)",
-          boxShadow: "0 20px 40px -10px rgba(0,0,0,0.7), inset 0 1px 0 0 rgba(255,255,255,0.1)",
+          boxShadow:
+            "0 20px 40px -10px rgba(0,0,0,0.7), inset 0 1px 0 0 rgba(255,255,255,0.1)",
         }}
       >
         {DOCK_APPS.map((app) => {
-          const tone = app.active ? "text-signal" : "text-paper/70 hover:text-paper";
+          const tone = app.active
+            ? "text-accent-signal"
+            : "text-chrome-text/70 hover:text-chrome-text";
 
           return (
             <div key={app.href} className="relative group flex flex-col items-center">
               {/* Label chip */}
               <span
                 aria-hidden="true"
-                className="pointer-events-none absolute -top-8 px-2 py-0.5 rounded bg-night-surface text-paper text-[10px] font-mono whitespace-nowrap border border-paper/10 shadow-lg opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"
+                className="pointer-events-none absolute -top-8 px-2 py-0.5 rounded bg-chrome text-chrome-text text-[10px] font-mono whitespace-nowrap border border-chrome-text/10 shadow-lg opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"
               >
                 {app.label}
               </span>
@@ -63,7 +65,7 @@ export default function MacDock({ onOpenAI, onOpenTerminal }) {
                   onClick={onOpenTerminal}
                   title="Open Terminal"
                   aria-label={app.label}
-                  className={`${buttonBase} ${tone} ${app.active ? "bg-paper/20" : "bg-paper/5 hover:bg-paper/15"}`}
+                  className={`${buttonBase} ${tone} ${app.active ? "bg-chrome-text/20" : "bg-chrome-text/5 hover:bg-chrome-text/15"}`}
                 >
                   <DockIcon name={app.name} />
                 </button>
@@ -71,7 +73,7 @@ export default function MacDock({ onOpenAI, onOpenTerminal }) {
                 <Link
                   href={app.href}
                   aria-label={app.label}
-                  className={`${buttonBase} ${tone} ${app.active ? "bg-paper/20" : "bg-paper/5 hover:bg-paper/15"}`}
+                  className={`${buttonBase} ${tone} ${app.active ? "bg-chrome-text/20" : "bg-chrome-text/5 hover:bg-chrome-text/15"}`}
                 >
                   <DockIcon name={app.name} />
                 </Link>
@@ -80,7 +82,7 @@ export default function MacDock({ onOpenAI, onOpenTerminal }) {
               {/* Active route dot */}
               <span
                 className={`w-1 h-1 rounded-full mt-1 transition-all ${
-                  app.active ? "bg-signal" : "bg-transparent"
+                  app.active ? "bg-accent-signal" : "bg-transparent"
                 }`}
               />
             </div>
@@ -88,13 +90,13 @@ export default function MacDock({ onOpenAI, onOpenTerminal }) {
         })}
 
         {/* Separator */}
-        <div className="hidden w-px h-7 bg-paper/15 mx-1 self-center min-[380px]:block" />
+        <div className="hidden w-px h-7 bg-chrome-text/15 mx-1 self-center min-[380px]:block" />
 
         {/* Assistant */}
         <div className="relative group flex flex-col items-center">
           <span
             aria-hidden="true"
-            className="pointer-events-none absolute -top-8 px-2 py-0.5 rounded bg-night-surface text-paper text-[10px] font-mono whitespace-nowrap border border-paper/10 shadow-lg opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"
+            className="pointer-events-none absolute -top-8 px-2 py-0.5 rounded bg-chrome text-chrome-text text-[10px] font-mono whitespace-nowrap border border-chrome-text/10 shadow-lg opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"
           >
             Assistant
           </span>
@@ -104,11 +106,11 @@ export default function MacDock({ onOpenAI, onOpenTerminal }) {
             onClick={onOpenAI}
             title="Open Rashmin AI assistant"
             aria-label="Assistant"
-            className={`${buttonBase} text-sky bg-cobalt/20 hover:bg-cobalt/40 border border-cobalt/40`}
+            className={`${buttonBase} text-accent-sky bg-cobalt/20 hover:bg-cobalt/40 border border-cobalt/40`}
           >
             <DockIcon name="assistant" />
           </button>
-          <span className="w-1 h-1 rounded-full mt-1 bg-board" />
+          <span className="w-1 h-1 rounded-full mt-1 bg-accent-board" />
         </div>
       </div>
     </div>

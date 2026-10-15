@@ -11,7 +11,7 @@ export default function ProjectRow({ project, index }) {
   return (
     <Link
       href={`/projects/${project.slug}`}
-      className="group relative block py-6 border-b border-ink/10 dark:border-paper/10 transition-colors focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-signal rounded-xs"
+      className="group relative block py-6 border-b border-ink/10 dark:border-paper/10 transition-colors focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-focus-ring rounded-xs"
     >
       <div className="flex flex-col md:flex-row md:items-baseline justify-between gap-4 md:gap-8">
         {/* Left: Number, Name, Summary, Tags */}

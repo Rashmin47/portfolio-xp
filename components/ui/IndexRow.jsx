@@ -50,7 +50,7 @@ export default function IndexRow({
       return (
         <Link
           href={href}
-          className="block focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-signal rounded-xs"
+          className="block focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-focus-ring rounded-xs"
         >
           {content}
         </Link>
@@ -61,7 +61,7 @@ export default function IndexRow({
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        className="block focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-signal rounded-xs"
+        className="block focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-focus-ring rounded-xs"
       >
         {content}
       </a>

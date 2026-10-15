@@ -7,7 +7,7 @@ export default function TextLink({
   ...props
 }) {
   const baseStyles =
-    "inline-flex items-center gap-1 text-ink dark:text-paper underline underline-offset-4 decoration-ink/25 dark:decoration-paper/25 hover:decoration-signal decoration-1 hover:decoration-2 transition-all focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-signal rounded-xs";
+    "inline-flex items-center gap-1 text-ink dark:text-paper underline underline-offset-4 decoration-ink/25 dark:decoration-paper/25 hover:decoration-signal decoration-1 hover:decoration-2 transition-all focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-focus-ring rounded-xs";
 
   const combinedClass = `${baseStyles} ${className}`.trim();
 

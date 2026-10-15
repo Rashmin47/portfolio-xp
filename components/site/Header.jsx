@@ -51,7 +51,7 @@ export default function Header() {
 
       {/* ── System Menu Bar ──────────────────────────────────────────────── */}
       <header
-        className="fixed top-0 left-0 right-0 h-7 z-40 px-3 bg-night-surface/90 backdrop-blur-md border-b border-paper/10 flex items-center justify-between text-[11px] font-mono text-paper select-none pointer-events-auto"
+        className="fixed top-0 left-0 right-0 h-7 z-40 px-3 bg-chrome-bar backdrop-blur-md border-b border-chrome-text/10 flex items-center justify-between text-[11px] font-mono text-chrome-text select-none pointer-events-auto"
         style={{
           boxShadow: "0 1px 3px rgba(0, 0, 0, 0.4)",
         }}
@@ -60,11 +60,11 @@ export default function Header() {
         <div className="flex items-center gap-3">
           <Link
             href="/"
-            className="flex items-center gap-1.5 font-bold hover:text-sky transition-colors text-paper rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
+            className="flex items-center gap-1.5 font-bold hover:text-accent-sky transition-colors text-chrome-text rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
             title="Rashmin Sharma Workspace"
           >
             {/* Studio monogram (own mark, no platform glyph) */}
-            <span className="text-signal" aria-hidden="true">
+            <span className="text-accent-signal" aria-hidden="true">
               <svg
                 viewBox="0 0 24 24"
                 className="h-4 w-4"
@@ -84,14 +84,14 @@ export default function Header() {
           </Link>
 
           {/* Active Application Context */}
-          <span className="font-bold text-signal px-1.5 py-0.5 rounded bg-signal/10 border border-signal/20">
+          <span className="font-bold text-accent-signal px-1.5 py-0.5 rounded bg-signal/10 border border-signal/30">
             {activeApp}
           </span>
 
           {/* System Menus */}
           <nav
             aria-label="System Navigation"
-            className="hidden md:flex items-center gap-1 text-muted"
+            className="hidden md:flex items-center gap-1 text-chrome-text/60"
           >
             {[
               { href: "/", label: "Home" },
@@ -108,10 +108,10 @@ export default function Header() {
                   key={href}
                   href={href}
                   aria-current={active ? "page" : undefined}
-                  className={`rounded-md px-2 py-0.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal ${
+                  className={`rounded-md px-2 py-0.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring ${
                     active
-                      ? "bg-paper/10 font-semibold text-paper"
-                      : "hover:bg-paper/5 hover:text-paper"
+                      ? "bg-chrome-text/10 font-semibold text-chrome-text"
+                      : "hover:bg-chrome-text/5 hover:text-chrome-text"
                   }`}
                 >
                   {label}
@@ -122,9 +122,9 @@ export default function Header() {
         </div>
 
         {/* Right: Status Indicators & Theme */}
-        <div className="flex items-center gap-2 sm:gap-3 text-muted">
+        <div className="flex items-center gap-2 sm:gap-3 text-chrome-text/60">
           <span className="hidden sm:inline text-[10px]">Kathmandu, NP</span>
-          {timeStr && <span className="text-paper/90 text-[10px]">{timeStr} NPT</span>}
+          {timeStr && <span className="text-chrome-text/90 text-[10px]">{timeStr} NPT</span>}
           <div className="scale-75 origin-right">
             <ThemeToggle />
           </div>

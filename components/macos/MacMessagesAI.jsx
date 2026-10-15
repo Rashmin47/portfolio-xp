@@ -97,14 +97,13 @@ export default function MacMessagesAI({ isOpen, onClose }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm pointer-events-auto">
       <div
-        className="w-full max-w-lg rounded-[14px] overflow-hidden border border-paper/15 shadow-2xl flex flex-col"
+        className="w-full max-w-lg rounded-[14px] overflow-hidden border border-chrome-text/15 bg-chrome shadow-2xl flex flex-col"
         style={{
-          background: "rgba(15, 23, 42, 0.96)",
           height: "min(580px, 85vh)",
         }}
       >
         {/* Title Bar */}
-        <div className="h-11 px-4 border-b border-paper/10 flex items-center justify-between select-none bg-night-surface/90 shrink-0">
+        <div className="h-11 px-4 border-b border-chrome-text/10 flex items-center justify-between select-none bg-chrome-bar shrink-0">
           <div className="flex items-center gap-2">
             <button
               type="button"
@@ -117,15 +116,15 @@ export default function MacMessagesAI({ isOpen, onClose }) {
             <span className="w-3.5 h-3.5 rounded-full bg-[#27C93F] border border-[#1AAB29]" />
           </div>
 
-          <div className="font-mono text-xs font-semibold text-paper flex items-center gap-2">
-            <span className="text-board">●</span>
+          <div className="font-mono text-xs font-semibold text-chrome-text flex items-center gap-2">
+            <span className="text-accent-board">●</span>
             <span>Rashmin AI — Assistant</span>
           </div>
 
           <button
             type="button"
             onClick={onClose}
-            className="text-xs font-mono text-muted hover:text-paper"
+            className="text-xs font-mono text-chrome-text/60 hover:text-chrome-text"
           >
             Esc
           </button>
@@ -144,18 +143,18 @@ export default function MacMessagesAI({ isOpen, onClose }) {
                   className={`max-w-[85%] rounded-xl px-4 py-2.5 whitespace-pre-wrap leading-relaxed ${
                     isUser
                       ? "bg-cobalt text-white rounded-br-sm"
-                      : "bg-paper/10 border border-paper/10 text-paper rounded-bl-sm"
+                      : "bg-chrome-text/10 border border-chrome-text/10 text-chrome-text rounded-bl-sm"
                   }`}
                 >
                   {m.text}
                 </div>
-                <span className="text-[10px] text-muted mt-1 px-1">{m.timestamp}</span>
+                <span className="text-[10px] text-chrome-text/60 mt-1 px-1">{m.timestamp}</span>
               </div>
             );
           })}
 
           {isTyping && (
-            <div className="flex items-center gap-1.5 px-3 py-2 bg-paper/10 rounded-lg text-muted text-xs w-20">
+            <div className="flex items-center gap-1.5 px-3 py-2 bg-chrome-text/10 rounded-lg text-chrome-text/60 text-xs w-20">
               <span className="animate-bounce">●</span>
               <span className="animate-bounce [animation-delay:150ms]">●</span>
               <span className="animate-bounce [animation-delay:300ms]">●</span>
@@ -166,7 +165,7 @@ export default function MacMessagesAI({ isOpen, onClose }) {
         </div>
 
         {/* Suggestion Chips */}
-        <div className="px-4 py-2 border-t border-paper/5 bg-night-surface/50 flex flex-wrap gap-1.5 shrink-0">
+        <div className="px-4 py-2 border-t border-chrome-text/5 bg-chrome-text/[0.03] flex flex-wrap gap-1.5 shrink-0">
           {[
             "What has Rashmin built?",
             "What is his tech stack?",
@@ -177,7 +176,7 @@ export default function MacMessagesAI({ isOpen, onClose }) {
               key={prompt}
               type="button"
               onClick={() => handleSend(prompt)}
-              className="text-[11px] font-mono px-2 py-1 rounded bg-paper/5 hover:bg-paper/15 text-sky hover:text-signal transition-colors border border-paper/10"
+              className="text-[11px] font-mono px-2 py-1 rounded bg-chrome-text/5 hover:bg-chrome-text/15 text-accent-sky hover:text-accent-signal transition-colors border border-chrome-text/10"
             >
               {prompt}
             </button>
@@ -190,14 +189,14 @@ export default function MacMessagesAI({ isOpen, onClose }) {
             e.preventDefault();
             handleSend();
           }}
-          className="p-3 border-t border-paper/10 flex items-center gap-2 bg-night-surface shrink-0"
+          className="p-3 border-t border-chrome-text/10 flex items-center gap-2 bg-chrome-bar shrink-0"
         >
           <input
             type="text"
             value={inputVal}
             onChange={(e) => setInputVal(e.target.value)}
             placeholder="Ask Rashmin AI anything..."
-            className="flex-1 bg-paper/5 border border-paper/10 rounded-lg px-3 py-2 font-mono text-xs text-paper placeholder:text-muted/50 focus:outline-none focus:border-signal"
+            className="flex-1 bg-chrome-text/5 border border-chrome-text/10 rounded-lg px-3 py-2 font-mono text-xs text-chrome-text placeholder:text-chrome-text/60 focus:outline-none focus:border-focus-ring"
           />
           <button
             type="submit"

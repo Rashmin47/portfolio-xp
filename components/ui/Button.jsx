@@ -9,7 +9,7 @@ export default function Button({
   ...props
 }) {
   const baseStyles =
-    "group inline-flex items-center justify-center gap-2 font-mono text-xs sm:text-sm uppercase tracking-wider font-medium px-4 py-2.5 rounded-[14px] transition-colors focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-signal select-none cursor-pointer";
+    "group inline-flex items-center justify-center gap-2 font-mono text-xs sm:text-sm uppercase tracking-wider font-medium px-4 py-2.5 rounded-[14px] transition-colors focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-focus-ring select-none cursor-pointer";
 
   const variantStyles =
     variant === "primary"

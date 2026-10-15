@@ -45,7 +45,7 @@ export default function NotesPage() {
             <article key={note.slug} className="py-6 group">
               <Link
                 href={`/notes/${note.slug}`}
-                className="block space-y-2 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-signal rounded-xs"
+                className="block space-y-2 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-focus-ring rounded-xs"
               >
                 <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
                   <div className="flex items-center gap-3 flex-wrap">

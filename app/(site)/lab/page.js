@@ -49,7 +49,7 @@ export default function LabPage() {
                 key={item.id}
                 className="group py-6 transition-colors"
               >
-                <summary className="list-none cursor-pointer focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-signal rounded-xs select-none">
+                <summary className="list-none cursor-pointer focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-focus-ring rounded-xs select-none">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-start gap-4 sm:gap-6 min-w-0">
                       <span className="font-mono text-xl sm:text-2xl text-muted font-normal shrink-0 mt-0.5">
