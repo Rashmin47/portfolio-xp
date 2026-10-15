@@ -1,60 +1,80 @@
 "use client";
 
+import { useState, useMemo } from "react";
+import { usePathname } from "next/navigation";
+import MacWindow from "@/components/macos/MacWindow";
+import MacDock from "@/components/macos/MacDock";
+import MacMessagesAI from "@/components/macos/MacMessagesAI";
+
 /**
  * Panel
  * -----
- * Desktop: left-aligned sidebar panel, max 640px, scrollable.
- *   - solid night-surface (#131D33) at 92% opacity
- *   - 1px hairline border (ink/15)
- *   - no blur
- *   - pointer-events: auto (so the 3D scene is clickable through gaps)
- *
- * Mobile: bottom sheet occupying ~62% of viewport height.
- *   - Has a visible handle bar to collapse to a 72px peek bar.
- *   - Peek state shows the header/peek content so the user knows there's content.
- *
- * Single-render: children are rendered exactly once to preserve state,
- * unique IDs (like #main-content), and avoid DOM duplication.
+ * Route-aware macOS Desktop Shell over the persistent 3D desk:
+ *  - Dynamically configures window layout based on the current page:
+ *      /           -> Terminal (zsh)
+ *      /lab        -> Terminal (hardware/experiments)
+ *      /about      -> TextEdit (About Me.rtf)
+ *      /notes      -> TextEdit (Notes.md)
+ *      /contact    -> Mail (Compose)
+ *      /projects   -> Finder (Projects)
+ *      /experience -> Finder (Experience)
+ *      /roadmap    -> Finder (Roadmap)
+ *  - Floating macOS Dock at bottom
+ *  - Integrated AI Assistant ("Rashmin AI — Messages")
  */
-
-import { useState } from "react";
-
 export default function Panel({ children }) {
-  const [collapsed, setCollapsed] = useState(false);
+  const pathname = usePathname();
+  const [isAIOpen, setIsAIOpen] = useState(false);
+
+  // Compute macOS window metadata by route
+  const { title, appType } = useMemo(() => {
+    if (pathname === "/") {
+      return { title: "rashmin — zsh", appType: "terminal" };
+    }
+    if (pathname.startsWith("/lab")) {
+      return { title: "rashmin@studio ~/lab — zsh", appType: "terminal" };
+    }
+    if (pathname.startsWith("/about")) {
+      return { title: "About Me — TextEdit", appType: "textedit" };
+    }
+    if (pathname.startsWith("/notes")) {
+      return { title: "Notes & Thoughts — TextEdit", appType: "textedit" };
+    }
+    if (pathname.startsWith("/contact")) {
+      return { title: "New Message — Mail", appType: "mail" };
+    }
+    if (pathname.startsWith("/projects")) {
+      return { title: "Projects — Finder", appType: "finder" };
+    }
+    if (pathname.startsWith("/experience")) {
+      return { title: "Experience & Ventures — Finder", appType: "finder" };
+    }
+    if (pathname.startsWith("/roadmap")) {
+      return { title: "Roadmap — Finder", appType: "finder" };
+    }
+    return { title: "Rashmin Sharma — Portfolio", appType: "finder" };
+  }, [pathname]);
 
   return (
-    <div
-      className={`fixed z-10 flex flex-col pointer-events-none transition-all duration-300
-        /* Desktop: fixed left-aligned sidebar */
-        md:top-0 md:left-0 md:bottom-0 md:w-[min(640px,48vw)] md:h-full md:border-r md:border-paper/10
-        /* Mobile: fixed bottom sheet */
-        left-0 right-0 bottom-0 max-md:border-t max-md:border-paper/10 max-md:rounded-t-2xl
-        ${collapsed ? "max-md:h-[72px]" : "max-md:h-[62vh]"}
-      `}
-      style={{
-        background: "rgba(19, 29, 51, 0.92)",
-      }}
-    >
-      {/* Mobile handle bar to collapse/expand bottom sheet */}
-      <div className="md:hidden flex items-center justify-center py-2 px-4 border-b border-paper/10 pointer-events-auto shrink-0">
-        <button
-          type="button"
-          aria-label={collapsed ? "Expand panel" : "Collapse panel"}
-          onClick={() => setCollapsed((c) => !c)}
-          className="w-full py-1 flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-signal"
-        >
-          <span className="w-10 h-1 bg-paper/30 rounded-full" />
-        </button>
-      </div>
-
-      {/* Scrollable content container */}
-      <div
-        className={`flex-1 min-h-0 overflow-y-auto overflow-x-hidden pointer-events-auto ${
-          collapsed ? "max-md:overflow-hidden" : ""
-        }`}
+    <>
+      {/* ── macOS Application Window ────────────────────────────────────── */}
+      <MacWindow
+        title={title}
+        appType={appType}
+        path={pathname}
+        onOpenAI={() => setIsAIOpen(true)}
       >
         {children}
-      </div>
-    </div>
+      </MacWindow>
+
+      {/* ── Bottom macOS Dock ───────────────────────────────────────────── */}
+      <MacDock onOpenAI={() => setIsAIOpen(true)} />
+
+      {/* ── AI Assistant Messenger Modal ─────────────────────────────────── */}
+      <MacMessagesAI
+        isOpen={isAIOpen}
+        onClose={() => setIsAIOpen(false)}
+      />
+    </>
   );
 }

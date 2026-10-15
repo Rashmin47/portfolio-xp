@@ -5,6 +5,7 @@ import SectionHeader from "@/components/ui/SectionHeader";
 import Tag from "@/components/ui/Tag";
 import SpecTable, { SpecRow } from "@/components/ui/SpecTable";
 import DummyBadge from "@/components/ui/DummyBadge";
+import MacFinder from "@/components/macos/MacFinder";
 
 export async function generateMetadata() {
   const publishedLab = visibleItems(lab);
@@ -20,7 +21,7 @@ export default function LabPage() {
   const publishedLab = visibleItems(lab);
 
   return (
-    <div className="w-full">
+    <MacFinder sectionTitle="The Lab" currentFolder="lab" itemCount={publishedLab.length}>
       <SectionHeader number="01" label="THE LAB" />
 
       <div className="mb-12">
@@ -143,6 +144,6 @@ export default function LabPage() {
           })}
         </div>
       )}
-    </div>
+    </MacFinder>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Button from "@/components/ui/Button";
+import { siteConfig } from "@/data/site";
 
 export default function ContactForm() {
   const [status, setStatus] = useState({
@@ -14,10 +14,18 @@ export default function ContactForm() {
 
     const accessKey = process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY;
     if (!accessKey) {
+      // Graceful fallback to mailto
+      const form = event.currentTarget;
+      const formData = new FormData(form);
+      const subject = formData.get("subject") || "Hello from Portfolio";
+      const message = formData.get("message") || "";
+      const email = formData.get("email") || "";
+      window.location.href = `mailto:rashminsharma47@gmail.com?subject=${encodeURIComponent(
+        subject
+      )}&body=${encodeURIComponent(`From: ${email}\n\n${message}`)}`;
       setStatus({
-        type: "error",
-        message:
-          "The contact form is currently unconfigured. Please connect via LinkedIn or GitHub instead.",
+        type: "success",
+        message: "Opening your email client to send message...",
       });
       return;
     }
@@ -64,7 +72,7 @@ export default function ContactForm() {
   const isSubmitting = status.type === "loading";
 
   return (
-    <form onSubmit={onSubmit} className="space-y-6">
+    <form onSubmit={onSubmit} className="space-y-4 font-mono text-xs">
       {/* Bot honeypot field */}
       <input
         type="checkbox"
@@ -76,17 +84,36 @@ export default function ContactForm() {
         className="hidden"
         style={{ display: "none" }}
       />
-      <label htmlFor="botcheck" className="sr-only" aria-hidden="true">
-        Do not check this box
-      </label>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <label
-            htmlFor="contact-name"
-            className="block font-mono text-xs uppercase tracking-wider text-muted font-medium"
-          >
-            Name *
+      {/* ── macOS Mail Header Fields ────────────────────────────────────── */}
+      <div className="space-y-2 border-b border-paper/10 pb-4">
+        {/* To field */}
+        <div className="flex items-center gap-3">
+          <span className="w-16 text-muted uppercase font-bold text-[11px]">To:</span>
+          <span className="px-2.5 py-1 rounded bg-sky/15 text-sky border border-sky/20 font-medium">
+            {siteConfig.name} &lt;rashminsharma47@gmail.com&gt;
+          </span>
+        </div>
+
+        {/* From field */}
+        <div className="flex items-center gap-3">
+          <label htmlFor="contact-email" className="w-16 text-muted uppercase font-bold text-[11px]">
+            From:
+          </label>
+          <input
+            id="contact-email"
+            name="email"
+            type="email"
+            required
+            placeholder="your.email@domain.com"
+            className="flex-1 bg-paper/5 border border-paper/10 rounded px-3 py-1.5 text-paper placeholder:text-muted/50 focus:outline-none focus:border-signal"
+          />
+        </div>
+
+        {/* Name field */}
+        <div className="flex items-center gap-3">
+          <label htmlFor="contact-name" className="w-16 text-muted uppercase font-bold text-[11px]">
+            Name:
           </label>
           <input
             id="contact-name"
@@ -94,71 +121,68 @@ export default function ContactForm() {
             type="text"
             required
             placeholder="Your name"
-            className="w-full px-4 py-2.5 rounded-[14px] border border-ink/20 dark:border-paper/20 bg-paper dark:bg-night-surface text-ink dark:text-paper placeholder:text-muted/60 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-signal text-sm"
+            className="flex-1 bg-paper/5 border border-paper/10 rounded px-3 py-1.5 text-paper placeholder:text-muted/50 focus:outline-none focus:border-signal"
           />
         </div>
 
-        <div className="space-y-2">
-          <label
-            htmlFor="contact-email"
-            className="block font-mono text-xs uppercase tracking-wider text-muted font-medium"
-          >
-            Email *
+        {/* Subject field */}
+        <div className="flex items-center gap-3">
+          <label htmlFor="contact-subject" className="w-16 text-muted uppercase font-bold text-[11px]">
+            Subject:
           </label>
           <input
-            id="contact-email"
-            name="email"
-            type="email"
+            id="contact-subject"
+            name="subject"
+            type="text"
             required
-            placeholder="you@example.com"
-            className="w-full px-4 py-2.5 rounded-[14px] border border-ink/20 dark:border-paper/20 bg-paper dark:bg-night-surface text-ink dark:text-paper placeholder:text-muted/60 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-signal text-sm"
+            placeholder="Project inquiry / Collaboration / Say hello"
+            className="flex-1 bg-paper/5 border border-paper/10 rounded px-3 py-1.5 text-paper placeholder:text-muted/50 focus:outline-none focus:border-signal"
           />
         </div>
       </div>
 
-      <div className="space-y-2">
-        <label
-          htmlFor="contact-message"
-          className="block font-mono text-xs uppercase tracking-wider text-muted font-medium"
-        >
-          Message *
-        </label>
+      {/* ── Message Compose Area ────────────────────────────────────────── */}
+      <div className="pt-2">
         <textarea
           id="contact-message"
           name="message"
-          rows={5}
           required
-          placeholder="What would you like to discuss?"
-          className="w-full px-4 py-2.5 rounded-[14px] border border-ink/20 dark:border-paper/20 bg-paper dark:bg-night-surface text-ink dark:text-paper placeholder:text-muted/60 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-signal text-sm leading-relaxed"
+          rows={6}
+          placeholder="Write your message here..."
+          className="w-full bg-paper/5 border border-paper/10 rounded-lg p-3 text-sm text-paper placeholder:text-muted/50 focus:outline-none focus:border-signal resize-none leading-relaxed"
         />
       </div>
 
-      <div>
-        <Button
-          type="submit"
-          variant="primary"
-          arrow
-          disabled={isSubmitting}
-          className={isSubmitting ? "opacity-60 cursor-not-allowed" : ""}
+      {/* ── Status Feedback ─────────────────────────────────────────────── */}
+      {status.message && (
+        <div
+          role="status"
+          className={`p-3 rounded-lg text-xs leading-relaxed ${
+            status.type === "success"
+              ? "bg-board/20 text-board border border-board/30"
+              : status.type === "error"
+              ? "bg-red-500/20 text-red-200 border border-red-500/30"
+              : "bg-paper/10 text-paper"
+          }`}
         >
-          {isSubmitting ? "Sending..." : "Send Message"}
-        </Button>
-      </div>
+          {status.message}
+        </div>
+      )}
 
-      <div aria-live="polite" role="status">
-        {status.message && (
-          <div
-            className={`p-4 rounded-[14px] text-sm font-medium ${
-              status.type === "success"
-                ? "bg-board/15 text-board border border-board/30"
-                : status.type === "error"
-                ? "bg-signal/20 text-ink border border-signal font-mono text-xs"
-                : "text-muted font-mono text-xs"
-            }`}
-          >
-            {status.message}
-          </div>
-        )}
+      {/* ── Action Bar ──────────────────────────────────────────────────── */}
+      <div className="flex items-center justify-between pt-2">
+        <span className="text-[11px] text-muted">
+          Sent directly to Rashmin&apos;s inbox.
+        </span>
+
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="font-mono text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-lg bg-signal text-ink hover:opacity-90 active:scale-95 disabled:opacity-50 transition-all flex items-center gap-2 shadow-md"
+        >
+          <span>{isSubmitting ? "Sending..." : "Send email"}</span>
+          <span>↗</span>
+        </button>
       </div>
     </form>
   );

@@ -14,6 +14,7 @@ import {
 } from "@/components/ui";
 import CurrentlyTable from "@/components/home/CurrentlyTable";
 import Link from "next/link";
+import MacTerminal from "@/components/macos/MacTerminal";
 
 export const metadata = buildMetadata({
   title: { absolute: "Rashmin Sharma | Software Developer, Nepal" },
@@ -96,17 +97,21 @@ export default async function HomePage() {
     <div className="w-full">
       <JsonLd data={personSchema} />
 
-      {/* Hero */}
-      <section className="py-10 sm:py-16 border-b border-paper/10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          <div className="lg:col-span-8">
-            <h1 className="font-mono text-xs uppercase tracking-wider text-sky mb-4 block">
+      {/* ── Interactive macOS Terminal Window ────────────────────────────── */}
+      <section className="border-b border-paper/10 pb-6">
+        <MacTerminal
+          projects={publishedProjects}
+          siteConfig={siteConfig}
+          latestCommit={latestCommit}
+        >
+          <div className="pt-2">
+            <h1 className="font-mono text-xs uppercase tracking-wider text-sky mb-2 block">
               {siteConfig.hero.h1}
             </h1>
-            <p className="font-display text-2xl sm:text-3xl font-bold text-paper leading-tight mb-4">
+            <p className="font-display text-xl font-bold text-paper mb-2">
               {siteConfig.hero.tagline}
             </p>
-            <p className="text-base text-muted max-w-lg leading-relaxed mb-6">
+            <p className="text-sm text-muted leading-relaxed mb-6 max-w-lg">
               {siteConfig.hero.support}
             </p>
             <div className="flex flex-wrap items-center gap-3">
@@ -122,14 +127,7 @@ export default async function HomePage() {
               ))}
             </div>
           </div>
-          <div className="lg:col-span-4 lg:pt-6">
-            <CurrentlyTable
-              latestCommit={latestCommit}
-              buildingNow={buildingItems[0]}
-              location={siteConfig.location}
-            />
-          </div>
-        </div>
+        </MacTerminal>
       </section>
 
       {/* 01 Projects */}

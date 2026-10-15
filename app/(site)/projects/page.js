@@ -3,6 +3,7 @@ import { buildMetadata } from "@/lib/seo";
 import { visibleItems } from "@/lib/content";
 import SectionHeader from "@/components/ui/SectionHeader";
 import ProjectRow from "@/components/projects/ProjectRow";
+import MacFinder from "@/components/macos/MacFinder";
 
 export async function generateMetadata() {
   const publishedProjects = visibleItems(projects);
@@ -18,7 +19,7 @@ export default function ProjectsPage() {
   const publishedProjects = visibleItems(projects);
 
   return (
-    <div className="w-full">
+    <MacFinder sectionTitle="Projects" currentFolder="projects" itemCount={publishedProjects.length}>
       <SectionHeader number="01" label="INDEX" />
 
       <div className="mb-12">
@@ -44,6 +45,6 @@ export default function ProjectsPage() {
           ))}
         </div>
       )}
-    </div>
+    </MacFinder>
   );
 }

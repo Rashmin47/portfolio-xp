@@ -5,6 +5,7 @@ import { visibleItems } from "@/lib/content";
 import SectionHeader from "@/components/ui/SectionHeader";
 import Tag from "@/components/ui/Tag";
 import DummyBadge from "@/components/ui/DummyBadge";
+import MacTextEdit from "@/components/macos/MacTextEdit";
 
 export async function generateMetadata() {
   const publishedNotes = visibleItems(notes);
@@ -20,7 +21,7 @@ export default function NotesPage() {
   const publishedNotes = visibleItems(notes);
 
   return (
-    <div className="w-full">
+    <MacTextEdit documentTitle="Notes.md">
       <SectionHeader number="01" label="NOTES" />
 
       <div className="mb-12">
@@ -87,6 +88,6 @@ export default function NotesPage() {
           ))}
         </div>
       )}
-    </div>
+    </MacTextEdit>
   );
 }

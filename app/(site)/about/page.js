@@ -6,6 +6,7 @@ import JsonLd from "@/components/seo/JsonLd";
 import SectionHeader from "@/components/ui/SectionHeader";
 import SpecTable, { SpecRow } from "@/components/ui/SpecTable";
 import Prose from "@/components/ui/Prose";
+import MacTextEdit from "@/components/macos/MacTextEdit";
 
 export const metadata = buildMetadata({
   title: "About",
@@ -31,7 +32,7 @@ export default function AboutPage() {
   };
 
   return (
-    <div className="w-full">
+    <MacTextEdit documentTitle="About Me.rtf">
       <JsonLd data={profilePageSchema} />
 
       <SectionHeader number="01" label="ABOUT" />
@@ -192,6 +193,6 @@ export default function AboutPage() {
           )}
         </main>
       </div>
-    </div>
+    </MacTextEdit>
   );
 }

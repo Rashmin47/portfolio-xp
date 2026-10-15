@@ -1,33 +1,46 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 
-const NAV_ITEMS = [
-  { href: "/projects", label: "PROJECTS" },
-  { href: "/experience", label: "EXPERIENCE" },
-  { href: "/notes", label: "NOTES" },
-  { href: "/about", label: "ABOUT" },
-  { href: "/contact", label: "CONTACT" },
-];
-
+/**
+ * Header (macOS System Menu Bar)
+ * ------------------------------
+ * Top-of-screen macOS system menu bar:
+ *  - Apple  / Studio brand
+ *  - Active application context (Terminal, Finder, TextEdit, Mail)
+ *  - System menu items
+ *  - Status items: Location, Kathmandu time, Theme toggle
+ */
 export default function Header() {
   const pathname = usePathname();
-  const detailsRef = useRef(null);
+  const [timeStr, setTimeStr] = useState("");
 
-  // Close mobile menu on route change
+  // Get active app name from route
+  const activeApp = (() => {
+    if (pathname === "/" || pathname.startsWith("/lab")) return "Terminal";
+    if (pathname.startsWith("/about") || pathname.startsWith("/notes")) return "TextEdit";
+    if (pathname.startsWith("/contact")) return "Mail";
+    return "Finder";
+  })();
+
   useEffect(() => {
-    if (detailsRef.current) {
-      detailsRef.current.open = false;
-    }
-  }, [pathname]);
-
-  const isActive = (href) => {
-    if (href === "/") return pathname === "/";
-    return pathname === href || pathname.startsWith(`${href}/`);
-  };
+    const updateTime = () => {
+      const now = new Date();
+      setTimeStr(
+        now.toLocaleTimeString("en-US", {
+          hour: "numeric",
+          minute: "2-digit",
+          hour12: true,
+        })
+      );
+    };
+    updateTime();
+    const interval = setInterval(updateTime, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <>
@@ -39,80 +52,55 @@ export default function Header() {
         Skip to content
       </a>
 
-      <header className="border-b border-paper/10 bg-night-surface sticky top-0 z-40" style={{ pointerEvents: "auto" }}>
-        <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+      {/* ── macOS System Menu Bar ────────────────────────────────────────── */}
+      <header
+        className="fixed top-0 left-0 right-0 h-7 z-40 px-3 bg-night-surface/90 backdrop-blur-md border-b border-paper/10 flex items-center justify-between text-[11px] font-mono text-paper select-none pointer-events-auto"
+        style={{
+          boxShadow: "0 1px 3px rgba(0, 0, 0, 0.4)",
+        }}
+      >
+        {/* Left: Apple / Logo + App Name + Menus */}
+        <div className="flex items-center gap-4">
           <Link
-              href="/"
-              className="font-display font-bold tracking-tight text-xl text-paper hover:text-sky transition-colors"
-            >
-              RASHMIN
+            href="/"
+            className="flex items-center gap-1.5 font-bold hover:text-sky transition-colors text-paper"
+            title="Rashmin Sharma Workspace"
+          >
+            <span className="text-xs"></span>
+            <span className="tracking-tight hidden sm:inline">Rashmin Studio</span>
+          </Link>
+
+          {/* Active Application Context */}
+          <span className="font-bold text-signal px-1.5 py-0.5 rounded bg-signal/10 border border-signal/20">
+            {activeApp}
+          </span>
+
+          {/* System Menus */}
+          <nav aria-label="System Navigation" className="hidden md:flex items-center gap-3 text-muted">
+            <Link href="/" className="hover:text-paper transition-colors">
+              Terminal
             </Link>
-          </div>
+            <Link href="/projects" className="hover:text-paper transition-colors">
+              Projects
+            </Link>
+            <Link href="/about" className="hover:text-paper transition-colors">
+              About
+            </Link>
+            <Link href="/notes" className="hover:text-paper transition-colors">
+              Notes
+            </Link>
+            <Link href="/contact" className="hover:text-paper transition-colors">
+              Contact
+            </Link>
+          </nav>
+        </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-6">
-            <nav aria-label="Main Navigation">
-              <ul className="flex items-center gap-6">
-                {NAV_ITEMS.map((item) => {
-                  const active = isActive(item.href);
-                  return (
-                    <li key={item.href}>
-                      <Link
-                        href={item.href}
-                        className={`font-mono text-xs uppercase tracking-wider transition-colors pb-0.5 ${
-                          active
-                            ? "text-ink dark:text-paper font-semibold border-b-2 border-signal"
-                            : "text-muted hover:text-ink dark:hover:text-paper"
-                        }`}
-                      >
-                        {item.label}
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            </nav>
+        {/* Right: Status Indicators & Theme */}
+        <div className="flex items-center gap-3 text-muted">
+          <span className="hidden sm:inline text-[10px]">Kathmandu, NP</span>
+          {timeStr && <span className="text-paper/90 text-[10px]">{timeStr}</span>}
+          <div className="scale-75 origin-right">
             <ThemeToggle />
-          </div>
-
-          {/* Mobile Menu & Theme Toggle */}
-          <div className="flex items-center gap-3 md:hidden">
-            <ThemeToggle />
-            <details
-              ref={detailsRef}
-              className="relative"
-              onKeyDown={(e) => {
-                if (e.key === "Escape" && detailsRef.current) {
-                  detailsRef.current.open = false;
-                }
-              }}
-            >
-              <summary className="list-none cursor-pointer font-mono text-xs uppercase tracking-wider px-3 py-1.5 border border-ink/15 dark:border-paper/15 rounded-[14px] select-none text-ink dark:text-paper hover:bg-ink/[0.04] dark:hover:bg-paper/[0.04] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-signal">
-                MENU
-              </summary>
-              <nav
-                aria-label="Mobile Navigation"
-                className="absolute right-0 mt-2 w-48 py-2 bg-paper dark:bg-night-surface border border-ink/15 dark:border-paper/15 rounded-[14px] z-50 flex flex-col"
-              >
-                {NAV_ITEMS.map((item) => {
-                  const active = isActive(item.href);
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className={`px-4 py-2 font-mono text-xs uppercase tracking-wider transition-colors ${
-                        active
-                          ? "text-ink dark:text-paper font-semibold bg-signal/15 border-l-2 border-signal"
-                          : "text-muted hover:text-ink dark:hover:text-paper hover:bg-ink/[0.03] dark:hover:bg-paper/[0.04]"
-                      }`}
-                    >
-                      {item.label}
-                    </Link>
-                  );
-                })}
-              </nav>
-            </details>
           </div>
         </div>
       </header>

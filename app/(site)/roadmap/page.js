@@ -3,6 +3,7 @@ import { buildMetadata } from "@/lib/seo";
 import { visibleItems } from "@/lib/content";
 import SectionHeader from "@/components/ui/SectionHeader";
 import DummyBadge from "@/components/ui/DummyBadge";
+import MacFinder from "@/components/macos/MacFinder";
 
 export async function generateMetadata() {
   const publishedRoadmap = visibleItems(roadmap);
@@ -83,7 +84,7 @@ export default function RoadmapPage() {
   );
 
   return (
-    <div className="w-full">
+    <MacFinder sectionTitle="Roadmap" currentFolder="roadmap" itemCount={publishedRoadmap.length}>
       <SectionHeader number="01" label="ROADMAP" />
 
       <div className="mb-12">
@@ -109,6 +110,6 @@ export default function RoadmapPage() {
           {renderColumn("LATER", laterItems.length, laterItems)}
         </div>
       )}
-    </div>
+    </MacFinder>
   );
 }

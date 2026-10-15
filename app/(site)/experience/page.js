@@ -4,6 +4,7 @@ import { visibleItems } from "@/lib/content";
 import SectionHeader from "@/components/ui/SectionHeader";
 import SpecTable, { SpecRow } from "@/components/ui/SpecTable";
 import DummyBadge from "@/components/ui/DummyBadge";
+import MacFinder from "@/components/macos/MacFinder";
 
 export async function generateMetadata() {
   const publishedVentures = visibleItems(ventures);
@@ -19,7 +20,7 @@ export default function VenturesPage() {
   const publishedVentures = visibleItems(ventures);
 
   return (
-    <div className="w-full">
+    <MacFinder sectionTitle="Experience" currentFolder="experience" itemCount={publishedVentures.length}>
       <SectionHeader number="01" label="EXPERIENCE" />
 
       <div className="mb-12">
@@ -93,6 +94,6 @@ export default function VenturesPage() {
           })}
         </div>
       )}
-    </div>
+    </MacFinder>
   );
 }
