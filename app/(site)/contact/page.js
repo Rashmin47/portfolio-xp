@@ -16,9 +16,9 @@ export default function ContactPage() {
     <div className="w-full p-4 sm:p-6">
       <SectionHeader number="01" label="CONTACT" />
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 lg:gap-0">
+      <div className="grid grid-cols-1 @2xl:grid-cols-12 @2xl:gap-0">
         {/* Left Column: Short copy & Direct Links */}
-        <div className="lg:col-span-5 lg:pr-10 lg:border-r lg:border-ink/10 dark:lg:border-paper/10 space-y-6">
+        <div className="space-y-6 min-w-0 @2xl:col-span-5 @2xl:pr-10 @2xl:border-r @2xl:border-ink/10 dark:@2xl:border-paper/10">
           <div className="space-y-3">
             <h1 className="text-3xl sm:text-4xl font-display font-bold tracking-tight text-ink dark:text-paper">
               Get in touch
@@ -50,7 +50,7 @@ export default function ContactPage() {
         </div>
 
         {/* Right Column: compose form, flat on the window surface */}
-        <div className="lg:col-span-7 lg:pl-10 pt-8 lg:pt-0">
+        <div className="min-w-0 pt-8 @2xl:col-span-7 @2xl:pl-10 @2xl:pt-0">
           <ContactForm />
         </div>
       </div>

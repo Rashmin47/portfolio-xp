@@ -170,11 +170,11 @@ export default async function ProjectDetailPage({ params }) {
         </div>
       )}
 
-      {/* Layout with Sticky Section Nav on Desktop */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-start pt-8 border-t border-ink/10 dark:border-paper/10">
-        {/* Sticky Section Nav on Desktop (plain anchor links) */}
+      {/* Layout with Sticky Section Nav (only when the window gives it room) */}
+      <div className="grid grid-cols-1 @xl:grid-cols-[13rem_minmax(0,1fr)] gap-12 @xl:gap-8 items-start pt-8 border-t border-ink/10 dark:border-paper/10">
+        {/* Sticky Section Nav (plain anchor links) */}
         {sections.length > 0 && (
-          <aside className="hidden lg:block lg:col-span-3 sticky top-24 self-start">
+          <aside className="hidden @xl:block @xl:sticky @xl:top-6 self-start min-w-0">
             <nav
               aria-label="Table of contents"
               className="font-mono text-xs uppercase tracking-wider space-y-2"
@@ -199,7 +199,7 @@ export default async function ProjectDetailPage({ params }) {
         )}
 
         {/* Engineering Record Sections */}
-        <div className={sections.length > 0 ? "lg:col-span-9" : "w-full"}>
+        <div className={sections.length > 0 ? "min-w-0" : "w-full"}>
           {/* 1. Problem */}
           {project.problem && (
             <section id="problem" className="scroll-mt-24 mb-12 sm:mb-16">
@@ -253,7 +253,7 @@ export default async function ProjectDetailPage({ params }) {
                     <h3 className="font-display font-semibold text-lg sm:text-xl text-ink dark:text-paper">
                       {d.title}
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 @3xl:grid-cols-3 gap-4">
                       {/* Chose */}
                       <div className="p-3.5 rounded-[10px] bg-board/10 border border-board/20">
                         <span className="font-mono text-[11px] uppercase tracking-wider text-board font-bold block mb-1.5">

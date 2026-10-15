@@ -154,7 +154,7 @@ export default async function HomePage() {
         {publishedRoadmap.length > 0 && (
           <section>
             <SectionHeader number="03" label="NEXT" />
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 @lg:grid-cols-3 gap-4">
               {[
                 { label: "NOW", items: nowRoadmap, empty: "No active items" },
                 { label: "NEXT", items: nextRoadmap, empty: "Queued next" },

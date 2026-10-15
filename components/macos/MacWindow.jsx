@@ -147,7 +147,7 @@ export default function MacWindow({
 
         {/* ── Window Content Body ────────────────────────────────────────── */}
         {!collapsed && (
-          <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden flex flex-col max-md:pb-16">
+          <div className="@container flex-1 min-h-0 overflow-y-auto overflow-x-hidden flex flex-col max-md:pb-16">
             {children}
           </div>
         )}

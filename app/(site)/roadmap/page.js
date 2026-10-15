@@ -104,7 +104,7 @@ export default function RoadmapPage() {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-4">
+        <div className="grid grid-cols-1 @xl:grid-cols-3 gap-8 pt-4">
           {renderColumn("NOW", nowItems.length, nowItems, "border-l-4 border-l-signal")}
           {renderColumn("NEXT", nextItems.length, nextItems)}
           {renderColumn("LATER", laterItems.length, laterItems)}

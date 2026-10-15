@@ -46,9 +46,9 @@ export default function MacTextEdit({
 
       {/* ── Document Workspace Canvas ─────────────────────────────────── */}
       <div className="flex-1 overflow-y-auto p-4 sm:p-6 flex justify-center">
-        {/* Paper Sheet */}
+        {/* Paper Sheet — a container so the document can lay itself out by its own width */}
         <div
-          className="w-full max-w-2xl bg-paper dark:bg-[#131D33] text-ink dark:text-paper rounded-lg p-6 sm:p-10 shadow-xl border border-paper/10 transition-colors"
+          className="@container w-full max-w-3xl bg-paper dark:bg-[#131D33] text-ink dark:text-paper rounded-lg p-6 sm:p-10 shadow-xl border border-paper/10 transition-colors"
           style={{
             minHeight: "100%",
             boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05)",

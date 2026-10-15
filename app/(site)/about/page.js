@@ -37,9 +37,9 @@ export default function AboutPage() {
 
       <SectionHeader number="01" label="ABOUT" />
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-start">
+      <div className="grid grid-cols-1 @2xl:grid-cols-3 gap-10 @2xl:gap-8 items-start">
         {/* Left Column: Sticky on Desktop */}
-        <aside className="lg:col-span-4 lg:sticky lg:top-24 space-y-6">
+        <aside className="@2xl:col-span-1 @2xl:sticky @2xl:top-6 space-y-6 min-w-0">
           {about.photo?.src && (
             <div className="rounded-[14px] overflow-hidden border border-ink/10 dark:border-paper/10 aspect-square max-w-[240px]">
               <Image
@@ -100,7 +100,7 @@ export default function AboutPage() {
         </aside>
 
         {/* Right Column: Content */}
-        <main className="lg:col-span-8 space-y-12">
+        <main className="@2xl:col-span-2 space-y-12 min-w-0">
           {/* Bio Paragraphs */}
           {about.bio && about.bio.length > 0 && (
             <div className="space-y-4">

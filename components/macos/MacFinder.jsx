@@ -51,8 +51,8 @@ export default function MacFinder({
 
       {/* ── Split View: Sidebar + Content ─────────────────────────────── */}
       <div className="flex-1 flex min-h-0 overflow-hidden">
-        {/* Left Sidebar (Desktop) */}
-        <aside className="w-44 border-r border-paper/10 p-3 hidden md:flex flex-col gap-1 shrink-0 bg-paper/[0.015] font-mono text-xs">
+        {/* Left Sidebar (Desktop) — hidden when the window itself is narrow */}
+        <aside className="w-44 border-r border-paper/10 p-3 hidden @3xl:flex flex-col gap-1 shrink-0 bg-paper/[0.015] font-mono text-xs">
           <span className="text-[10px] uppercase font-bold text-muted/70 px-2 py-1 tracking-wider">
             Favorites
           </span>
@@ -76,7 +76,7 @@ export default function MacFinder({
         </aside>
 
         {/* Main Files View */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 min-w-0">
+        <div className="@container flex-1 overflow-y-auto p-4 sm:p-6 min-w-0">
           {children}
         </div>
       </div>
