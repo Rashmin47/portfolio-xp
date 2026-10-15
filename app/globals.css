@@ -159,6 +159,36 @@ code, kbd, samp, pre,
   }
 }
 
+/* ——— Hotspot spot-card: popup anchored beside the 3D object it describes ——— */
+
+.spot-card {
+  --arrow: 44px;
+}
+
+.spot-card[data-arrow]::after {
+  content: "";
+  position: absolute;
+  top: var(--arrow);
+  width: 11px;
+  height: 11px;
+  background: rgba(15, 23, 42, 0.96);
+  pointer-events: none;
+}
+
+.spot-card[data-arrow][data-side="right"]::after {
+  left: -6px;
+  border-left: 1px solid rgba(255, 255, 255, 0.15);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  transform: rotate(45deg);
+}
+
+.spot-card[data-arrow][data-side="left"]::after {
+  right: -6px;
+  border-right: 1px solid rgba(255, 255, 255, 0.15);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  transform: rotate(45deg);
+}
+
 /* ——— Dock magnification: desktop only, off under reduced motion ——— */
 
 .dock-magnify {

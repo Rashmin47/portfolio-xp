@@ -31,6 +31,7 @@ export default function HotspotBeacons({ hotspots, beaconRefs, onHover, onSelect
           }}
           aria-label={`${hotspot.label} — open details`}
           aria-haspopup="dialog"
+          data-beacon={hotspot.id}
           className="group absolute top-0 left-0 flex h-11 w-11 items-center justify-center rounded-full opacity-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-signal/70"
           style={{
             pointerEvents: "auto",

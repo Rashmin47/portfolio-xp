@@ -10,8 +10,8 @@
  * Reduced motion: scene still renders but camera transitions become instant
  * jumps (no damp). Parallax and idle animations stop.
  * Hotspots: the DOM buttons in HotspotBeacons are projected onto their 3D
- * anchors by the scene; clicking one opens the module dialog, whose primary
- * action navigates to the route.
+ * anchors by the scene; clicking one flies the camera to that object and opens
+ * its spot card next to it, whose primary action navigates to the route.
  * Fallback (no WebGL / saveData / low memory): nothing renders — the page
  * body background (#0B1220) shows instead.
  */
@@ -75,14 +75,15 @@ export default function WorldCanvas() {
     }
   }, [sceneReady]);
 
-  // ── 3. Hotspot click → show popup card (not immediate navigation) ────────────
+  // ── 3. Hotspot click → fly the camera to the object and open its spot card ───
   const handleSelect = useCallback((id) => {
     const hs = hotspots.find((h) => h.id === id);
     if (hs) setSelectedHotspot(hs);
   }, []);
 
-  // ── 4. Resolve camera pose for current route ─────────────────────────────────
-  const targetPose = routePoses[pathname] || defaultPose;
+  // ── 4. Camera pose: the focused object while its card is open, else the route
+  const targetPose =
+    (selectedHotspot && selectedHotspot.pose) || routePoses[pathname] || defaultPose;
 
   // ── 5. Not yet checked or capability ok=false → don't render canvas ──────────
   //    The DOM beacon layer lives inside this branch, so beacons disappear with
@@ -123,9 +124,10 @@ export default function WorldCanvas() {
         opacity={opacity}
       />
 
-      {/* Module dialog — opened from a beacon or from an in-scene object click */}
+      {/* Spot card — opened from a beacon or from an in-scene object click */}
       <HotspotPopup
         hotspot={selectedHotspot}
+        beaconRefs={beaconRefs}
         onClose={() => setSelectedHotspot(null)}
       />
     </>
