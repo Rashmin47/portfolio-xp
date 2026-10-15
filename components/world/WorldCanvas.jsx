@@ -10,7 +10,8 @@
  * Reduced motion: scene still renders but camera transitions become instant
  * jumps (no damp). Parallax and idle animations stop.
  * Hotspots: the DOM buttons in HotspotBeacons are projected onto their 3D
- * anchors by the scene; clicking one navigates to its route.
+ * anchors by the scene; clicking one opens the module dialog, whose primary
+ * action navigates to the route.
  * Fallback (no WebGL / saveData / low memory): nothing renders — the page
  * body background (#0B1220) shows instead.
  */
@@ -113,15 +114,16 @@ export default function WorldCanvas() {
         />
       </div>
 
-      {/* DOM hotspots projected over the canvas — click navigates to the route */}
+      {/* DOM hotspots projected over the canvas — click opens the module dialog */}
       <HotspotBeacons
         hotspots={hotspots}
         beaconRefs={beaconRefs}
         onHover={setHoveredId}
+        onSelect={handleSelect}
         opacity={opacity}
       />
 
-      {/* Hotspot popup — for in-scene object clicks */}
+      {/* Module dialog — opened from a beacon or from an in-scene object click */}
       <HotspotPopup
         hotspot={selectedHotspot}
         onClose={() => setSelectedHotspot(null)}

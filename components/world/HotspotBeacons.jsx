@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-
 /**
  * HotspotBeacons
  * --------------
@@ -11,33 +9,36 @@ import Link from "next/link";
  *
  * - 44px touch target around a small signal dot with a pulsing ring
  * - label chip on hover, keyboard focus and touch press
- * - clicking navigates to the hotspot route
+ * - clicking opens the module dialog (the dialog's own button goes to the page)
  *
  * The layer itself is pointer-events:none so canvas drag still works in the
- * gaps; only the buttons opt back in. WorldCanvas does not render this layer
- * at all when the capability check skips the scene.
+ * gaps; only the buttons opt back in (needed because body is pointer-events:none).
+ * WorldCanvas does not render this layer at all when the capability check skips
+ * the scene.
  */
-export default function HotspotBeacons({ hotspots, beaconRefs, onHover, opacity = 1 }) {
+export default function HotspotBeacons({ hotspots, beaconRefs, onHover, onSelect, opacity = 1 }) {
   return (
     <div
       className="fixed inset-0 z-10"
       style={{ pointerEvents: "none", opacity, transition: "opacity 600ms ease" }}
     >
       {hotspots.map((hotspot) => (
-        <Link
+        <button
           key={hotspot.id}
-          href={hotspot.href}
+          type="button"
           ref={(el) => {
             beaconRefs.current[hotspot.id] = el;
           }}
-          aria-label={`${hotspot.label} — ${hotspot.description}`}
-          className="group absolute top-0 left-0 flex h-11 w-11 items-center justify-center rounded-full opacity-0 focus:outline-none"
+          aria-label={`${hotspot.label} — open details`}
+          aria-haspopup="dialog"
+          className="group absolute top-0 left-0 flex h-11 w-11 items-center justify-center rounded-full opacity-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-signal/70"
           style={{
             pointerEvents: "auto",
             // Parked off-screen until the projector positions it
             transform: "translate3d(-9999px, -9999px, 0)",
             willChange: "transform",
           }}
+          onClick={() => onSelect?.(hotspot.id)}
           onMouseEnter={() => onHover?.(hotspot.id)}
           onMouseLeave={() => onHover?.(null)}
           onFocus={() => onHover?.(hotspot.id)}
@@ -63,7 +64,7 @@ export default function HotspotBeacons({ hotspots, beaconRefs, onHover, opacity 
           >
             {hotspot.label}
           </span>
-        </Link>
+        </button>
       ))}
     </div>
   );
