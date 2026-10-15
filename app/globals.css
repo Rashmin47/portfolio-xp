@@ -36,48 +36,53 @@
   --font-family-outfit: var(--font-body), system-ui, sans-serif;
 }
 
-/* ——— Base styles ——— */
+/* ——— Base styles ———
+   These live in @layer base on purpose: unlayered rules beat every Tailwind
+   utility, which made the fluid h1/h2/h3 sizes override the explicit
+   text-* utilities on headings and blow out of their columns. */
 
-body {
-  background-color: var(--color-paper);
-  color: var(--color-ink);
-  font-family: var(--font-family-body);
-  font-size: var(--text-body);
-}
+@layer base {
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-family-body);
+    font-size: var(--text-body);
+  }
 
-:where(.dark, .dark *) body,
-html.dark body {
-  background-color: var(--color-night);
-  color: var(--color-paper);
-}
+  :where(.dark, .dark *) body,
+  html.dark body {
+    background-color: var(--color-night);
+    color: var(--color-paper);
+  }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-family-display);
-}
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-family-display);
+  }
 
-h1 {
-  font-size: var(--text-h1);
-  font-weight: 700;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
-}
+  h1 {
+    font-size: var(--text-h1);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
 
-h2 {
-  font-size: var(--text-h2);
-  font-weight: 600;
-  line-height: 1.2;
-  letter-spacing: -0.01em;
-}
+  h2 {
+    font-size: var(--text-h2);
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
 
-h3 {
-  font-size: var(--text-h3);
-  font-weight: 600;
-  line-height: 1.25;
-}
+  h3 {
+    font-size: var(--text-h3);
+    font-weight: 600;
+    line-height: 1.25;
+  }
 
-code, kbd, samp, pre,
-[data-label], .label {
-  font-family: var(--font-family-mono);
+  code, kbd, samp, pre,
+  [data-label], .label {
+    font-family: var(--font-family-mono);
+  }
 }
 
 /* Legacy utility (used by existing components via className="font-ovo") */

@@ -19,7 +19,7 @@ export default function VenturesPage() {
   const publishedVentures = visibleItems(ventures);
 
   return (
-    <div className="w-full">
+    <div className="w-full p-4 sm:p-6">
       <SectionHeader number="01" label="VENTURES" />
 
       <div className="mb-12">

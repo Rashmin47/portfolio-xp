@@ -108,7 +108,7 @@ export default async function ProjectDetailPage({ params }) {
     (project.links && project.links.length > 0);
 
   return (
-    <article className="w-full">
+    <article className="w-full p-4 sm:p-6">
       {/* Back Link */}
       <div className="mb-6">
         <Link

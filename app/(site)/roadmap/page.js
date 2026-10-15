@@ -41,11 +41,11 @@ export default function RoadmapPage() {
               key={item.id}
               className={`p-4 rounded-[14px] border border-ink/10 dark:border-paper/10 bg-ink/[0.02] dark:bg-paper/[0.02] space-y-2 ${borderAccent}`}
             >
-              <div className="flex items-start justify-between gap-2">
-                <h2 className="font-display font-medium text-base text-ink dark:text-paper leading-snug">
+              <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-1.5">
+                <h2 className="min-w-0 font-display font-medium text-base text-ink dark:text-paper leading-snug">
                   {item.title}
                 </h2>
-                {item.dummy && <DummyBadge />}
+                {item.dummy && <DummyBadge className="shrink-0" />}
               </div>
 
               {item.description && (

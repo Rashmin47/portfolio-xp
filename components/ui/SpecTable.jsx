@@ -18,7 +18,7 @@ export default function SpecTable({
               <span className="font-mono text-xs uppercase tracking-wider text-muted shrink-0">
                 {item.key ?? item.label}
               </span>
-              <span className="font-mono text-xs sm:text-sm text-ink dark:text-paper text-right">
+              <span className="min-w-0 break-words font-mono text-xs sm:text-sm text-ink dark:text-paper text-right">
                 {item.value}
               </span>
             </div>
@@ -36,7 +36,7 @@ export function SpecRow({ label, value, children, className = "" }) {
       <span className="font-mono text-xs uppercase tracking-wider text-muted shrink-0">
         {label}
       </span>
-      <span className="font-mono text-xs sm:text-sm text-ink dark:text-paper text-right">
+      <span className="min-w-0 break-words font-mono text-xs sm:text-sm text-ink dark:text-paper text-right">
         {value ?? children}
       </span>
     </div>

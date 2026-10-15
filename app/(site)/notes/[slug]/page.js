@@ -70,7 +70,7 @@ export default async function NoteDetailPage({ params }) {
   };
 
   return (
-    <article className="w-full max-w-3xl">
+    <article className="w-full max-w-3xl mx-auto p-4 sm:p-6">
       <JsonLd data={articleSchema} />
 
       {/* Back Link */}
