@@ -12,7 +12,6 @@ import {
   IndexRow,
   DummyBadge,
 } from "@/components/ui";
-import CurrentlyTable from "@/components/home/CurrentlyTable";
 import Link from "next/link";
 import MacTerminal from "@/components/macos/MacTerminal";
 
@@ -94,173 +93,152 @@ export default async function HomePage() {
   };
 
   return (
-    <div className="w-full">
+    <div className="w-full flex flex-col">
       <JsonLd data={personSchema} />
 
-      {/* ── Interactive macOS Terminal Window ────────────────────────────── */}
-      <section className="border-b border-paper/10 pb-6">
-        <MacTerminal
-          projects={publishedProjects}
-          siteConfig={siteConfig}
-          latestCommit={latestCommit}
-        >
-          <div className="pt-2">
-            <h1 className="font-mono text-xs uppercase tracking-wider text-sky mb-2 block">
-              {siteConfig.hero.h1}
-            </h1>
-            <p className="font-display text-xl font-bold text-paper mb-2">
-              {siteConfig.hero.tagline}
-            </p>
-            <p className="text-sm text-muted leading-relaxed mb-6 max-w-lg">
-              {siteConfig.hero.support}
-            </p>
-            <div className="flex flex-wrap items-center gap-3">
-              {siteConfig.hero.ctas?.map((cta, index) => (
-                <Button
-                  key={cta.href}
-                  variant={index === 0 ? "primary" : "secondary"}
-                  href={cta.href}
-                  arrow
-                >
-                  {cta.label}
-                </Button>
+      {/* ── Interactive macOS Terminal (hero) ──────────────────────────── */}
+      <MacTerminal
+        projects={publishedProjects}
+        siteConfig={siteConfig}
+        latestCommit={latestCommit}
+      />
+
+      {/* ── Indexed content sections below the terminal ─────────────────── */}
+      <div className="px-5 pb-8 space-y-12">
+
+        {/* 01 Projects */}
+        {publishedProjects.length > 0 && (
+          <section>
+            <SectionHeader number="01" label="PROJECTS" />
+            <div className="border-t border-paper/10">
+              {publishedProjects.map((project, idx) => (
+                <IndexRow
+                  key={project.slug}
+                  index={String(idx + 1).padStart(2, "0")}
+                  title={
+                    <span className="inline-flex items-center gap-2 flex-wrap">
+                      <span>{project.title}</span>
+                      {project.dummy && <DummyBadge />}
+                    </span>
+                  }
+                  meta={project.year || (project.tags && project.tags[0])}
+                  href={`/projects/${project.slug}`}
+                />
               ))}
             </div>
-          </div>
-        </MacTerminal>
-      </section>
+            <div className="mt-4">
+              <TextLink href="/projects">View all projects →</TextLink>
+            </div>
+          </section>
+        )}
 
-      {/* 01 Projects */}
-      {publishedProjects.length > 0 && (
-        <section className="mt-12 sm:mt-16">
-          <SectionHeader number="01" label="PROJECTS" />
-          <div className="border-t border-paper/10">
-            {publishedProjects.map((project, idx) => (
-              <IndexRow
-                key={project.slug}
-                index={String(idx + 1).padStart(2, "0")}
-                title={
-                  <span className="inline-flex items-center gap-2 flex-wrap">
-                    <span>{project.title}</span>
-                    {project.dummy && <DummyBadge />}
+        {/* 02 Building now */}
+        {buildingItems.length > 0 && (
+          <section>
+            <SectionHeader number="02" label="BUILDING NOW" />
+            <ul className="divide-y divide-paper/10 border-y border-paper/10">
+              {buildingItems.map((item, idx) => (
+                <li key={idx} className="py-3 flex items-start gap-3">
+                  <span
+                    className="inline-block w-2 h-2 rounded-full bg-board mt-2 shrink-0"
+                    aria-hidden="true"
+                  />
+                  <span className="text-sm text-paper font-medium">{item}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {/* 03 Next */}
+        {publishedRoadmap.length > 0 && (
+          <section>
+            <SectionHeader number="03" label="NEXT" />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {[
+                { label: "NOW", items: nowRoadmap, empty: "No active items" },
+                { label: "NEXT", items: nextRoadmap, empty: "Queued next" },
+                { label: "LATER", items: laterRoadmap, empty: "Future exploratory" },
+              ].map(({ label, items, empty }) => (
+                <div key={label} className="space-y-2">
+                  <span className="font-mono text-xs uppercase tracking-wider text-muted block border-b border-paper/10 pb-2">
+                    {label}
                   </span>
-                }
-                meta={project.year || (project.tags && project.tags[0])}
-                href={`/projects/${project.slug}`}
-              />
-            ))}
-          </div>
-          <div className="mt-4">
-            <TextLink href="/projects">View all projects →</TextLink>
-          </div>
-        </section>
-      )}
+                  {items.length > 0 ? (
+                    <div className="space-y-2">
+                      {items.map((item) => (
+                        <div
+                          key={item.id}
+                          className="p-3 rounded-[14px] border border-paper/10 bg-paper/[0.03]"
+                        >
+                          <h4 className="font-display font-medium text-sm text-paper mb-1">
+                            {item.title}
+                          </h4>
+                          <p className="text-xs text-muted leading-relaxed">
+                            {item.description}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="font-mono text-xs text-muted">{empty}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+            <div className="mt-4">
+              <TextLink href="/roadmap">Full roadmap →</TextLink>
+            </div>
+          </section>
+        )}
 
-      {/* 02 Building now */}
-      {buildingItems.length > 0 && (
-        <section className="mt-12 sm:mt-16">
-          <SectionHeader number="02" label="BUILDING NOW" />
-          <ul className="divide-y divide-paper/10 border-y border-paper/10">
-            {buildingItems.map((item, idx) => (
-              <li key={idx} className="py-3 flex items-start gap-3">
-                <span
-                  className="inline-block w-2 h-2 rounded-full bg-board mt-2 shrink-0"
-                  aria-hidden="true"
+        {/* 04 Notes */}
+        {publishedNotes.length > 0 && (
+          <section>
+            <SectionHeader number="04" label="NOTES" />
+            <div className="border-t border-paper/10">
+              {publishedNotes.map((note, idx) => (
+                <IndexRow
+                  key={note.slug}
+                  index={String(idx + 1).padStart(2, "0")}
+                  title={note.title}
+                  meta={note.datePublished?.slice(0, 10)}
+                  href={`/notes/${note.slug}`}
                 />
-                <span className="text-sm text-paper font-medium">{item}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+              ))}
+            </div>
+            <div className="mt-4">
+              <TextLink href="/notes">All notes →</TextLink>
+            </div>
+          </section>
+        )}
 
-      {/* 03 Next */}
-      {publishedRoadmap.length > 0 && (
-        <section className="mt-12 sm:mt-16">
-          <SectionHeader number="03" label="NEXT" />
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {[
-              { label: "NOW", items: nowRoadmap, empty: "No active items" },
-              { label: "NEXT", items: nextRoadmap, empty: "Queued next" },
-              { label: "LATER", items: laterRoadmap, empty: "Future exploratory" },
-            ].map(({ label, items, empty }) => (
-              <div key={label} className="space-y-2">
-                <span className="font-mono text-xs uppercase tracking-wider text-muted block border-b border-paper/10 pb-2">
-                  {label}
-                </span>
-                {items.length > 0 ? (
-                  <div className="space-y-2">
-                    {items.map((item) => (
-                      <div
-                        key={item.id}
-                        className="p-3 rounded-[14px] border border-paper/10 bg-paper/[0.03]"
-                      >
-                        <h4 className="font-display font-medium text-sm text-paper mb-1">
-                          {item.title}
-                        </h4>
-                        <p className="text-xs text-muted leading-relaxed">
-                          {item.description}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="font-mono text-xs text-muted">{empty}</p>
-                )}
-              </div>
-            ))}
-          </div>
-          <div className="mt-4">
-            <TextLink href="/roadmap">Full roadmap →</TextLink>
-          </div>
-        </section>
-      )}
-
-      {/* 04 Notes */}
-      {publishedNotes.length > 0 && (
-        <section className="mt-12 sm:mt-16">
-          <SectionHeader number="04" label="NOTES" />
-          <div className="border-t border-paper/10">
-            {publishedNotes.map((note, idx) => (
-              <IndexRow
-                key={note.slug}
-                index={String(idx + 1).padStart(2, "0")}
-                title={note.title}
-                meta={note.datePublished?.slice(0, 10)}
-                href={`/notes/${note.slug}`}
-              />
-            ))}
-          </div>
-          <div className="mt-4">
-            <TextLink href="/notes">All notes →</TextLink>
-          </div>
-        </section>
-      )}
-
-      {/* 05 Closing */}
-      <section className="mt-12 sm:mt-16 pt-6 pb-4">
-        <SectionHeader number="05" label="CLOSING" />
-        <div className="max-w-lg">
-          <p className="text-xl sm:text-2xl font-display font-bold text-paper leading-tight mb-6">
-            Let&apos;s build something that matters.
-          </p>
-          <div className="flex flex-wrap items-center gap-3">
-            <Button variant="primary" href="/contact" arrow>
-              Contact
-            </Button>
-            {siteConfig.github && (
-              <Button variant="secondary" href={siteConfig.github} arrow>
-                GitHub
+        {/* 05 Closing */}
+        <section className="pt-4 border-t border-paper/10">
+          <SectionHeader number="05" label="CLOSING" />
+          <div className="max-w-lg">
+            <p className="text-xl sm:text-2xl font-display font-bold text-paper leading-tight mb-6">
+              Let&apos;s build something that matters.
+            </p>
+            <div className="flex flex-wrap items-center gap-3">
+              <Button variant="primary" href="/contact" arrow>
+                Contact
               </Button>
-            )}
-            {siteConfig.linkedin && (
-              <Button variant="secondary" href={siteConfig.linkedin} arrow>
-                LinkedIn
-              </Button>
-            )}
+              {siteConfig.github && (
+                <Button variant="secondary" href={siteConfig.github} arrow>
+                  GitHub
+                </Button>
+              )}
+              {siteConfig.linkedin && (
+                <Button variant="secondary" href={siteConfig.linkedin} arrow>
+                  LinkedIn
+                </Button>
+              )}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+
+      </div>
     </div>
   );
 }

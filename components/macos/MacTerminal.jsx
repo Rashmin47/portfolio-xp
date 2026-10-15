@@ -18,7 +18,7 @@ export default function MacTerminal({
   projects = [],
   siteConfig = {},
   latestCommit = null,
-  children,
+  children = null,
 }) {
   const router = useRouter();
   const [inputVal, setInputVal] = useState("");

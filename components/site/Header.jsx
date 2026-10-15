@@ -20,9 +20,14 @@ export default function Header() {
 
   // Get active app name from route
   const activeApp = (() => {
-    if (pathname === "/" || pathname.startsWith("/lab")) return "Terminal";
-    if (pathname.startsWith("/about") || pathname.startsWith("/notes")) return "TextEdit";
+    if (pathname === "/") return "Terminal";
+    if (pathname.startsWith("/lab")) return "Terminal — Lab";
+    if (pathname.startsWith("/about")) return "TextEdit — About";
+    if (pathname.startsWith("/notes")) return "TextEdit — Notes";
     if (pathname.startsWith("/contact")) return "Mail";
+    if (pathname.startsWith("/projects")) return "Finder — Projects";
+    if (pathname.startsWith("/experience")) return "Finder — Experience";
+    if (pathname.startsWith("/roadmap")) return "Finder — Roadmap";
     return "Finder";
   })();
 
@@ -77,19 +82,22 @@ export default function Header() {
 
           {/* System Menus */}
           <nav aria-label="System Navigation" className="hidden md:flex items-center gap-3 text-muted">
-            <Link href="/" className="hover:text-paper transition-colors">
-              Terminal
+            <Link href="/" className={`hover:text-paper transition-colors${pathname === "/" ? " text-paper font-semibold" : ""}`}>
+              Home
             </Link>
-            <Link href="/projects" className="hover:text-paper transition-colors">
+            <Link href="/projects" className={`hover:text-paper transition-colors${pathname?.startsWith("/projects") ? " text-paper font-semibold" : ""}`}>
               Projects
             </Link>
-            <Link href="/about" className="hover:text-paper transition-colors">
+            <Link href="/experience" className={`hover:text-paper transition-colors${pathname?.startsWith("/experience") ? " text-paper font-semibold" : ""}`}>
+              Experience
+            </Link>
+            <Link href="/about" className={`hover:text-paper transition-colors${pathname?.startsWith("/about") ? " text-paper font-semibold" : ""}`}>
               About
             </Link>
-            <Link href="/notes" className="hover:text-paper transition-colors">
+            <Link href="/notes" className={`hover:text-paper transition-colors${pathname?.startsWith("/notes") ? " text-paper font-semibold" : ""}`}>
               Notes
             </Link>
-            <Link href="/contact" className="hover:text-paper transition-colors">
+            <Link href="/contact" className={`hover:text-paper transition-colors${pathname?.startsWith("/contact") ? " text-paper font-semibold" : ""}`}>
               Contact
             </Link>
           </nav>
