@@ -8,7 +8,7 @@ export async function generateMetadata() {
   const publishedProjects = visibleItems(projects);
   return buildMetadata({
     title: "Projects",
-    description: "Shipped software projects, hardware experiments, and systems by Rashmin Sharma.",
+    description: "Projects and case studies by Rashmin Sharma.",
     path: "/projects",
     noindex: publishedProjects.length === 0,
   });
@@ -23,10 +23,10 @@ export default function ProjectsPage() {
 
       <div className="mb-12">
         <h1 className="text-3xl sm:text-4xl font-display font-bold tracking-tight text-ink dark:text-paper mb-3">
-          Shipped &amp; Built
+          Projects
         </h1>
         <p className="text-muted text-base sm:text-lg max-w-2xl leading-relaxed">
-          Production software systems, prototypes, and engineering case studies.
+          Selected projects and case studies.
           Hover a project on desktop to preview its interface.
         </p>
       </div>

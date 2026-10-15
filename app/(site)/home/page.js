@@ -78,11 +78,11 @@ export default async function HomePage() {
 
   const publishedProjects = visibleItems(projects).slice(0, 3);
   const buildingItems = siteConfig.building || [];
-  const publishedRoadmap = (roadmap || []).filter((r) => r.published);
+  const publishedRoadmap = visibleItems(roadmap || []);
   const nowRoadmap = publishedRoadmap.filter((r) => r.status === "now");
   const nextRoadmap = publishedRoadmap.filter((r) => r.status === "next");
   const laterRoadmap = publishedRoadmap.filter((r) => r.status === "later");
-  const publishedNotes = (notes || []).filter((n) => n.published).slice(0, 2);
+  const publishedNotes = visibleItems(notes || []).slice(0, 2);
 
   const personSchema = {
     "@context": "https://schema.org",
@@ -167,7 +167,7 @@ export default async function HomePage() {
             ))}
           </div>
           <div className="mt-6">
-            <TextLink href="/projects">View all shipped projects →</TextLink>
+            <TextLink href="/projects">View all projects →</TextLink>
           </div>
         </section>
       )}

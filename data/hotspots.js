@@ -8,7 +8,7 @@
 export const hotspots = [
   {
     id: "laptop",
-    label: "Shipped",
+    label: "Projects",
     href: "/projects",
     description: "Software projects built and deployed.",
     objectId: "laptop",
@@ -74,9 +74,9 @@ export const hotspots = [
   },
   {
     id: "book",
-    label: "Ventures",
-    href: "/ventures",
-    description: "Companies, startups and bets I am making.",
+    label: "Experience",
+    href: "/experience",
+    description: "Ventures, companies, and initiatives I am building.",
     objectId: "book",
     pose: {
       position: { x: 0.68, y: 1.3, z: 1.7 },

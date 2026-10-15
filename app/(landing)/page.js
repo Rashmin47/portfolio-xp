@@ -5,7 +5,7 @@ import JsonLd from "@/components/seo/JsonLd";
 import WorkshopClient from "@/components/workshop/WorkshopClient";
 
 export const metadata = buildMetadata({
-  title: siteConfig.name,
+  title: { absolute: "Rashmin Sharma | Software Developer, Nepal" },
   description: siteConfig.hero.support,
   path: "/",
 });

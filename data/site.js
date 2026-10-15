@@ -38,7 +38,7 @@ export const siteConfig = {
       "I build software, experiment with hardware and AI, and I am working toward founding my own product company.",
     ctas: [
       {
-        label: "See what I've shipped",
+        label: "View my projects",
         href: "/projects",
       },
       {

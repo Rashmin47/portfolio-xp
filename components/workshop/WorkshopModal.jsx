@@ -833,7 +833,7 @@ function ContactSection({ onCopyEmail, copiedEmail }) {
       {/* Direct Channels */}
       <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
         <p style={{ color: "#CBD5E1", fontSize: "14px", lineHeight: 1.6, margin: 0 }}>
-          I am always open to discussing high-craft engineering products, architecture discussions, or potential ventures.
+          I am always open to discussing high-craft engineering products, architecture discussions, or new opportunities.
         </p>
 
         <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>

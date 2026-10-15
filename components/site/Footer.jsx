@@ -38,7 +38,7 @@ export default function Footer() {
                   href="/projects"
                   className="text-muted hover:text-ink dark:hover:text-paper hover:underline decoration-signal underline-offset-4 transition-colors"
                 >
-                  Shipped
+                  Projects
                 </Link>
               </li>
               <li>
@@ -59,10 +59,10 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/ventures"
+                  href="/experience"
                   className="text-muted hover:text-ink dark:hover:text-paper hover:underline decoration-signal underline-offset-4 transition-colors"
                 >
-                  Ventures
+                  Experience
                 </Link>
               </li>
               <li>

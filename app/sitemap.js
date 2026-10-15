@@ -73,7 +73,7 @@ export default function sitemap() {
 
   if (realItems(ventures).length > 0) {
     routes.push({
-      url: `${siteUrl}/ventures`,
+      url: `${siteUrl}/experience`,
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 0.7,
