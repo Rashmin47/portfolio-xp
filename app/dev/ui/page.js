@@ -147,7 +147,7 @@ export default function DevUiPage() {
           </blockquote>
           <ul>
             <li>Content lives in server-rendered HTML pages</li>
-            <li>Visible classic view fast lane always accessible</li>
+            <li>Accessible HTML panels over persistent 3D world</li>
             <li>One accent: <code>signal #F2C81F</code> paired with ink text</li>
           </ul>
         </Prose>

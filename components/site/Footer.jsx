@@ -89,14 +89,6 @@ export default function Footer() {
                   Contact
                 </Link>
               </li>
-              <li>
-                <Link
-                  href="/workshop"
-                  className="text-muted hover:text-ink dark:hover:text-paper hover:underline decoration-signal underline-offset-4 transition-colors"
-                >
-                  The Workshop
-                </Link>
-              </li>
             </ul>
           </div>
 

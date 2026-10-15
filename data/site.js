@@ -42,13 +42,13 @@ export const siteConfig = {
         href: "/projects",
       },
       {
-        label: "The Workshop",
-        href: "/workshop",
+        label: "Experience",
+        href: "/experience",
       },
     ],
   },
   building: [
-    "The Workshop: 3D interactive portfolio and workspace",
-    "Classic site and SEO foundation",
+    "Portfolio XP: 3D interactive portfolio and workspace",
+    "Product prototypes and open source experiments",
   ],
 };

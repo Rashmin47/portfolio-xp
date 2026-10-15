@@ -90,3 +90,19 @@ export const defaultPose = {
   position: { x: -1.35, y: 2.15, z: 3.85 },
   target:   { x: 0.22, y: 0.92, z: -0.1 },
 };
+
+/**
+ * Route-keyed camera poses.
+ * The WorldCanvas reads usePathname() and dampes to the matching pose.
+ * Routes not listed fall back to defaultPose.
+ */
+export const routePoses = {
+  "/":           defaultPose,
+  "/projects":   hotspots.find((h) => h.id === "laptop").pose,
+  "/lab":        hotspots.find((h) => h.id === "pi").pose,
+  "/roadmap":    hotspots.find((h) => h.id === "whiteboard").pose,
+  "/notes":      hotspots.find((h) => h.id === "notebook").pose,
+  "/about":      hotspots.find((h) => h.id === "plant").pose,
+  "/contact":    hotspots.find((h) => h.id === "phone").pose,
+  "/experience": hotspots.find((h) => h.id === "book").pose,
+};

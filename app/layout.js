@@ -5,6 +5,7 @@ import {
 } from "next/font/google";
 import "./globals.css";
 import { siteUrl } from "@/lib/seo";
+import WorldCanvas from "@/components/world/WorldCanvas";
 
 const bricolage = Bricolage_Grotesque({
   subsets: ["latin"],
@@ -46,9 +47,19 @@ export default function RootLayout({ children }) {
           }}
         />
       </head>
+      {/*
+       * bg-night: fallback dark background when canvas is not rendered.
+       * pointer-events: none on body so the 3D canvas receives events through
+       * the gaps between panels. Each interactive element sets pointer-events:auto.
+       */}
       <body
-        className="antialiased leading-8 overflow-x-hidden bg-paper text-ink dark:bg-night dark:text-paper"
+        className="antialiased leading-8 bg-night text-paper"
+        style={{ pointerEvents: "none" }}
       >
+        {/* Persistent 3D world — fixed, z-index 0, aria-hidden */}
+        <WorldCanvas />
+
+        {/* Page content — sits above the world */}
         {children}
       </body>
     </html>

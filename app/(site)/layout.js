@@ -1,14 +1,26 @@
 import Header from "@/components/site/Header";
 import Footer from "@/components/site/Footer";
+import Panel from "@/components/world/Panel";
 
+/**
+ * Site layout wraps every route's content in the Panel component,
+ * which renders as a left sidebar on desktop and bottom sheet on mobile.
+ * Header and footer live inside the Panel so they scroll with content.
+ */
 export default function SiteLayout({ children }) {
   return (
-    <div className="min-h-screen flex flex-col bg-paper text-ink dark:bg-night dark:text-paper">
-      <Header />
-      <main id="main-content" className="flex-1 max-w-5xl w-full mx-auto px-6 py-12">
-        {children}
-      </main>
-      <Footer />
-    </div>
+    <Panel>
+      {/* pointer-events:auto so links and buttons are clickable */}
+      <div style={{ pointerEvents: "auto", display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+        <Header />
+        <main
+          id="main-content"
+          style={{ flex: 1, padding: "3rem 1.5rem", maxWidth: "100%", overflowX: "hidden" }}
+        >
+          {children}
+        </main>
+        <Footer />
+      </div>
+    </Panel>
   );
 }

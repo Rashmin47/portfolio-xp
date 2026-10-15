@@ -16,10 +16,9 @@ import CurrentlyTable from "@/components/home/CurrentlyTable";
 import Link from "next/link";
 
 export const metadata = buildMetadata({
-  title: "Classic View",
+  title: { absolute: "Rashmin Sharma | Software Developer, Nepal" },
   description: siteConfig.hero.support,
-  path: "/home",
-  noindex: true,
+  path: "/",
 });
 
 function formatRelativeDate(dateStr) {
@@ -97,33 +96,20 @@ export default async function HomePage() {
     <div className="w-full">
       <JsonLd data={personSchema} />
 
-      {/* Banner: link back to 3D experience */}
-      <div className="mb-8 p-3 rounded-card border border-cobalt/20 bg-cobalt/5 flex items-center justify-between gap-4">
-        <span className="text-sm text-muted font-mono">
-          You&apos;re in classic view.
-        </span>
-        <Link
-          href="/"
-          className="text-sm font-mono text-cobalt dark:text-sky hover:underline"
-        >
-          ← Enter the Workshop (3D)
-        </Link>
-      </div>
-
       {/* Hero */}
-      <section className="py-12 sm:py-20 lg:py-28 border-b border-ink/10 dark:border-paper/10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-start">
+      <section className="py-10 sm:py-16 border-b border-paper/10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           <div className="lg:col-span-8">
-            <h1 className="font-mono text-xs uppercase tracking-wider text-muted mb-4 block">
+            <h1 className="font-mono text-xs uppercase tracking-wider text-sky mb-4 block">
               {siteConfig.hero.h1}
             </h1>
-            <p className="display text-ink dark:text-paper mb-6">
+            <p className="font-display text-2xl sm:text-3xl font-bold text-paper leading-tight mb-4">
               {siteConfig.hero.tagline}
             </p>
-            <p className="text-base sm:text-lg text-muted max-w-2xl leading-relaxed mb-8">
+            <p className="text-base text-muted max-w-lg leading-relaxed mb-6">
               {siteConfig.hero.support}
             </p>
-            <div className="flex flex-wrap items-center gap-4">
+            <div className="flex flex-wrap items-center gap-3">
               {siteConfig.hero.ctas?.map((cta, index) => (
                 <Button
                   key={cta.href}
@@ -136,7 +122,7 @@ export default async function HomePage() {
               ))}
             </div>
           </div>
-          <div className="lg:col-span-4 lg:pt-8">
+          <div className="lg:col-span-4 lg:pt-6">
             <CurrentlyTable
               latestCommit={latestCommit}
               buildingNow={buildingItems[0]}
@@ -146,11 +132,11 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 01 Shipped */}
+      {/* 01 Projects */}
       {publishedProjects.length > 0 && (
-        <section className="mt-16 sm:mt-24">
-          <SectionHeader number="01" label="SHIPPED" />
-          <div className="border-t border-ink/10 dark:border-paper/10">
+        <section className="mt-12 sm:mt-16">
+          <SectionHeader number="01" label="PROJECTS" />
+          <div className="border-t border-paper/10">
             {publishedProjects.map((project, idx) => (
               <IndexRow
                 key={project.slug}
@@ -166,7 +152,7 @@ export default async function HomePage() {
               />
             ))}
           </div>
-          <div className="mt-6">
+          <div className="mt-4">
             <TextLink href="/projects">View all projects →</TextLink>
           </div>
         </section>
@@ -174,18 +160,16 @@ export default async function HomePage() {
 
       {/* 02 Building now */}
       {buildingItems.length > 0 && (
-        <section className="mt-16 sm:mt-24">
+        <section className="mt-12 sm:mt-16">
           <SectionHeader number="02" label="BUILDING NOW" />
-          <ul className="divide-y divide-ink/10 dark:divide-paper/10 border-y border-ink/10 dark:border-paper/10">
+          <ul className="divide-y divide-paper/10 border-y border-paper/10">
             {buildingItems.map((item, idx) => (
-              <li key={idx} className="py-3.5 flex items-start gap-3">
+              <li key={idx} className="py-3 flex items-start gap-3">
                 <span
                   className="inline-block w-2 h-2 rounded-full bg-board mt-2 shrink-0"
                   aria-hidden="true"
                 />
-                <span className="text-sm sm:text-base text-ink dark:text-paper font-medium">
-                  {item}
-                </span>
+                <span className="text-sm text-paper font-medium">{item}</span>
               </li>
             ))}
           </ul>
@@ -194,26 +178,26 @@ export default async function HomePage() {
 
       {/* 03 Next */}
       {publishedRoadmap.length > 0 && (
-        <section className="mt-16 sm:mt-24">
+        <section className="mt-12 sm:mt-16">
           <SectionHeader number="03" label="NEXT" />
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {[
               { label: "NOW", items: nowRoadmap, empty: "No active items" },
               { label: "NEXT", items: nextRoadmap, empty: "Queued next" },
               { label: "LATER", items: laterRoadmap, empty: "Future exploratory" },
             ].map(({ label, items, empty }) => (
-              <div key={label} className="space-y-3">
-                <span className="font-mono text-xs uppercase tracking-wider text-muted block border-b border-ink/10 dark:border-paper/10 pb-2">
+              <div key={label} className="space-y-2">
+                <span className="font-mono text-xs uppercase tracking-wider text-muted block border-b border-paper/10 pb-2">
                   {label}
                 </span>
                 {items.length > 0 ? (
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     {items.map((item) => (
                       <div
                         key={item.id}
-                        className="p-3.5 rounded-[14px] border border-ink/10 dark:border-paper/10 bg-ink/[0.02] dark:bg-paper/[0.02]"
+                        className="p-3 rounded-[14px] border border-paper/10 bg-paper/[0.03]"
                       >
-                        <h4 className="font-display font-medium text-sm text-ink dark:text-paper mb-1">
+                        <h4 className="font-display font-medium text-sm text-paper mb-1">
                           {item.title}
                         </h4>
                         <p className="text-xs text-muted leading-relaxed">
@@ -228,7 +212,7 @@ export default async function HomePage() {
               </div>
             ))}
           </div>
-          <div className="mt-6">
+          <div className="mt-4">
             <TextLink href="/roadmap">Full roadmap →</TextLink>
           </div>
         </section>
@@ -236,9 +220,9 @@ export default async function HomePage() {
 
       {/* 04 Notes */}
       {publishedNotes.length > 0 && (
-        <section className="mt-16 sm:mt-24">
+        <section className="mt-12 sm:mt-16">
           <SectionHeader number="04" label="NOTES" />
-          <div className="border-t border-ink/10 dark:border-paper/10">
+          <div className="border-t border-paper/10">
             {publishedNotes.map((note, idx) => (
               <IndexRow
                 key={note.slug}
@@ -249,20 +233,20 @@ export default async function HomePage() {
               />
             ))}
           </div>
-          <div className="mt-6">
+          <div className="mt-4">
             <TextLink href="/notes">All notes →</TextLink>
           </div>
         </section>
       )}
 
       {/* 05 Closing */}
-      <section className="mt-16 sm:mt-24 pt-8">
+      <section className="mt-12 sm:mt-16 pt-6 pb-4">
         <SectionHeader number="05" label="CLOSING" />
-        <div className="max-w-2xl">
-          <p className="text-2xl sm:text-3xl lg:text-4xl font-display font-bold tracking-tight text-ink dark:text-paper leading-tight mb-8">
+        <div className="max-w-lg">
+          <p className="text-xl sm:text-2xl font-display font-bold text-paper leading-tight mb-6">
             Let&apos;s build something that matters.
           </p>
-          <div className="flex flex-wrap items-center gap-4">
+          <div className="flex flex-wrap items-center gap-3">
             <Button variant="primary" href="/contact" arrow>
               Contact
             </Button>

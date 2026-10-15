@@ -4,14 +4,7 @@ import { lab } from "@/data/lab";
 import { roadmap } from "@/data/roadmap";
 import { notes } from "@/data/notes";
 import { ventures } from "@/data/ventures";
-
-/**
- * Sitemap only includes non-dummy, published items.
- * Dummy items are excluded regardless of NODE_ENV.
- */
-function realItems(list) {
-  return list.filter((item) => item.published && !item.dummy);
-}
+import { visibleItems } from "@/lib/content";
 
 export default function sitemap() {
   const routes = [
@@ -35,7 +28,7 @@ export default function sitemap() {
     },
   ];
 
-  if (realItems(projects).length > 0) {
+  if (visibleItems(projects).length > 0) {
     routes.push({
       url: `${siteUrl}/projects`,
       lastModified: new Date(),
@@ -44,7 +37,7 @@ export default function sitemap() {
     });
   }
 
-  if (realItems(lab).length > 0) {
+  if (visibleItems(lab).length > 0) {
     routes.push({
       url: `${siteUrl}/lab`,
       lastModified: new Date(),
@@ -53,7 +46,7 @@ export default function sitemap() {
     });
   }
 
-  if (realItems(roadmap).length > 0) {
+  if (visibleItems(roadmap).length > 0) {
     routes.push({
       url: `${siteUrl}/roadmap`,
       lastModified: new Date(),
@@ -62,7 +55,7 @@ export default function sitemap() {
     });
   }
 
-  if (realItems(notes).length > 0) {
+  if (visibleItems(notes).length > 0) {
     routes.push({
       url: `${siteUrl}/notes`,
       lastModified: new Date(),
@@ -71,7 +64,7 @@ export default function sitemap() {
     });
   }
 
-  if (realItems(ventures).length > 0) {
+  if (visibleItems(ventures).length > 0) {
     routes.push({
       url: `${siteUrl}/experience`,
       lastModified: new Date(),
@@ -80,7 +73,7 @@ export default function sitemap() {
     });
   }
 
-  for (const project of realItems(projects)) {
+  for (const project of visibleItems(projects)) {
     routes.push({
       url: `${siteUrl}/projects/${project.slug}`,
       lastModified: project.updatedAt ? new Date(project.updatedAt) : new Date(),
@@ -89,7 +82,7 @@ export default function sitemap() {
     });
   }
 
-  for (const note of realItems(notes)) {
+  for (const note of visibleItems(notes)) {
     routes.push({
       url: `${siteUrl}/notes/${note.slug}`,
       lastModified: note.updatedAt ? new Date(note.updatedAt) : new Date(),

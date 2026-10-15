@@ -2,11 +2,11 @@
 const nextConfig = {
   async redirects() {
     return [
-      {
-        source: "/ventures",
-        destination: "/experience",
-        permanent: true,
-      },
+      // Renamed routes
+      { source: "/ventures",  destination: "/experience", permanent: true },
+      // Removed routes → redirect to homepage panel
+      { source: "/home",      destination: "/",           permanent: true },
+      { source: "/workshop",  destination: "/",           permanent: true },
     ];
   },
 };

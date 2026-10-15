@@ -39,21 +39,14 @@ export default function Header() {
         Skip to content
       </a>
 
-      <header className="border-b border-ink/10 dark:border-paper/10 bg-paper/90 dark:bg-night/90 backdrop-blur sticky top-0 z-40">
+      <header className="border-b border-paper/10 bg-night-surface sticky top-0 z-40" style={{ pointerEvents: "auto" }}>
         <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link
-              href="/home"
-              className="font-display font-bold tracking-tight text-xl text-ink dark:text-paper hover:text-cobalt dark:hover:text-sky transition-colors"
+          <Link
+              href="/"
+              className="font-display font-bold tracking-tight text-xl text-paper hover:text-sky transition-colors"
             >
               RASHMIN
-            </Link>
-            <Link
-              href="/"
-              className="font-mono text-[10px] uppercase tracking-wider text-muted border border-muted/30 rounded px-1.5 py-0.5 hover:text-cobalt dark:hover:text-sky hover:border-cobalt/50 transition-colors"
-              title="Enter the 3D Workshop"
-            >
-              3D ↗
             </Link>
           </div>
 

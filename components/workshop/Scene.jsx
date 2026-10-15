@@ -3,7 +3,8 @@
 import { Component, useRef, useEffect, useMemo, useCallback } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
-import { defaultPose } from "@/data/hotspots";
+import { usePathname, useRouter } from "next/navigation";
+import { defaultPose, routePoses } from "@/data/hotspots";
 
 // ─── Design token palette & material tones ────────────────────────────────────
 const C = {
@@ -325,7 +326,7 @@ function Chair() {
 }
 
 // ─── Laptop (Shipped Projects Module) ─────────────────────────────────────────
-function Laptop({ hovered }) {
+function Laptop({ hovered, onClick }) {
   const groupRef = useRef();
   const aluMat   = useMat(C.macAluminum, { roughness: 0.3, metalness: 0.7 });
   const darkMat  = useMat(C.macDark,     { roughness: 0.5, metalness: 0.2 });
@@ -345,7 +346,14 @@ function Laptop({ hovered }) {
   });
 
   return (
-    <group ref={groupRef} name="obj_laptop" position={[-0.1, 0.77, 0.08]}>
+    <group
+      ref={groupRef}
+      name="obj_laptop"
+      position={[-0.1, 0.77, 0.08]}
+      onClick={(e) => { e.stopPropagation(); onClick?.(); }}
+      onPointerOver={(e) => { e.stopPropagation(); document.body.style.cursor = "pointer"; }}
+      onPointerOut={() => { document.body.style.cursor = "auto"; }}
+    >
       {/* Aluminum base chassis */}
       <mesh position={[0, 0.01, 0]} material={aluMat}>
         <boxGeometry args={[0.54, 0.016, 0.36]} />
@@ -452,7 +460,7 @@ function DeskLamp() {
 }
 
 // ─── Raspberry Pi + Breadboard (The Lab) ──────────────────────────────────────
-function RaspberryPi({ hovered }) {
+function RaspberryPi({ hovered, onClick }) {
   const groupRef = useRef();
   const pcbMat    = useMat(C.piPcb,    { roughness: 0.4 });
   const chipMat   = useMat(C.piChip,   { roughness: 0.2, metalness: 0.6 });
@@ -471,7 +479,14 @@ function RaspberryPi({ hovered }) {
   });
 
   return (
-    <group ref={groupRef} name="obj_pi" position={[1.25, 0.77, -0.05]}>
+    <group
+      ref={groupRef}
+      name="obj_pi"
+      position={[1.25, 0.77, -0.05]}
+      onClick={(e) => { e.stopPropagation(); onClick?.(); }}
+      onPointerOver={(e) => { e.stopPropagation(); document.body.style.cursor = "pointer"; }}
+      onPointerOut={() => { document.body.style.cursor = "auto"; }}
+    >
       {/* Green PCB board */}
       <mesh position={[0, 0.007, 0]} material={pcbMat}>
         <boxGeometry args={[0.22, 0.014, 0.15]} />
@@ -526,7 +541,7 @@ function RaspberryPi({ hovered }) {
 }
 
 // ─── Roadmap Whiteboard (Wall-mounted above desk) ─────────────────────────────
-function RoadmapBoard({ hovered }) {
+function RoadmapBoard({ hovered, onClick }) {
   const groupRef   = useRef();
   const frameMat   = useMat(C.wbFrame,    { roughness: 0.4, metalness: 0.5 });
   const faceMat    = useMat(C.wbFace,     { roughness: 0.2 });
@@ -542,7 +557,14 @@ function RoadmapBoard({ hovered }) {
   });
 
   return (
-    <group ref={groupRef} name="obj_whiteboard" position={[-0.3, 2.05, -2.46]}>
+    <group
+      ref={groupRef}
+      name="obj_whiteboard"
+      position={[-0.3, 2.05, -2.46]}
+      onClick={(e) => { e.stopPropagation(); onClick?.(); }}
+      onPointerOver={(e) => { e.stopPropagation(); document.body.style.cursor = "pointer"; }}
+      onPointerOut={() => { document.body.style.cursor = "auto"; }}
+    >
       {/* Aluminum frame */}
       <mesh material={frameMat}>
         <boxGeometry args={[1.5, 0.85, 0.04]} />
@@ -596,7 +618,7 @@ function RoadmapBoard({ hovered }) {
 }
 
 // ─── Notebook & Brass Pen (Notes Module) ─────────────────────────────────────
-function Notebook({ hovered }) {
+function Notebook({ hovered, onClick }) {
   const groupRef = useRef();
   const coverMat = useMat(C.cobalt,    { roughness: 0.6 });
   const paperMat = useMat("#FFFDF7",   { roughness: 0.8 });
@@ -610,7 +632,15 @@ function Notebook({ hovered }) {
   });
 
   return (
-    <group ref={groupRef} name="obj_notebook" position={[-1.0, 0.77, 0.28]} rotation={[0, 0.15, 0]}>
+    <group
+      ref={groupRef}
+      name="obj_notebook"
+      position={[-1.0, 0.77, 0.28]}
+      rotation={[0, 0.15, 0]}
+      onClick={(e) => { e.stopPropagation(); onClick?.(); }}
+      onPointerOver={(e) => { e.stopPropagation(); document.body.style.cursor = "pointer"; }}
+      onPointerOut={() => { document.body.style.cursor = "auto"; }}
+    >
       {/* Open notebook base cover */}
       <mesh position={[0, 0.008, 0]} material={coverMat}>
         <boxGeometry args={[0.34, 0.016, 0.24]} />
@@ -645,7 +675,7 @@ function Notebook({ hovered }) {
 }
 
 // ─── Desk Nameplate & Book Stack (Ventures Module) ───────────────────────────
-function VenturesBooks({ hovered }) {
+function VenturesBooks({ hovered, onClick }) {
   const groupRef = useRef();
   const woodMat  = useMat(C.deskEdge,  { roughness: 0.5 });
   const brassMat = useMat(C.signal,    { roughness: 0.2, metalness: 0.85 });
@@ -660,7 +690,15 @@ function VenturesBooks({ hovered }) {
   });
 
   return (
-    <group ref={groupRef} name="obj_ventures" position={[0.68, 0.77, 0.28]} rotation={[0, -0.15, 0]}>
+    <group
+      ref={groupRef}
+      name="obj_ventures"
+      position={[0.68, 0.77, 0.28]}
+      rotation={[0, -0.15, 0]}
+      onClick={(e) => { e.stopPropagation(); onClick?.(); }}
+      onPointerOver={(e) => { e.stopPropagation(); document.body.style.cursor = "pointer"; }}
+      onPointerOut={() => { document.body.style.cursor = "auto"; }}
+    >
       {/* Bottom hardcover book */}
       <mesh position={[0, 0.016, 0]} material={book1Mat}>
         <boxGeometry args={[0.26, 0.032, 0.19]} />
@@ -695,7 +733,7 @@ function VenturesBooks({ hovered }) {
 }
 
 // ─── Smartphone on Desk Stand (Contact Module) ────────────────────────────────
-function PhoneStand({ hovered }) {
+function PhoneStand({ hovered, onClick }) {
   const groupRef = useRef();
   const standMat  = useMat(C.macAluminum, { roughness: 0.3, metalness: 0.8 });
   const phoneMat  = useMat(C.phoneBody,   { roughness: 0.3, metalness: 0.5 });
@@ -713,7 +751,15 @@ function PhoneStand({ hovered }) {
   });
 
   return (
-    <group ref={groupRef} name="obj_phone" position={[1.82, 0.77, 0.2]} rotation={[0, -0.3, 0]}>
+    <group
+      ref={groupRef}
+      name="obj_phone"
+      position={[1.82, 0.77, 0.2]}
+      rotation={[0, -0.3, 0]}
+      onClick={(e) => { e.stopPropagation(); onClick?.(); }}
+      onPointerOver={(e) => { e.stopPropagation(); document.body.style.cursor = "pointer"; }}
+      onPointerOut={() => { document.body.style.cursor = "auto"; }}
+    >
       {/* Aluminum angled phone stand base */}
       <mesh position={[0, 0.008, 0]} material={standMat}>
         <boxGeometry args={[0.1, 0.016, 0.11]} />
@@ -743,7 +789,7 @@ function PhoneStand({ hovered }) {
 }
 
 // ─── Potted Monstera / Succulent Plant (About Module) ─────────────────────────
-function PottedPlant({ hovered }) {
+function PottedPlant({ hovered, onClick }) {
   const groupRef = useRef();
   const potMat   = useMat(C.plantPot,   { roughness: 0.65 });
   const soilMat  = useMat(C.plantSoil,  { roughness: 0.95 });
@@ -757,7 +803,14 @@ function PottedPlant({ hovered }) {
   });
 
   return (
-    <group ref={groupRef} name="obj_plant" position={[-1.78, 0.77, -0.08]}>
+    <group
+      ref={groupRef}
+      name="obj_plant"
+      position={[-1.78, 0.77, -0.08]}
+      onClick={(e) => { e.stopPropagation(); onClick?.(); }}
+      onPointerOver={(e) => { e.stopPropagation(); document.body.style.cursor = "pointer"; }}
+      onPointerOut={() => { document.body.style.cursor = "auto"; }}
+    >
       {/* Terracotta ceramic pot */}
       <mesh position={[0, 0.07, 0]} material={potMat}>
         <cylinderGeometry args={[0.09, 0.07, 0.14, 16]} />
@@ -885,18 +938,23 @@ function WallShelf() {
 }
 
 // ─── Floating 3D Beacon Indicator (Jesse Zhou inspired Pin) ───────────────────
-function HotspotBeacon({ position, hovered, onClick }) {
+function HotspotBeacon({ position, hovered, onClick, reducedMotion }) {
   const ringRef = useRef();
 
   useFrame(({ clock }) => {
-    if (!ringRef.current) return;
+    if (reducedMotion || !ringRef.current) return;
     const t = clock.elapsedTime * 2.5;
     const scale = 1 + Math.sin(t) * 0.2;
     ringRef.current.scale.set(scale, scale, scale);
   });
 
   return (
-    <group position={position} onClick={onClick}>
+    <group
+      position={position}
+      onClick={(e) => { e.stopPropagation(); onClick?.(); }}
+      onPointerOver={(e) => { e.stopPropagation(); document.body.style.cursor = "pointer"; }}
+      onPointerOut={() => { document.body.style.cursor = "auto"; }}
+    >
       {/* Inner glowing signal core */}
       <mesh>
         <sphereGeometry args={[0.028, 16, 16]} />
@@ -957,13 +1015,34 @@ const _scratch = new THREE.Vector3();
 const DEG5 = (5 * Math.PI) / 180;
 const DEG3 = (3 * Math.PI) / 180;
 
-function CameraRig({ targetPose }) {
+function CameraRig({ targetPose: explicitPose, reducedMotion = false }) {
+  const pathname = usePathname();
   const { camera, invalidate } = useThree();
   const mouse      = useRef({ x: 0, y: 0 });
   const isDragging = useRef(false);
   const dragStart  = useRef({ x: 0, y: 0 });
   const dragRot    = useRef({ x: 0, y: 0 });
   const prevDragRot= useRef({ x: 0, y: 0 });
+  const introDone  = useRef(false);
+
+  // Target pose keyed by route
+  const targetPose = explicitPose || routePoses[pathname] || defaultPose;
+
+  // On first visit, start slightly back for smooth opening camera move (once per session)
+  useEffect(() => {
+    if (introDone.current || typeof window === "undefined") return;
+    introDone.current = true;
+    const seen = sessionStorage.getItem("world-camera-intro");
+    if (!seen && !reducedMotion) {
+      sessionStorage.setItem("world-camera-intro", "1");
+      camera.position.set(
+        targetPose.position.x - 0.4,
+        targetPose.position.y + 0.35,
+        targetPose.position.z + 0.7
+      );
+      camera.lookAt(targetPose.target.x, targetPose.target.y, targetPose.target.z);
+    }
+  }, [camera, targetPose, reducedMotion]);
 
   useEffect(() => {
     const onPointerMove = (e) => {
@@ -998,7 +1077,8 @@ function CameraRig({ targetPose }) {
   useEffect(() => {
     dragRot.current = { x: 0, y: 0 };
     prevDragRot.current = { x: 0, y: 0 };
-  }, [targetPose]);
+    invalidate();
+  }, [targetPose, invalidate]);
 
   useFrame((_, delta) => {
     const p = targetPose.position;
@@ -1008,14 +1088,21 @@ function CameraRig({ targetPose }) {
     const py = p.y - dragRot.current.x * 0.5;
     const pz = p.z;
 
-    camera.position.x = THREE.MathUtils.damp(camera.position.x, px, 5, delta);
-    camera.position.y = THREE.MathUtils.damp(camera.position.y, py, 5, delta);
-    camera.position.z = THREE.MathUtils.damp(camera.position.z, pz, 5, delta);
+    if (reducedMotion) {
+      // Instant jump, no damp, no parallax
+      camera.position.set(px, py, pz);
+      _scratch.set(t.x, t.y, t.z);
+      camera.lookAt(_scratch);
+    } else {
+      camera.position.x = THREE.MathUtils.damp(camera.position.x, px, 5, delta);
+      camera.position.y = THREE.MathUtils.damp(camera.position.y, py, 5, delta);
+      camera.position.z = THREE.MathUtils.damp(camera.position.z, pz, 5, delta);
 
-    const parallaxX = mouse.current.x * DEG5;
-    const parallaxY = mouse.current.y * DEG3;
-    _scratch.set(t.x + parallaxX * 0.3, t.y - parallaxY * 0.2, t.z);
-    camera.lookAt(_scratch);
+      const parallaxX = mouse.current.x * DEG5;
+      const parallaxY = mouse.current.y * DEG3;
+      _scratch.set(t.x + parallaxX * 0.3, t.y - parallaxY * 0.2, t.z);
+      camera.lookAt(_scratch);
+    }
 
     invalidate();
   });
@@ -1023,7 +1110,7 @@ function CameraRig({ targetPose }) {
   return null;
 }
 
-// ─── Coordinated, Spacious Hotspot Positions (Zero overlapping!) ──────────────
+// ─── Coordinated, Spacious Hotspot Positions ──────────────────────────────────
 const HOTSPOT_BEACON_POSITIONS = {
   plant:      [-1.78, 1.02, -0.08],
   notebook:   [-1.0,  0.86,  0.28],
@@ -1044,23 +1131,46 @@ const HOTSPOT_LABEL_POSITIONS = {
   phone:      [ 1.82, 1.20,  0.2 ],
 };
 
+// ─── Ready Notifier: calls onReady once first frame renders ───────────────────
+function ReadyNotifier({ onReady }) {
+  const called = useRef(false);
+  useFrame(() => {
+    if (!called.current) {
+      called.current = true;
+      onReady?.();
+    }
+  });
+  return null;
+}
+
 // ─── Inner Scene Assembler ────────────────────────────────────────────────────
-function SceneContent({ targetPose, hotspots, onSelect, hoveredId, labelRefs }) {
+function SceneContent({ targetPose, hotspots, onSelect, hoveredId, labelRefs, reducedMotion }) {
+  const router = useRouter();
+
+  const handleSelectObject = useCallback((id) => {
+    if (onSelect) {
+      onSelect(id);
+    } else {
+      const hs = hotspots.find((h) => h.id === id);
+      if (hs) router.push(hs.href);
+    }
+  }, [onSelect, hotspots, router]);
+
   return (
     <>
-      <CameraRig targetPose={targetPose} />
+      <CameraRig targetPose={targetPose} reducedMotion={reducedMotion} />
       <SceneLighting />
       <Room />
       <Desk />
       <Chair />
-      <Laptop       hovered={hoveredId === "laptop"} />
+      <Laptop       hovered={hoveredId === "laptop"} onClick={() => handleSelectObject("laptop")} />
       <DeskLamp />
-      <RaspberryPi  hovered={hoveredId === "pi"} />
-      <RoadmapBoard hovered={hoveredId === "whiteboard"} />
-      <Notebook     hovered={hoveredId === "notebook"} />
-      <VenturesBooks hovered={hoveredId === "book"} />
-      <PhoneStand   hovered={hoveredId === "phone"} />
-      <PottedPlant  hovered={hoveredId === "plant"} />
+      <RaspberryPi  hovered={hoveredId === "pi"} onClick={() => handleSelectObject("pi")} />
+      <RoadmapBoard hovered={hoveredId === "whiteboard"} onClick={() => handleSelectObject("whiteboard")} />
+      <Notebook     hovered={hoveredId === "notebook"} onClick={() => handleSelectObject("notebook")} />
+      <VenturesBooks hovered={hoveredId === "book"} onClick={() => handleSelectObject("book")} />
+      <PhoneStand   hovered={hoveredId === "phone"} onClick={() => handleSelectObject("phone")} />
+      <PottedPlant  hovered={hoveredId === "plant"} onClick={() => handleSelectObject("plant")} />
       <CoffeeMug />
       <WallShelf />
 
@@ -1077,7 +1187,8 @@ function SceneContent({ targetPose, hotspots, onSelect, hoveredId, labelRefs }) 
             key={hs.id}
             position={beaconPos}
             hovered={isHovered}
-            onClick={() => onSelect(hs.id)}
+            onClick={() => handleSelectObject(hs.id)}
+            reducedMotion={reducedMotion}
           />
         );
       })}
@@ -1133,13 +1244,15 @@ function DisposeCleaner() {
 }
 
 // ─── Root Export ──────────────────────────────────────────────────────────────
-export default function Scene({ hotspots, selectedId, onSelect, onHover, labelRefs }) {
-  const activePose = useMemo(() => {
-    if (!selectedId) return defaultPose;
-    const hs = hotspots.find((h) => h.id === selectedId);
-    return hs ? hs.pose : defaultPose;
-  }, [selectedId, hotspots]);
-
+export default function Scene({
+  hotspots,
+  targetPose,
+  onSelect,
+  onHover,
+  labelRefs,
+  onReady,
+  reducedMotion = false,
+}) {
   return (
     <SceneErrorBoundary>
       <Canvas
@@ -1156,13 +1269,15 @@ export default function Scene({ hotspots, selectedId, onSelect, onHover, labelRe
           height: "100%",
         }}
       >
+        <ReadyNotifier onReady={onReady} />
         <DisposeCleaner />
         <SceneContent
-          targetPose={activePose}
+          targetPose={targetPose}
           hotspots={hotspots}
           onSelect={onSelect}
-          hoveredId={selectedId}
+          hoveredId={null}
           labelRefs={labelRefs}
+          reducedMotion={reducedMotion}
         />
       </Canvas>
     </SceneErrorBoundary>
