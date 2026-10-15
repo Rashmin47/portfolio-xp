@@ -994,6 +994,12 @@ function CameraRig({ targetPose }) {
     };
   }, [invalidate]);
 
+  // Reset drag rotation when target pose changes
+  useEffect(() => {
+    dragRot.current = { x: 0, y: 0 };
+    prevDragRot.current = { x: 0, y: 0 };
+  }, [targetPose]);
+
   useFrame((_, delta) => {
     const p = targetPose.position;
     const t = targetPose.target;

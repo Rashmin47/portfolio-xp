@@ -87,6 +87,6 @@ export const hotspots = [
 
 /** Default camera pose (isometric 3/4 workshop eye-level overview) */
 export const defaultPose = {
-  position: { x: 0, y: 2.15, z: 3.9 },
-  target:   { x: 0, y: 0.95, z: 0 },
+  position: { x: -1.35, y: 2.15, z: 3.85 },
+  target:   { x: 0.22, y: 0.92, z: -0.1 },
 };
