@@ -9,6 +9,8 @@
  *
  * Reduced motion: scene still renders but camera transitions become instant
  * jumps (no damp). Parallax and idle animations stop.
+ * Hotspots: the DOM buttons in HotspotBeacons are projected onto their 3D
+ * anchors by the scene; clicking one navigates to its route.
  * Fallback (no WebGL / saveData / low memory): nothing renders — the page
  * body background (#0B1220) shows instead.
  */
@@ -19,6 +21,7 @@ import dynamic from "next/dynamic";
 import { hotspots, routePoses, defaultPose } from "@/data/hotspots";
 import { checkWorldCapability } from "@/lib/world-capability";
 import HotspotPopup from "@/components/world/HotspotPopup";
+import HotspotBeacons from "@/components/world/HotspotBeacons";
 
 const Scene = dynamic(() => import("@/components/workshop/Scene"), {
   ssr: false,
@@ -32,7 +35,8 @@ export default function WorldCanvas() {
   const [sceneReady, setSceneReady] = useState(false);
   const [opacity, setOpacity] = useState(0);
   const [selectedHotspot, setSelectedHotspot] = useState(null);
-  const labelRefs = useRef({});
+  const [hoveredId, setHoveredId] = useState(null);
+  const beaconRefs = useRef({});
 
   // ── 1. Run capability check after hydration (idle) ──────────────────────────
   useEffect(() => {
@@ -80,6 +84,8 @@ export default function WorldCanvas() {
   const targetPose = routePoses[pathname] || defaultPose;
 
   // ── 5. Not yet checked or capability ok=false → don't render canvas ──────────
+  //    The DOM beacon layer lives inside this branch, so beacons disappear with
+  //    the scene whenever the capability check skips it.
   if (cap === null || !cap.ok) return null;
 
   return (
@@ -100,13 +106,22 @@ export default function WorldCanvas() {
           hotspots={hotspots}
           targetPose={targetPose}
           onSelect={handleSelect}
-          labelRefs={labelRefs}
+          beaconRefs={beaconRefs}
+          hoveredId={hoveredId}
           onReady={handleSceneReady}
           reducedMotion={cap?.reducedMotion}
         />
       </div>
 
-      {/* Hotspot popup — rendered outside the canvas div so pointer-events work */}
+      {/* DOM hotspots projected over the canvas — click navigates to the route */}
+      <HotspotBeacons
+        hotspots={hotspots}
+        beaconRefs={beaconRefs}
+        onHover={setHoveredId}
+        opacity={opacity}
+      />
+
+      {/* Hotspot popup — for in-scene object clicks */}
       <HotspotPopup
         hotspot={selectedHotspot}
         onClose={() => setSelectedHotspot(null)}

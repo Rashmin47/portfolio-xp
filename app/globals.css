@@ -131,3 +131,55 @@ code, kbd, samp, pre,
   border-top-color: color-mix(in srgb, var(--color-paper) 12%, transparent);
 }
 
+/* ——— Hotspot beacon pulse (DOM overlay over the 3D canvas) ——— */
+
+@keyframes beacon-pulse {
+  0% {
+    transform: scale(0.55);
+    opacity: 0.85;
+  }
+  70% {
+    transform: scale(1.75);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.75);
+    opacity: 0;
+  }
+}
+
+.beacon-ring {
+  animation: beacon-pulse 2.4s ease-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .beacon-ring {
+    animation: none;
+    opacity: 0.5;
+  }
+}
+
+/* ——— Dock magnification: desktop only, off under reduced motion ——— */
+
+.dock-magnify {
+  transition: transform 200ms ease, background-color 200ms ease, color 200ms ease;
+}
+
+@media (min-width: 1024px) {
+  .dock-magnify:hover {
+    transform: translateY(-8px) scale(1.12);
+  }
+  .dock-magnify:active {
+    transform: translateY(-8px) scale(1.06);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dock-magnify,
+  .dock-magnify:hover,
+  .dock-magnify:active {
+    transform: none;
+    transition: none;
+  }
+}
+

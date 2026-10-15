@@ -4,13 +4,14 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import ThemeToggle from "@/components/ui/ThemeToggle";
+import { nepalClock } from "@/lib/nepal-time";
 
 /**
- * Header (macOS System Menu Bar)
+ * Header (system menu bar)
  * ------------------------------
- * Top-of-screen macOS system menu bar:
- *  - Apple  / Studio brand
- *  - Active application context (Terminal, Finder, TextEdit, Mail)
+ * Top-of-screen system menu bar:
+ *  - Studio monogram + app name
+ *  - Active application context (Terminal, Files, Notes, Mail)
  *  - System menu items
  *  - Status items: Location, Kathmandu time, Theme toggle
  */
@@ -22,26 +23,17 @@ export default function Header() {
   const activeApp = (() => {
     if (pathname === "/") return "Terminal";
     if (pathname.startsWith("/lab")) return "Terminal — Lab";
-    if (pathname.startsWith("/about")) return "TextEdit — About";
-    if (pathname.startsWith("/notes")) return "TextEdit — Notes";
+    if (pathname.startsWith("/about")) return "Notes — About Me";
+    if (pathname.startsWith("/notes")) return "Notes — Thoughts";
     if (pathname.startsWith("/contact")) return "Mail";
-    if (pathname.startsWith("/projects")) return "Finder — Projects";
-    if (pathname.startsWith("/experience")) return "Finder — Experience";
-    if (pathname.startsWith("/roadmap")) return "Finder — Roadmap";
-    return "Finder";
+    if (pathname.startsWith("/projects")) return "Files — Projects";
+    if (pathname.startsWith("/experience")) return "Files — Experience";
+    if (pathname.startsWith("/roadmap")) return "Files — Roadmap";
+    return "Files";
   })();
 
   useEffect(() => {
-    const updateTime = () => {
-      const now = new Date();
-      setTimeStr(
-        now.toLocaleTimeString("en-US", {
-          hour: "numeric",
-          minute: "2-digit",
-          hour12: true,
-        })
-      );
-    };
+    const updateTime = () => setTimeStr(nepalClock());
     updateTime();
     const interval = setInterval(updateTime, 30000);
     return () => clearInterval(interval);
@@ -57,21 +49,37 @@ export default function Header() {
         Skip to content
       </a>
 
-      {/* ── macOS System Menu Bar ────────────────────────────────────────── */}
+      {/* ── System Menu Bar ──────────────────────────────────────────────── */}
       <header
         className="fixed top-0 left-0 right-0 h-7 z-40 px-3 bg-night-surface/90 backdrop-blur-md border-b border-paper/10 flex items-center justify-between text-[11px] font-mono text-paper select-none pointer-events-auto"
         style={{
           boxShadow: "0 1px 3px rgba(0, 0, 0, 0.4)",
         }}
       >
-        {/* Left: Apple / Logo + App Name + Menus */}
+        {/* Left: Studio monogram + App Name + Menus */}
         <div className="flex items-center gap-4">
           <Link
             href="/"
             className="flex items-center gap-1.5 font-bold hover:text-sky transition-colors text-paper"
             title="Rashmin Sharma Workspace"
           >
-            <span className="text-xs"></span>
+            {/* Studio monogram (own mark, no platform glyph) */}
+            <span className="text-signal" aria-hidden="true">
+              <svg
+                viewBox="0 0 24 24"
+                className="h-4 w-4"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                focusable="false"
+              >
+                <rect x="1.75" y="1.75" width="20.5" height="20.5" rx="6" strokeOpacity="0.45" />
+                <path d="M9.6 17.6V6.9h3.1a3.2 3.2 0 0 1 0 6.4H9.6" />
+                <path d="M13.2 13.3l3 4.3" />
+              </svg>
+            </span>
             <span className="tracking-tight hidden sm:inline">Rashmin Studio</span>
           </Link>
 
@@ -106,7 +114,7 @@ export default function Header() {
         {/* Right: Status Indicators & Theme */}
         <div className="flex items-center gap-3 text-muted">
           <span className="hidden sm:inline text-[10px]">Kathmandu, NP</span>
-          {timeStr && <span className="text-paper/90 text-[10px]">{timeStr}</span>}
+          {timeStr && <span className="text-paper/90 text-[10px]">{timeStr} NPT</span>}
           <div className="scale-75 origin-right">
             <ThemeToggle />
           </div>
