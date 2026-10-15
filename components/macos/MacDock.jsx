@@ -11,7 +11,7 @@ import { usePathname } from "next/navigation";
  *  - Active app indicator dot
  *  - Instant navigation between workshop apps
  */
-export default function MacDock({ onOpenAI }) {
+export default function MacDock({ onOpenAI, onOpenTerminal }) {
   const pathname = usePathname();
 
   const DOCK_APPS = [
@@ -45,17 +45,32 @@ export default function MacDock({ onOpenAI }) {
               {app.label}
             </span>
 
-            {/* Icon Button */}
-            <Link
-              href={app.href}
-              className={`w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center text-lg sm:text-xl transition-all duration-200 hover:-translate-y-2 hover:scale-110 active:scale-95 ${
-                app.active
-                  ? "bg-paper/20 shadow-inner"
-                  : "bg-paper/5 hover:bg-paper/15"
-              }`}
-            >
-              <span>{app.icon}</span>
-            </Link>
+            {/* Icon Button — use button for Terminal on homepage to open window */}
+            {app.href === "/" && onOpenTerminal ? (
+              <button
+                type="button"
+                onClick={onOpenTerminal}
+                title="Open Terminal"
+                className={`w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center text-lg sm:text-xl transition-all duration-200 hover:-translate-y-2 hover:scale-110 active:scale-95 ${
+                  app.active
+                    ? "bg-paper/20 shadow-inner"
+                    : "bg-paper/5 hover:bg-paper/15"
+                }`}
+              >
+                <span>{app.icon}</span>
+              </button>
+            ) : (
+              <Link
+                href={app.href}
+                className={`w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center text-lg sm:text-xl transition-all duration-200 hover:-translate-y-2 hover:scale-110 active:scale-95 ${
+                  app.active
+                    ? "bg-paper/20 shadow-inner"
+                    : "bg-paper/5 hover:bg-paper/15"
+                }`}
+              >
+                <span>{app.icon}</span>
+              </Link>
+            )}
 
             {/* Active app dot */}
             <span

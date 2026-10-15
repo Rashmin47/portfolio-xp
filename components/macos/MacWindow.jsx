@@ -18,6 +18,7 @@ export default function MacWindow({
   appType = "terminal", // "terminal" | "textedit" | "finder" | "mail" | "messages"
   path = "~",
   onOpenAI,
+  onClose,
   children,
 }) {
   const router = useRouter();
@@ -25,6 +26,10 @@ export default function MacWindow({
   const [expanded, setExpanded] = useState(false);
 
   const handleClose = () => {
+    if (onClose) {
+      onClose();
+      return;
+    }
     // Navigate home if not on home, or minimize if already on home
     if (path !== "~" && path !== "/") {
       router.push("/");

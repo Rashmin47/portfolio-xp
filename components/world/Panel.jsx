@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import MacWindow from "@/components/macos/MacWindow";
 import MacDock from "@/components/macos/MacDock";
@@ -9,22 +9,26 @@ import MacMessagesAI from "@/components/macos/MacMessagesAI";
 /**
  * Panel
  * -----
- * Route-aware macOS Desktop Shell over the persistent 3D desk:
- *  - Dynamically configures window layout based on the current page:
- *      /           -> Terminal (zsh)
- *      /lab        -> Terminal (hardware/experiments)
- *      /about      -> TextEdit (About Me.rtf)
- *      /notes      -> TextEdit (Notes.md)
- *      /contact    -> Mail (Compose)
- *      /projects   -> Finder (Projects)
- *      /experience -> Finder (Experience)
- *      /roadmap    -> Finder (Roadmap)
- *  - Floating macOS Dock at bottom
- *  - Integrated AI Assistant ("Rashmin AI — Messages")
+ * Route-aware macOS Desktop Shell over the persistent 3D desk.
+ *
+ * Homepage (/): window starts CLOSED so the 3D world is the first impression.
+ *   Clicking the Terminal dock icon opens it.
+ * All other routes: window opens automatically (navigating implies intent).
  */
 export default function Panel({ children }) {
   const pathname = usePathname();
   const [isAIOpen, setIsAIOpen] = useState(false);
+
+  // On the homepage, window starts closed so the 3D scene is visible first.
+  // On every other route it auto-opens because the user navigated there.
+  const [windowOpen, setWindowOpen] = useState(pathname !== "/");
+
+  // When the route changes away from home, ensure the window opens.
+  useEffect(() => {
+    if (pathname !== "/") {
+      setWindowOpen(true);
+    }
+  }, [pathname]);
 
   // Compute macOS window metadata by route
   const { title, appType } = useMemo(() => {
@@ -58,17 +62,28 @@ export default function Panel({ children }) {
   return (
     <>
       {/* ── macOS Application Window ────────────────────────────────────── */}
-      <MacWindow
-        title={title}
-        appType={appType}
-        path={pathname}
-        onOpenAI={() => setIsAIOpen(true)}
-      >
-        {children}
-      </MacWindow>
+      {windowOpen && (
+        <MacWindow
+          title={title}
+          appType={appType}
+          path={pathname}
+          onOpenAI={() => setIsAIOpen(true)}
+          onClose={() => {
+            // On homepage, close just hides the window (shows 3D world again)
+            if (pathname === "/") {
+              setWindowOpen(false);
+            }
+          }}
+        >
+          {children}
+        </MacWindow>
+      )}
 
       {/* ── Bottom macOS Dock ───────────────────────────────────────────── */}
-      <MacDock onOpenAI={() => setIsAIOpen(true)} />
+      <MacDock
+        onOpenAI={() => setIsAIOpen(true)}
+        onOpenTerminal={pathname === "/" ? () => setWindowOpen(true) : null}
+      />
 
       {/* ── AI Assistant Messenger Modal ─────────────────────────────────── */}
       <MacMessagesAI
