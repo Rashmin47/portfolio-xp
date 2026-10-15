@@ -49,15 +49,16 @@ export default function MacWindow({
   return (
     <div
       className={`fixed z-20 flex flex-col pointer-events-none transition-all duration-300
-        /* Desktop: styled macOS window positioned over 3D desk */
-        md:top-11 md:left-8 md:bottom-20
+        /* Desktop: perfectly centered macOS window over 3D desk */
+        md:top-11 md:bottom-22
+        md:left-1/2 md:-translate-x-1/2 md:right-auto
         ${
           expanded
-            ? "md:w-[min(1080px,80vw)]"
-            : "md:w-[min(740px,54vw)]"
+            ? "md:w-[calc(100vw-64px)] md:max-w-6xl"
+            : "md:w-[calc(100vw-64px)] md:max-w-4xl"
         }
         /* Mobile: responsive bottom sheet */
-        left-0 right-0 bottom-0 max-md:border-t max-md:border-paper/10 max-md:rounded-t-2xl
+        left-0 right-0 bottom-0 max-md:translate-x-0 max-md:border-t max-md:border-paper/10 max-md:rounded-t-2xl
         ${collapsed ? "max-md:h-[64px] md:!bottom-auto md:!h-[52px]" : "max-md:h-[72vh] md:h-auto"}
       `}
     >

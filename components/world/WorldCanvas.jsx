@@ -14,10 +14,11 @@
  */
 
 import { useEffect, useState, useRef, useCallback } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import dynamic from "next/dynamic";
 import { hotspots, routePoses, defaultPose } from "@/data/hotspots";
 import { checkWorldCapability } from "@/lib/world-capability";
+import HotspotPopup from "@/components/world/HotspotPopup";
 
 const Scene = dynamic(() => import("@/components/workshop/Scene"), {
   ssr: false,
@@ -26,11 +27,11 @@ const Scene = dynamic(() => import("@/components/workshop/Scene"), {
 
 export default function WorldCanvas() {
   const pathname = usePathname();
-  const router   = useRouter();
 
   const [cap, setCap]         = useState(null); // null = not yet checked
   const [sceneReady, setSceneReady] = useState(false);
   const [opacity, setOpacity] = useState(0);
+  const [selectedHotspot, setSelectedHotspot] = useState(null);
   const labelRefs = useRef({});
 
   // ── 1. Run capability check after hydration (idle) ──────────────────────────
@@ -69,11 +70,11 @@ export default function WorldCanvas() {
     }
   }, [sceneReady]);
 
-  // ── 3. Hotspot click → router.push ──────────────────────────────────────────
+  // ── 3. Hotspot click → show popup card (not immediate navigation) ────────────
   const handleSelect = useCallback((id) => {
     const hs = hotspots.find((h) => h.id === id);
-    if (hs) router.push(hs.href);
-  }, [router]);
+    if (hs) setSelectedHotspot(hs);
+  }, []);
 
   // ── 4. Resolve camera pose for current route ─────────────────────────────────
   const targetPose = routePoses[pathname] || defaultPose;
@@ -82,26 +83,34 @@ export default function WorldCanvas() {
   if (cap === null || !cap.ok) return null;
 
   return (
-    <div
-      aria-hidden="true"
-      style={{
-        position: "fixed",
-        inset: 0,
-        zIndex: 0,
-        pointerEvents: "auto",  // scene receives pointer events (drag/orbit)
-        opacity,
-        transition: sceneReady ? "opacity 600ms ease" : "none",
-        background: "#0B1220",
-      }}
-    >
-      <Scene
-        hotspots={hotspots}
-        targetPose={targetPose}
-        onSelect={handleSelect}
-        labelRefs={labelRefs}
-        onReady={handleSceneReady}
-        reducedMotion={cap?.reducedMotion}
+    <>
+      <div
+        aria-hidden="true"
+        style={{
+          position: "fixed",
+          inset: 0,
+          zIndex: 0,
+          pointerEvents: "auto", // scene receives pointer events (drag/orbit)
+          opacity,
+          transition: sceneReady ? "opacity 600ms ease" : "none",
+          background: "#0B1220",
+        }}
+      >
+        <Scene
+          hotspots={hotspots}
+          targetPose={targetPose}
+          onSelect={handleSelect}
+          labelRefs={labelRefs}
+          onReady={handleSceneReady}
+          reducedMotion={cap?.reducedMotion}
+        />
+      </div>
+
+      {/* Hotspot popup — rendered outside the canvas div so pointer-events work */}
+      <HotspotPopup
+        hotspot={selectedHotspot}
+        onClose={() => setSelectedHotspot(null)}
       />
-    </div>
+    </>
   );
 }
