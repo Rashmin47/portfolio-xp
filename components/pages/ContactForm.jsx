@@ -71,8 +71,13 @@ export default function ContactForm() {
 
   const isSubmitting = status.type === "loading";
 
+  const labelClass =
+    "w-20 shrink-0 font-mono text-[11px] uppercase tracking-wider font-bold text-paper/70";
+  const fieldClass =
+    "min-w-0 flex-1 bg-paper/5 border border-paper/10 rounded-md px-3 py-2 text-paper placeholder:text-paper/35 focus:outline-none focus:border-signal focus:ring-1 focus:ring-signal transition-colors";
+
   return (
-    <form onSubmit={onSubmit} className="space-y-4 font-mono text-xs">
+    <form onSubmit={onSubmit} className="font-mono text-xs">
       {/* Bot honeypot field */}
       <input
         type="checkbox"
@@ -85,20 +90,18 @@ export default function ContactForm() {
         style={{ display: "none" }}
       />
 
-      {/* ── macOS Mail Header Fields ────────────────────────────────────── */}
-      <div className="space-y-2 border-b border-paper/10 pb-4">
-        {/* To field */}
-        <div className="flex items-center gap-3">
-          <span className="w-16 text-muted uppercase font-bold text-[11px]">To:</span>
-          <span className="px-2.5 py-1 rounded bg-sky/15 text-sky border border-sky/20 font-medium">
+      {/* ── Compose header: one labelled row per field ─────────────────── */}
+      <div className="divide-y divide-paper/10 border-y border-paper/10">
+        <div className="flex items-center gap-3 py-3">
+          <span className={labelClass}>To</span>
+          <span className="min-w-0 flex-1 truncate rounded-md border border-sky/25 bg-sky/10 px-3 py-2 font-medium text-sky">
             {siteConfig.name} &lt;rashminsharma47@gmail.com&gt;
           </span>
         </div>
 
-        {/* From field */}
-        <div className="flex items-center gap-3">
-          <label htmlFor="contact-email" className="w-16 text-muted uppercase font-bold text-[11px]">
-            From:
+        <div className="flex items-center gap-3 py-3">
+          <label htmlFor="contact-email" className={labelClass}>
+            From
           </label>
           <input
             id="contact-email"
@@ -106,14 +109,13 @@ export default function ContactForm() {
             type="email"
             required
             placeholder="your.email@domain.com"
-            className="flex-1 bg-paper/5 border border-paper/10 rounded px-3 py-1.5 text-paper placeholder:text-muted/50 focus:outline-none focus:border-signal"
+            className={fieldClass}
           />
         </div>
 
-        {/* Name field */}
-        <div className="flex items-center gap-3">
-          <label htmlFor="contact-name" className="w-16 text-muted uppercase font-bold text-[11px]">
-            Name:
+        <div className="flex items-center gap-3 py-3">
+          <label htmlFor="contact-name" className={labelClass}>
+            Name
           </label>
           <input
             id="contact-name"
@@ -121,14 +123,13 @@ export default function ContactForm() {
             type="text"
             required
             placeholder="Your name"
-            className="flex-1 bg-paper/5 border border-paper/10 rounded px-3 py-1.5 text-paper placeholder:text-muted/50 focus:outline-none focus:border-signal"
+            className={fieldClass}
           />
         </div>
 
-        {/* Subject field */}
-        <div className="flex items-center gap-3">
-          <label htmlFor="contact-subject" className="w-16 text-muted uppercase font-bold text-[11px]">
-            Subject:
+        <div className="flex items-center gap-3 py-3">
+          <label htmlFor="contact-subject" className={labelClass}>
+            Subject
           </label>
           <input
             id="contact-subject"
@@ -136,20 +137,23 @@ export default function ContactForm() {
             type="text"
             required
             placeholder="Project inquiry / Collaboration / Say hello"
-            className="flex-1 bg-paper/5 border border-paper/10 rounded px-3 py-1.5 text-paper placeholder:text-muted/50 focus:outline-none focus:border-signal"
+            className={fieldClass}
           />
         </div>
       </div>
 
       {/* ── Message Compose Area ────────────────────────────────────────── */}
-      <div className="pt-2">
+      <div className="pt-4">
+        <label htmlFor="contact-message" className="sr-only">
+          Message
+        </label>
         <textarea
           id="contact-message"
           name="message"
           required
-          rows={6}
+          rows={8}
           placeholder="Write your message here..."
-          className="w-full bg-paper/5 border border-paper/10 rounded-lg p-3 text-sm text-paper placeholder:text-muted/50 focus:outline-none focus:border-signal resize-none leading-relaxed"
+          className="min-h-[220px] w-full resize-y rounded-lg border border-paper/10 bg-paper/5 p-4 text-sm leading-relaxed text-paper placeholder:text-paper/35 focus:outline-none focus:border-signal focus:ring-1 focus:ring-signal"
         />
       </div>
 
@@ -157,12 +161,12 @@ export default function ContactForm() {
       {status.message && (
         <div
           role="status"
-          className={`p-3 rounded-lg text-xs leading-relaxed ${
+          className={`mt-4 rounded-lg border p-3 text-xs leading-relaxed text-paper ${
             status.type === "success"
-              ? "bg-board/20 text-board border border-board/30"
+              ? "border-board/40 bg-board/15"
               : status.type === "error"
-              ? "bg-red-500/20 text-red-200 border border-red-500/30"
-              : "bg-paper/10 text-paper"
+              ? "border-red-500/40 bg-red-500/15"
+              : "border-paper/15 bg-paper/10"
           }`}
         >
           {status.message}
@@ -170,15 +174,15 @@ export default function ContactForm() {
       )}
 
       {/* ── Action Bar ──────────────────────────────────────────────────── */}
-      <div className="flex items-center justify-between pt-2">
-        <span className="text-[11px] text-muted">
+      <div className="mt-4 flex flex-col gap-3 border-t border-paper/10 pt-4 sm:flex-row sm:items-center sm:justify-between">
+        <span className="text-[11px] text-paper/60">
           Sent directly to Rashmin&apos;s inbox.
         </span>
 
         <button
           type="submit"
           disabled={isSubmitting}
-          className="font-mono text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-lg bg-signal text-ink hover:opacity-90 active:scale-95 disabled:opacity-50 transition-all flex items-center gap-2 shadow-md"
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-signal px-5 py-2.5 font-mono text-xs font-bold uppercase tracking-wider text-ink transition-all hover:opacity-90 active:scale-95 disabled:opacity-50 sm:w-auto"
         >
           <span>{isSubmitting ? "Sending..." : "Send email"}</span>
           <span>↗</span>

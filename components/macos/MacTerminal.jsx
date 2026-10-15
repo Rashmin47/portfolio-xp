@@ -224,7 +224,7 @@ export default function MacTerminal({
   }, [history]);
 
   return (
-    <div className="p-5 font-mono text-paper flex-1 flex flex-col justify-between">
+    <div className="p-4 sm:p-6 font-mono text-paper flex-1 flex flex-col justify-between">
       {/* ── Terminal Header Info ────────────────────────────────────── */}
       <div className="space-y-4">
         <p className="text-xs text-muted font-mono pb-2">

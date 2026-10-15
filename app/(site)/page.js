@@ -104,7 +104,7 @@ export default async function HomePage() {
       />
 
       {/* ── Indexed content sections below the terminal ─────────────────── */}
-      <div className="px-5 pb-8 space-y-12">
+      <div className="px-4 sm:px-6 pb-8 sm:pb-10 space-y-12">
 
         {/* 01 Projects */}
         {publishedProjects.length > 0 && (

@@ -15,10 +15,8 @@ export default function SiteLayout({ children }) {
 
       {/* Main macOS Application Window over 3D Workshop Desk */}
       <Panel>
-        <main
-          id="main-content"
-          className="flex-1 min-h-0 flex flex-col overflow-y-auto"
-        >
+        {/* Single scroll owner: the app shells (Finder/editor) or the window body */}
+        <main id="main-content" className="flex-1 min-h-0 flex flex-col">
           {children}
         </main>
       </Panel>

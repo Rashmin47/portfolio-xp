@@ -57,10 +57,10 @@ export default function Header() {
         }}
       >
         {/* Left: Studio monogram + App Name + Menus */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <Link
             href="/"
-            className="flex items-center gap-1.5 font-bold hover:text-sky transition-colors text-paper"
+            className="flex items-center gap-1.5 font-bold hover:text-sky transition-colors text-paper rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
             title="Rashmin Sharma Workspace"
           >
             {/* Studio monogram (own mark, no platform glyph) */}
@@ -89,30 +89,40 @@ export default function Header() {
           </span>
 
           {/* System Menus */}
-          <nav aria-label="System Navigation" className="hidden md:flex items-center gap-3 text-muted">
-            <Link href="/" className={`hover:text-paper transition-colors${pathname === "/" ? " text-paper font-semibold" : ""}`}>
-              Home
-            </Link>
-            <Link href="/projects" className={`hover:text-paper transition-colors${pathname?.startsWith("/projects") ? " text-paper font-semibold" : ""}`}>
-              Projects
-            </Link>
-            <Link href="/experience" className={`hover:text-paper transition-colors${pathname?.startsWith("/experience") ? " text-paper font-semibold" : ""}`}>
-              Experience
-            </Link>
-            <Link href="/about" className={`hover:text-paper transition-colors${pathname?.startsWith("/about") ? " text-paper font-semibold" : ""}`}>
-              About
-            </Link>
-            <Link href="/notes" className={`hover:text-paper transition-colors${pathname?.startsWith("/notes") ? " text-paper font-semibold" : ""}`}>
-              Notes
-            </Link>
-            <Link href="/contact" className={`hover:text-paper transition-colors${pathname?.startsWith("/contact") ? " text-paper font-semibold" : ""}`}>
-              Contact
-            </Link>
+          <nav
+            aria-label="System Navigation"
+            className="hidden md:flex items-center gap-1 text-muted"
+          >
+            {[
+              { href: "/", label: "Home" },
+              { href: "/projects", label: "Projects" },
+              { href: "/experience", label: "Experience" },
+              { href: "/about", label: "About" },
+              { href: "/notes", label: "Notes" },
+              { href: "/contact", label: "Contact" },
+            ].map(({ href, label }) => {
+              const active =
+                href === "/" ? pathname === "/" : pathname?.startsWith(href);
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  aria-current={active ? "page" : undefined}
+                  className={`rounded-md px-2 py-0.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal ${
+                    active
+                      ? "bg-paper/10 font-semibold text-paper"
+                      : "hover:bg-paper/5 hover:text-paper"
+                  }`}
+                >
+                  {label}
+                </Link>
+              );
+            })}
           </nav>
         </div>
 
         {/* Right: Status Indicators & Theme */}
-        <div className="flex items-center gap-3 text-muted">
+        <div className="flex items-center gap-2 sm:gap-3 text-muted">
           <span className="hidden sm:inline text-[10px]">Kathmandu, NP</span>
           {timeStr && <span className="text-paper/90 text-[10px]">{timeStr} NPT</span>}
           <div className="scale-75 origin-right">

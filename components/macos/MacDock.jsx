@@ -28,16 +28,16 @@ export default function MacDock({ onOpenAI, onOpenTerminal }) {
   ];
 
   const buttonBase =
-    "dock-magnify w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center";
+    "dock-magnify w-8 h-8 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl flex items-center justify-center";
 
   return (
     <div
-      className="fixed bottom-3 left-1/2 -translate-x-1/2 z-30 pointer-events-auto"
+      className="fixed bottom-3 left-1/2 -translate-x-1/2 z-30 pointer-events-auto max-w-[calc(100vw-0.75rem)]"
       role="toolbar"
       aria-label="Application dock"
     >
       <div
-        className="flex items-end gap-1.5 sm:gap-2 px-3 py-2 rounded-2xl border border-paper/15 shadow-2xl backdrop-blur-xl"
+        className="flex flex-wrap items-end justify-center gap-1 sm:gap-2 px-2 py-1.5 sm:px-3 sm:py-2 rounded-2xl border border-paper/15 shadow-2xl backdrop-blur-xl"
         style={{
           background: "rgba(15, 23, 42, 0.85)",
           boxShadow: "0 20px 40px -10px rgba(0,0,0,0.7), inset 0 1px 0 0 rgba(255,255,255,0.1)",
@@ -88,7 +88,7 @@ export default function MacDock({ onOpenAI, onOpenTerminal }) {
         })}
 
         {/* Separator */}
-        <div className="w-px h-7 bg-paper/15 mx-1 self-center" />
+        <div className="hidden w-px h-7 bg-paper/15 mx-1 self-center min-[380px]:block" />
 
         {/* Assistant */}
         <div className="relative group flex flex-col items-center">

@@ -72,7 +72,7 @@ export default function MacWindow({
       >
         {/* ── macOS Title Bar ────────────────────────────────────────────── */}
         <div
-          className="h-11 px-4 border-b border-paper/10 flex items-center justify-between shrink-0 select-none bg-night-surface/90"
+          className="h-11 px-4 sm:px-6 border-b border-paper/10 flex items-center justify-between shrink-0 select-none bg-night-surface/90"
         >
           {/* Traffic Lights (🔴 🟡 🟢) */}
           <div className="flex items-center gap-2">
@@ -81,7 +81,7 @@ export default function MacWindow({
               type="button"
               onClick={handleClose}
               title="Close window (go to home)"
-              className="w-3.5 h-3.5 rounded-full bg-[#FF5F56] border border-[#E0443E] flex items-center justify-center group focus:outline-none"
+              className="w-3.5 h-3.5 rounded-full bg-[#FF5F56] border border-[#E0443E] flex items-center justify-center group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
             >
               <span className="opacity-0 group-hover:opacity-100 text-[9px] font-bold text-black/70 leading-none">
                 ×
@@ -92,7 +92,7 @@ export default function MacWindow({
               type="button"
               onClick={handleMinimize}
               title="Minimize window"
-              className="w-3.5 h-3.5 rounded-full bg-[#FFBD2E] border border-[#DEA123] flex items-center justify-center group focus:outline-none"
+              className="w-3.5 h-3.5 rounded-full bg-[#FFBD2E] border border-[#DEA123] flex items-center justify-center group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
             >
               <span className="opacity-0 group-hover:opacity-100 text-[9px] font-bold text-black/70 leading-none">
                 –
@@ -103,7 +103,7 @@ export default function MacWindow({
               type="button"
               onClick={handleMaximize}
               title={expanded ? "Restore size" : "Expand window"}
-              className="w-3.5 h-3.5 rounded-full bg-[#27C93F] border border-[#1AAB29] flex items-center justify-center group focus:outline-none"
+              className="w-3.5 h-3.5 rounded-full bg-[#27C93F] border border-[#1AAB29] flex items-center justify-center group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
             >
               <span className="opacity-0 group-hover:opacity-100 text-[8px] font-bold text-black/70 leading-none">
                 +
@@ -128,7 +128,7 @@ export default function MacWindow({
                 type="button"
                 onClick={onOpenAI}
                 title="Ask AI Assistant"
-                className="font-mono text-[11px] px-2.5 py-1 rounded-md bg-paper/10 hover:bg-paper/20 text-paper flex items-center gap-1.5 transition-colors"
+                className="font-mono text-[11px] px-2.5 py-1 rounded-md bg-paper/10 hover:bg-paper/20 text-paper flex items-center gap-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
               >
                 <span className="w-2 h-2 rounded-full bg-board animate-pulse" />
                 <span>AI</span>
@@ -138,7 +138,7 @@ export default function MacWindow({
             <button
               type="button"
               onClick={handleMinimize}
-              className="md:hidden text-muted hover:text-paper text-xs font-mono px-2 py-0.5 rounded bg-paper/5"
+              className="md:hidden text-paper/70 hover:text-paper text-xs font-mono px-2 py-0.5 rounded bg-paper/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
             >
               {collapsed ? "Expand" : "Peek"}
             </button>
@@ -147,7 +147,7 @@ export default function MacWindow({
 
         {/* ── Window Content Body ────────────────────────────────────────── */}
         {!collapsed && (
-          <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden flex flex-col">
+          <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden flex flex-col max-md:pb-16">
             {children}
           </div>
         )}
