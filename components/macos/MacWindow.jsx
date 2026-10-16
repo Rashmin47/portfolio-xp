@@ -114,7 +114,7 @@ export default function MacWindow({
 
           {/* Window Center Title & App Icon */}
           <div className="flex items-center gap-2 font-mono text-xs font-semibold text-chrome-text/90 truncate px-2">
-            {appType === "terminal" && <span className="text-sky text-sm">⬛</span>}
+            {appType === "terminal" && <span className="text-sky text-xs font-bold">❯_</span>}
             {appType === "textedit" && <span className="text-signal text-sm">📝</span>}
             {appType === "finder" && <span className="text-sky text-sm">📁</span>}
             {appType === "mail" && <span className="text-sky text-sm">✉️</span>}

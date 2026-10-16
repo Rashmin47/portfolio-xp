@@ -24,12 +24,14 @@ const C = {
   nightSurf:   "#131D33",
   muted:       "#5B6578",
 
-  // Room tones — walls and floor sit darker so the desk stays the focal plane
-  wall:        "#171E2B",
-  wallTrim:    "#121926",
-  woodFloor:   "#241A14",
-  floorPlank:  "#2C2118",
-  rug:         "#162032",
+  // Room tones — a dim studio, lifted just enough that the back wall, floor
+  // and window read as a room instead of falling away to pure black. Still
+  // well below the desk in value, so the workspace stays the focal plane.
+  wall:        "#212C40",
+  wallTrim:    "#1A2334",
+  woodFloor:   "#31251A",
+  floorPlank:  "#3C2D20",
+  rug:         "#1D2A45",
 
   // Darker, desaturated desk wood (palette-adjacent: ink / cobalt / signal)
   deskTop:     "#5B4839",
@@ -44,7 +46,7 @@ const C = {
 
   piPcb:       "#207D3E",
   piChip:      "#181E26",
-  piSilver:    "#E2E8F0",
+  piSilver:    "#CBD5E1",
   piGold:      "#D4AF37",
 
   coasterCork: "#A2744B",
@@ -369,7 +371,7 @@ function SceneLighting() {
       <pointLight
         position={[-1.2, 1.4, 0.2]}
         color="#FFE4A0"
-        intensity={1.15}
+        intensity={0.95}
         distance={3.5}
         decay={2}
       />
@@ -380,7 +382,7 @@ function SceneLighting() {
         position={[-1.28, 1.55, -0.14]}
         target-position={[-0.5, 0.77, 0.06]}
         color={C.lampCone}
-        intensity={1.3}
+        intensity={1.05}
         angle={0.62}
         penumbra={1}
         distance={4.5}
@@ -398,17 +400,18 @@ function SceneLighting() {
       <pointLight
         position={[-0.05, 1.05, 0.25]}
         color="#62C0FF"
-        intensity={0.8}
+        intensity={0.65}
         distance={1.6}
         decay={2}
       />
 
-      {/* Soft green hardware glow on the Raspberry Pi breadboard */}
+      {/* Soft green hardware glow on the Raspberry Pi breadboard — low, so the
+          board reads as a lit device rather than a lamp */}
       <pointLight
         position={[1.25, 0.95, 0.1]}
         color="#2EA84B"
-        intensity={1.0}
-        distance={1.2}
+        intensity={0.5}
+        distance={0.95}
         decay={2}
       />
 
@@ -424,7 +427,7 @@ function SceneLighting() {
 
       {/* Dark exponential fog — low density, so only the far floor edge and the
           back corners fall away; the desk sits well inside the near range. */}
-      <fogExp2 attach="fog" color={C.night} density={0.038} />
+      <fogExp2 attach="fog" color={C.night} density={0.03} />
     </>
   );
 }
@@ -501,6 +504,15 @@ function Room() {
 
   return (
     <group name="obj_room">
+      {/* Soft warm wall wash behind the desk: separates the workspace from the
+          back wall and gives the room depth without lighting the whole frame */}
+      <GlowPanel
+        position={[0.1, 1.55, -2.57]}
+        size={[7.2, 3.8]}
+        color={C.poolWarm}
+        opacity={0.07}
+      />
+
       {/* Back main wall */}
       <mesh position={[0, 2.5, -2.6]} material={wallMat}>
         <planeGeometry args={[14, 7]} />
@@ -623,7 +635,7 @@ function Desk() {
         rotation={[-Math.PI / 2, 0, 0]}
         size={[2.4, 1.1]}
         color={C.poolWarm}
-        opacity={0.12}
+        opacity={0.09}
       />
     </group>
   );
@@ -767,8 +779,8 @@ function Laptop({ hovered, onClick }) {
         <boxGeometry args={[0.16, 0.002, 0.1]} />
       </mesh>
 
-      {/* Display lid (opened to a natural ~107 deg) */}
-      <group position={[0, 0.018, -0.175]} rotation={[-1.28, 0, 0]}>
+      {/* Display lid (opened to a natural ~97 deg) */}
+      <group position={[0, 0.018, -0.175]} rotation={[-1.44, 0, 0]}>
         {/* Back display shell */}
         <mesh position={[0, 0.17, 0]} material={aluMat}>
           <boxGeometry args={[0.54, 0.34, 0.012]} />
@@ -855,11 +867,12 @@ function RaspberryPi({ hovered, onClick }) {
   const chipMat   = useMat(C.piChip,   { roughness: 0.2, metalness: 0.6 });
   const silverMat = useMat(C.piSilver, { roughness: 0.3, metalness: 0.9 });
   const goldMat   = useMat(C.piGold,   { roughness: 0.2, metalness: 0.8 });
-  const bbMat     = useMat("#F8FAFC",  { roughness: 0.7 });
+  // Muted board plastic: at pure white it caught the sky fill and glowed
+  const bbMat     = useMat("#C9D2DF",  { roughness: 0.8 });
 
-  const ledRedMat    = useMat("#EF4444", { emissive: "#DC2626", emissiveIntensity: 1.2 });
-  const ledGreenMat  = useMat("#22C55E", { emissive: "#16A34A", emissiveIntensity: 1.5 });
-  const ledYellowMat = useMat("#EAB308", { emissive: "#CA8A04", emissiveIntensity: hovered ? 2.5 : 1.2 });
+  const ledRedMat    = useMat("#EF4444", { emissive: "#DC2626", emissiveIntensity: 0.6 });
+  const ledGreenMat  = useMat("#22C55E", { emissive: "#16A34A", emissiveIntensity: 0.8 });
+  const ledYellowMat = useMat("#EAB308", { emissive: "#CA8A04", emissiveIntensity: hovered ? 1.4 : 0.75 });
 
   useFrame((_, delta) => {
     if (!groupRef.current) return;
@@ -1011,8 +1024,8 @@ function RoadmapBoard({ hovered, onClick }) {
 function Notebook({ hovered, onClick }) {
   const groupRef = useRef();
   const coverMat = useMat(C.cobalt,    { roughness: 0.6 });
-  const paperMat = useMat("#E9DFCB",   { roughness: 0.9 });
-  const pageMat  = useMat("#DED2B9",   { roughness: 0.9 });
+  const paperMat = useMat("#E1D6BE",   { roughness: 0.92 });
+  const pageMat  = useMat("#D4C8AC",   { roughness: 0.92 });
   const penMat   = useMat(C.lampBrass, { roughness: 0.2, metalness: 0.85 });
   const lineMat  = useMat("#8C97A8",   { roughness: 0.85 });
 
@@ -1795,7 +1808,8 @@ export default function Scene({
         }}
         gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.0 }}
         style={{
-          background: "radial-gradient(ellipse at 50% 30%, #172338 0%, #0B1220 100%)",
+          background:
+            "radial-gradient(ellipse 118% 88% at 52% 30%, #26354F 0%, #17233A 44%, #0C1424 100%)",
           width: "100%",
           height: "100%",
         }}

@@ -20,7 +20,7 @@ export default function MacFinder({
   const pathname = usePathname();
 
   const SIDEBAR_ITEMS = [
-    { href: "/", label: "Home (zsh)", icon: "⬛" },
+    { href: "/", label: "Home (zsh)", icon: "❯" },
     { href: "/projects", label: "Projects", icon: "📁" },
     { href: "/experience", label: "Experience", icon: "💼" },
     { href: "/lab", label: "The Lab", icon: "🔬" },
