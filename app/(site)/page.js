@@ -16,8 +16,8 @@ import Link from "next/link";
 import MacTerminal from "@/components/macos/MacTerminal";
 
 export const metadata = buildMetadata({
-  title: { absolute: "Rashmin Sharma | Software Developer, Nepal" },
-  description: siteConfig.hero.support,
+  title: { absolute: "Rashmin Sharma — Software Developer in Kathmandu, Nepal" },
+  description: `Portfolio of ${siteConfig.name}, a software developer in Kathmandu, Nepal: selected projects, the lab, the public roadmap and engineering notes.`,
   path: "/",
 });
 

@@ -1,4 +1,5 @@
 import { roadmap } from "@/data/roadmap";
+import { siteConfig } from "@/data/site";
 import { buildMetadata, pageBreadcrumb } from "@/lib/seo";
 import { visibleItems } from "@/lib/content";
 import SectionHeader from "@/components/ui/SectionHeader";
@@ -9,8 +10,8 @@ import JsonLd from "@/components/seo/JsonLd";
 export async function generateMetadata() {
   const publishedRoadmap = visibleItems(roadmap);
   return buildMetadata({
-    title: "Roadmap",
-    description: "Public engineering roadmap: now, next, and later initiatives by Rashmin Sharma.",
+    title: "Public Engineering Roadmap: Now, Next, Later",
+    description: `An open engineering roadmap from ${siteConfig.name}: what is being built now, what is queued next and what is planned for later.`,
     path: "/roadmap",
     noindex: publishedRoadmap.length === 0,
   });

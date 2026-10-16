@@ -1,4 +1,5 @@
 import { lab } from "@/data/lab";
+import { siteConfig } from "@/data/site";
 import { buildMetadata, pageBreadcrumb } from "@/lib/seo";
 import { visibleItems } from "@/lib/content";
 import SectionHeader from "@/components/ui/SectionHeader";
@@ -11,8 +12,8 @@ import JsonLd from "@/components/seo/JsonLd";
 export async function generateMetadata() {
   const publishedLab = visibleItems(lab);
   return buildMetadata({
-    title: "The Lab",
-    description: "Hardware, edge computing, and applied AI experiments by Rashmin Sharma.",
+    title: "The Lab: Hardware and Applied AI Experiments",
+    description: `Bench notes from ${siteConfig.name}'s lab: embedded hardware, edge sensors and applied AI prototypes, with hardware lists and repositories.`,
     path: "/lab",
     noindex: publishedLab.length === 0,
   });

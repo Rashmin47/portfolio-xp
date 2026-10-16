@@ -3,7 +3,7 @@ import { projects } from "@/data/projects";
 import { lab } from "@/data/lab";
 import { roadmap } from "@/data/roadmap";
 import { notes } from "@/data/notes";
-import { ventures } from "@/data/ventures";
+import { experience } from "@/data/experience";
 import { visibleItems } from "@/lib/content";
 
 /**
@@ -49,8 +49,7 @@ export default function sitemap() {
     { path: "/lab", items: published(lab), changeFrequency: "weekly", priority: 0.7 },
     { path: "/roadmap", items: published(roadmap), changeFrequency: "weekly", priority: 0.7 },
     { path: "/notes", items: published(notes), changeFrequency: "weekly", priority: 0.7 },
-    { path: "/ventures", items: published(ventures), priority: 0.7 },
-    { path: "/experience", items: published(ventures), priority: 0.7 },
+    { path: "/experience", items: published(experience), priority: 0.7 },
   ];
 
   for (const collection of collections) {

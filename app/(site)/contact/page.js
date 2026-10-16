@@ -6,8 +6,8 @@ import Button from "@/components/ui/Button";
 import JsonLd from "@/components/seo/JsonLd";
 
 export const metadata = buildMetadata({
-  title: "Contact",
-  description: "Get in touch with Rashmin Sharma.",
+  title: "Contact Rashmin Sharma, Software Developer",
+  description: `Contact ${siteConfig.name} in Kathmandu, Nepal: send a message through the form, or connect directly on GitHub and LinkedIn.`,
   path: "/contact",
 });
 

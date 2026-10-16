@@ -13,7 +13,7 @@
  */
 
 /** @type {Venture[]} */
-export const ventures = [
+export const experience = [
   {
     id: "sample-venture-a",
     name: "Sample Venture Alpha",

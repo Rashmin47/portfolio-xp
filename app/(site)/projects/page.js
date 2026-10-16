@@ -1,4 +1,5 @@
 import { projects } from "@/data/projects";
+import { siteConfig } from "@/data/site";
 import { buildMetadata, pageBreadcrumb } from "@/lib/seo";
 import { visibleItems } from "@/lib/content";
 import SectionHeader from "@/components/ui/SectionHeader";
@@ -9,8 +10,8 @@ import JsonLd from "@/components/seo/JsonLd";
 export async function generateMetadata() {
   const publishedProjects = visibleItems(projects);
   return buildMetadata({
-    title: "Projects",
-    description: "Projects and case studies by Rashmin Sharma.",
+    title: "Projects and Case Studies by Rashmin Sharma",
+    description: `Engineering records by ${siteConfig.name}: the problem, constraints, decisions with trade-offs, what broke and the outcome.`,
     path: "/projects",
     noindex: publishedProjects.length === 0,
   });

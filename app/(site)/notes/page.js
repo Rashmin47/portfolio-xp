@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notes } from "@/data/notes";
+import { siteConfig } from "@/data/site";
 import { buildMetadata, pageBreadcrumb } from "@/lib/seo";
 import { visibleItems } from "@/lib/content";
 import SectionHeader from "@/components/ui/SectionHeader";
@@ -11,8 +12,8 @@ import JsonLd from "@/components/seo/JsonLd";
 export async function generateMetadata() {
   const publishedNotes = visibleItems(notes);
   return buildMetadata({
-    title: "Notes",
-    description: "Technical writings, engineering logs, and research notes by Rashmin Sharma.",
+    title: "Engineering Notes by Rashmin Sharma",
+    description: `Technical essays, engineering logs and post-mortems from ${siteConfig.name} on building web applications, backend systems and hardware.`,
     path: "/notes",
     noindex: publishedNotes.length === 0,
   });

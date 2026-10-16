@@ -1,4 +1,4 @@
-import { ventures } from "@/data/ventures";
+import { experience } from "@/data/experience";
 import { buildMetadata, pageBreadcrumb } from "@/lib/seo";
 import { visibleItems } from "@/lib/content";
 import SectionHeader from "@/components/ui/SectionHeader";
@@ -8,20 +8,21 @@ import MacFinder from "@/components/macos/MacFinder";
 import JsonLd from "@/components/seo/JsonLd";
 
 export async function generateMetadata() {
-  const publishedVentures = visibleItems(ventures);
+  const publishedExperience = visibleItems(experience);
   return buildMetadata({
-    title: "Experience",
-    description: "Ventures, product explorations, and companies in progress by Rashmin Sharma.",
+    title: "Experience and Ventures by Rashmin Sharma",
+    description:
+      "Companies, independent products and business experiments in progress, with the role, stage and status of each venture.",
     path: "/experience",
-    noindex: publishedVentures.length === 0,
+    noindex: publishedExperience.length === 0,
   });
 }
 
-export default function VenturesPage() {
-  const publishedVentures = visibleItems(ventures);
+export default function ExperiencePage() {
+  const publishedExperience = visibleItems(experience);
 
   return (
-    <MacFinder sectionTitle="Experience" currentFolder="experience" itemCount={publishedVentures.length}>
+    <MacFinder sectionTitle="Experience" currentFolder="experience" itemCount={publishedExperience.length}>
       <JsonLd data={pageBreadcrumb("Experience", "/experience")} />
       <SectionHeader number="01" label="EXPERIENCE" />
 
@@ -34,7 +35,7 @@ export default function VenturesPage() {
         </p>
       </div>
 
-      {publishedVentures.length === 0 ? (
+      {publishedExperience.length === 0 ? (
         <div className="py-12 border-t border-ink/10 dark:border-paper/10">
           <p className="font-mono text-xs uppercase tracking-wider text-muted">
             In progress · Venture information and case studies are currently being documented.
@@ -42,7 +43,7 @@ export default function VenturesPage() {
         </div>
       ) : (
         <div className="space-y-12">
-          {publishedVentures.map((venture) => {
+          {publishedExperience.map((venture) => {
             const name = venture.name || venture.title;
             return (
               <article

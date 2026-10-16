@@ -13,6 +13,10 @@
  *   - every application/ld+json block parses
  *   - at least three internal links
  *
+ * It then checks the prerendered sitemap.xml / robots.txt output when the build
+ * wrote it: no "localhost" and no "/ventures" in the sitemap, and the sitemap
+ * URL present in robots. Missing artifacts are reported as skipped.
+ *
  * Usage: SITE_URL=https://rashmin.com.np npm run build && SITE_URL=... npm run seo:check
  */
 import { readFile, readdir } from "node:fs/promises";
@@ -227,6 +231,60 @@ console.log(
 for (const row of rows) console.log(line(row));
 
 console.log("");
-console.log(`${rows.length} routes checked, ${failed} failed.`);
 
-if (failed > 0) process.exit(1);
+// ── Prerendered sitemap.xml / robots.txt ─────────────────────────────────────
+/** Read a prerendered artifact as text, or null when this build wrote none. */
+async function readArtifact(name, looksRight) {
+  for (const candidate of [`${name}.body`, name, `${name}.txt`]) {
+    try {
+      const text = await readFile(path.join(APP_DIR, candidate), "utf8");
+      if (looksRight(text)) return text;
+    } catch {
+      // try the next candidate
+    }
+  }
+  return null;
+}
+
+const sitemapProblems = [];
+const sitemap = await readArtifact("sitemap.xml", (t) => t.includes("<urlset"));
+if (sitemap === null) {
+  console.log("sitemap.xml  skipped (no readable sitemap output)");
+} else {
+  if (/localhost/i.test(sitemap)) sitemapProblems.push("contains localhost");
+  if (sitemap.includes("/ventures")) sitemapProblems.push("contains /ventures");
+  console.log(
+    `sitemap.xml  ${
+      sitemapProblems.length === 0
+        ? "PASS (no localhost, no /ventures)"
+        : `FAIL (${sitemapProblems.join(", ")})`
+    }`
+  );
+}
+
+const robotsProblems = [];
+const robots = await readArtifact("robots.txt", (t) => /^user-agent:/im.test(t));
+if (robots === null) {
+  console.log("robots.txt   skipped (no readable robots output)");
+} else {
+  if (!robots.includes(`${SITE_URL}/sitemap.xml`)) {
+    robotsProblems.push("sitemap URL missing");
+  }
+  console.log(
+    `robots.txt   ${
+      robotsProblems.length === 0
+        ? "PASS (sitemap URL present)"
+        : `FAIL (${robotsProblems.join(", ")})`
+    }`
+  );
+}
+
+const artifactFailures = sitemapProblems.length + robotsProblems.length;
+
+console.log("");
+console.log(
+  `${rows.length} routes checked, ${failed} failed. ` +
+    `${artifactFailures === 0 ? "Artifact checks passed." : `${artifactFailures} artifact check(s) failed.`}`
+);
+
+if (failed > 0 || artifactFailures > 0) process.exit(1);

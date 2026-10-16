@@ -18,6 +18,12 @@
 
 /** @type {AboutData} */
 export const about = {
+  photo: {
+    src: "/rashmin-portrait.jpg",
+    alt: "Portrait of Rashmin Sharma",
+    width: 853,
+    height: 1200,
+  },
   // Answer-first opening for /about. Restates the first bio paragraph in the
   // third person so the page leads with who he is; no new claims.
   intro: [

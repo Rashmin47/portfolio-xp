@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { siteConfig } from "@/data/site";
 import { about } from "@/data/about";
 import {
@@ -15,8 +14,9 @@ import Prose from "@/components/ui/Prose";
 import MacTextEdit from "@/components/macos/MacTextEdit";
 
 export const metadata = buildMetadata({
-  title: "About",
-  description: `About ${siteConfig.name}, ${siteConfig.role.toLowerCase()} based in ${siteConfig.location}.`,
+  title: "About Rashmin Sharma | Software Developer, Kathmandu",
+  description:
+    "A software developer in Kathmandu, Nepal building reliable web applications and backend systems, plus hardware and applied AI experiments.",
   path: "/about",
 });
 
@@ -45,14 +45,17 @@ export default function AboutPage() {
         {/* Left Column: Sticky on Desktop */}
         <aside className="@2xl:col-span-1 @2xl:sticky @2xl:top-6 space-y-6 min-w-0">
           {about.photo?.src && (
-            <div className="rounded-[14px] overflow-hidden border border-ink/10 dark:border-paper/10 aspect-square max-w-[240px]">
-              <Image
+            <div className="rounded-[14px] overflow-hidden border border-ink/10 dark:border-paper/10 max-w-[240px]">
+              {/* Plain <img>: portrait is a static asset, no optimizer needed */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 src={about.photo.src}
-                alt={about.photo.alt || siteConfig.name}
-                width={about.photo.width || 400}
-                height={about.photo.height || 400}
-                className="w-full h-full object-cover"
-                priority
+                alt={about.photo.alt}
+                width={about.photo.width}
+                height={about.photo.height}
+                loading="lazy"
+                decoding="async"
+                className="w-full h-auto object-cover"
               />
             </div>
           )}

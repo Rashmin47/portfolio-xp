@@ -25,10 +25,8 @@ const jetbrains = JetBrains_Mono({
 
 export const metadata = {
   metadataBase: new URL(siteUrl),
-  title: {
-    default: "Rashmin Sharma | Software Developer, Nepal",
-    template: "%s | Rashmin Sharma",
-  },
+  // No title template: every route states the brand once, in its own words.
+  title: "Rashmin Sharma | Software Developer, Nepal",
   description:
     "Portfolio of Rashmin Sharma, a software developer in Nepal: projects, experiments, roadmap and notes.",
   // Default for every route; pages that set their own robots (the noindex
