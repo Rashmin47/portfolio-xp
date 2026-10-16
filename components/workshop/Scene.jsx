@@ -1510,6 +1510,16 @@ const _scratch = new THREE.Vector3();
 const DEG5 = (5 * Math.PI) / 180;
 const DEG3 = (3 * Math.PI) / 180;
 
+/**
+ * Drag is a nudge, never an orbit. The rig only ever slides the camera a short
+ * way off its authored pose, so the desk, the room walls and the fog all stay
+ * inside a fixed volume: nothing has to be modelled, loaded or rendered for a
+ * range the visitor can reach. Both axes are clamped to these limits.
+ */
+const DRAG_LIMIT_X = 0.45;   // yaw nudge    (camera x offset = value * 0.9)
+const DRAG_LIMIT_UP = 0.25;  // pitch nudge  (camera y offset = value * 0.5)
+const DRAG_LIMIT_DOWN = 0.35;
+
 function CameraRig({ targetPose: explicitPose, reducedMotion = false }) {
   const pathname = usePathname();
   const { camera, invalidate } = useThree();
@@ -1547,8 +1557,15 @@ function CameraRig({ targetPose: explicitPose, reducedMotion = false }) {
       if (isDragging.current) {
         const dx = (e.clientX - dragStart.current.x) / window.innerWidth;
         const dy = (e.clientY - dragStart.current.y) / window.innerHeight;
-        dragRot.current.x = Math.max(-0.25, Math.min(0.35, prevDragRot.current.x + dy * 1.0));
-        dragRot.current.y = prevDragRot.current.y + dx * 2.2;
+        // Clamped on both axes: the view can be nudged, never flown away
+        dragRot.current.x = Math.max(
+          -DRAG_LIMIT_UP,
+          Math.min(DRAG_LIMIT_DOWN, prevDragRot.current.x + dy * 1.0)
+        );
+        dragRot.current.y = Math.max(
+          -DRAG_LIMIT_X,
+          Math.min(DRAG_LIMIT_X, prevDragRot.current.y + dx * 2.2)
+        );
       }
       // Parallax needs a frame to follow the pointer (not under reduced motion)
       if (isDragging.current || !reducedMotion) invalidate();

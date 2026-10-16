@@ -99,6 +99,9 @@ export default function WorldCanvas() {
           inset: 0,
           zIndex: 0,
           pointerEvents: "auto", // scene receives pointer events (drag/orbit)
+          // Vertical page scrolling still works, but pinch-zoom on the scene
+          // layer is blocked so the workshop cannot be pulled out of its box
+          touchAction: "pan-y",
           opacity,
           transition: sceneReady ? "opacity 600ms ease" : "none",
           background: "#0B1220",
