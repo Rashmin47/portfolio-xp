@@ -779,8 +779,9 @@ function Laptop({ hovered, onClick }) {
         <boxGeometry args={[0.16, 0.002, 0.1]} />
       </mesh>
 
-      {/* Display lid (opened to a natural ~97 deg) */}
-      <group position={[0, 0.018, -0.175]} rotation={[-1.44, 0, 0]}>
+      {/* Display lid propped open at ~45° from the desk, so the display is
+          readable from a camera that sits only ~16° above the desk plane */}
+      <group position={[0, 0.018, -0.175]} rotation={[-0.79, 0, 0]}>
         {/* Back display shell */}
         <mesh position={[0, 0.17, 0]} material={aluMat}>
           <boxGeometry args={[0.54, 0.34, 0.012]} />
@@ -812,6 +813,10 @@ function DeskLamp() {
   const brassMat = useMat(C.lampBrass, { roughness: 0.2, metalness: 0.8 });
   const shadeMat = useMat(C.lampBody,  { roughness: 0.4, side: THREE.DoubleSide });
   const bulbMat  = useMat("#FFFBEB",   { emissive: "#FDE047", emissiveIntensity: 2.0 });
+  // Emissive (but not blown out) diffuser disc under the shade
+  const diffuserMat = useMat("#FFF6E2", { roughness: 0.6, emissive: "#FFE9B0", emissiveIntensity: 0.85, side: THREE.DoubleSide });
+  // Warm inner lining, so the inside of the shade reads as lit, not blue metal
+  const linerMat  = useMat("#E8DFC8", { roughness: 0.85, emissive: "#FFDFA8", emissiveIntensity: 0.22, side: THREE.DoubleSide });
 
   return (
     <group position={[-1.25, 0.77, -0.15]} rotation={[0, 0.3, 0]}>
@@ -844,19 +849,34 @@ function DeskLamp() {
             <sphereGeometry args={[0.022, 12, 12]} />
           </mesh>
 
-          {/* Cone shade — double-sided so the open underside never shows
-              through it, with a rim and a bulb that clears the inner wall */}
-          <group position={[0, 0.38, 0]} rotation={[0, 0, 0.28]}>
-            <mesh position={[0, 0.05, 0]} material={shadeMat}>
-              <coneGeometry args={[0.08, 0.14, 16, 1, true]} />
+          {/* Lamp head: a wide flaring shade, hung from the arm's end so the
+              joint sphere reads as a finial on the crown. Double-sided so the
+              open underside never reads as see-through, with a brass rim and a
+              warm diffuser at the mouth that stands in for the light source. */}
+          <group position={[0, 0.36, 0]} rotation={[0, 0, 0.44]}>
+            {/* Shade wall — flares from a narrow crown to a wide mouth */}
+            <mesh position={[0, -0.055, 0]} material={shadeMat}>
+              <cylinderGeometry args={[0.045, 0.115, 0.12, 24, 1, true]} />
             </mesh>
-            {/* Shade rim at the opening */}
-            <mesh position={[0, -0.018, 0]} rotation={[Math.PI / 2, 0, 0]} material={brassMat}>
-              <torusGeometry args={[0.079, 0.004, 8, 24]} />
+            {/* Closed crown */}
+            <mesh position={[0, 0.005, 0]} material={shadeMat}>
+              <cylinderGeometry args={[0.045, 0.045, 0.008, 24]} />
             </mesh>
-            {/* Glowing bulb, sized to sit inside the cone */}
-            <mesh position={[0, -0.004, 0]} material={bulbMat}>
-              <sphereGeometry args={[0.025, 12, 12]} />
+            {/* Warm inner lining, just inside the wall */}
+            <mesh position={[0, -0.055, 0]} material={linerMat}>
+              <cylinderGeometry args={[0.041, 0.108, 0.115, 24, 1, true]} />
+            </mesh>
+            {/* Brass rim around the mouth */}
+            <mesh position={[0, -0.115, 0]} rotation={[Math.PI / 2, 0, 0]} material={brassMat}>
+              <torusGeometry args={[0.114, 0.0045, 8, 28]} />
+            </mesh>
+            {/* Warm diffuser just inside the mouth */}
+            <mesh position={[0, -0.104, 0]} rotation={[Math.PI / 2, 0, 0]} material={diffuserMat}>
+              <circleGeometry args={[0.106, 24]} />
+            </mesh>
+            {/* Bulb filament, tucked inside the cone and clear of the walls */}
+            <mesh position={[0, -0.075, 0]} material={bulbMat}>
+              <sphereGeometry args={[0.028, 12, 12]} />
             </mesh>
           </group>
         </group>
