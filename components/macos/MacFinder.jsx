@@ -33,7 +33,7 @@ export default function MacFinder({
   return (
     <div className="flex-1 flex flex-col bg-chrome-canvas text-chrome-text overflow-hidden min-h-0">
       {/* ── Finder Toolbar & Path Breadcrumbs ─────────────────────────── */}
-      <div className="h-9 px-4 bg-chrome-text/[0.03] border-b border-chrome-text/10 flex items-center justify-between font-mono text-xs text-chrome-text/60 select-none shrink-0">
+      <div className="h-9 px-4 bg-chrome-text/[0.03] border-b border-chrome-text/10 flex items-center justify-between font-mono text-xs text-chrome-text/65 select-none shrink-0">
         <div className="flex items-center gap-2 text-[11px] truncate">
           <span>Rashmin</span>
           <span className="text-chrome-text/20">/</span>
@@ -43,7 +43,7 @@ export default function MacFinder({
         </div>
 
         {itemCount !== undefined && (
-          <span className="text-[10px] text-chrome-text/60 hidden sm:inline">
+          <span className="text-[10px] text-chrome-text/65 hidden sm:inline">
             {itemCount} {itemCount === 1 ? "item" : "items"}
           </span>
         )}
@@ -53,7 +53,7 @@ export default function MacFinder({
       <div className="flex-1 flex min-h-0 overflow-hidden">
         {/* Left Sidebar (Desktop) — hidden when the window itself is narrow */}
         <aside className="w-44 border-r border-chrome-text/10 p-3 hidden @3xl:flex flex-col gap-1 shrink-0 bg-chrome-text/[0.015] font-mono text-xs">
-          <span className="text-[10px] uppercase font-bold text-chrome-text/60 px-2 py-1 tracking-wider">
+          <span className="text-[10px] uppercase font-bold text-chrome-text/65 px-2 py-1 tracking-wider">
             Favorites
           </span>
           {SIDEBAR_ITEMS.map((item) => {

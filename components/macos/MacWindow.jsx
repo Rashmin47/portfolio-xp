@@ -10,7 +10,8 @@ import { useRouter } from "next/navigation";
  * Authentic macOS application window wrapper with:
  *  - Traffic light controls (🔴 Close, 🟡 Minimize, 🟢 Maximize / Expand)
  *  - Window title bar with app name / path
- *  - Rounded corners, hairline borders, and dark translucent night-surface styling
+ *  - Rounded corners, hairline borders, and theme-aware translucent surface
+ *    styling (light frosted panel / dark night-surface panel)
  *  - Responsive: desktop floating window, mobile bottom sheet
  */
 export default function MacWindow({

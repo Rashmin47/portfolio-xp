@@ -29,7 +29,7 @@ export default function MacTerminal({
       output: (
         <div className="text-chrome-text/90 pl-1 font-mono text-sm">
           {siteConfig.name || "Rashmin Sharma"}
-          <span className="text-chrome-text/60 block text-xs mt-0.5">
+          <span className="text-chrome-text/65 block text-xs mt-0.5">
             {siteConfig.role || "Software Developer"} · {siteConfig.location || "Kathmandu, Nepal"}
           </span>
         </div>
@@ -107,7 +107,7 @@ export default function MacTerminal({
         result = (
           <div className="font-mono text-sm text-chrome-text/90 pl-1">
             <p className="font-bold text-chrome-text">{siteConfig.name}</p>
-            <p className="text-chrome-text/60 text-xs">{siteConfig.role} · {siteConfig.location}</p>
+            <p className="text-chrome-text/65 text-xs">{siteConfig.role} · {siteConfig.location}</p>
           </div>
         );
         break;
@@ -134,7 +134,7 @@ export default function MacTerminal({
             </div>
           );
         } else {
-          result = <p className="text-chrome-text/60 text-xs pl-1 font-mono">cat: {args || "file"}: No such file</p>;
+          result = <p className="text-chrome-text/65 text-xs pl-1 font-mono">cat: {args || "file"}: No such file</p>;
         }
         break;
 
@@ -146,7 +146,7 @@ export default function MacTerminal({
             result = <p className="text-accent-board text-xs pl-1 font-mono">Opening /{target}...</p>;
             router.push(`/${target}`);
           } else {
-            result = <p className="text-chrome-text/60 text-xs pl-1 font-mono">open: target not found: {args}</p>;
+            result = <p className="text-chrome-text/65 text-xs pl-1 font-mono">open: target not found: {args}</p>;
           }
         }
         break;
@@ -160,7 +160,7 @@ export default function MacTerminal({
                 <Link href={`/projects/${p.slug}`} className="text-accent-sky hover:underline">
                   {p.title}
                 </Link>
-                <span className="text-chrome-text/60 text-xs hidden sm:inline">
+                <span className="text-chrome-text/65 text-xs hidden sm:inline">
                   {p.stack?.slice(0, 2).join(" · ")}
                 </span>
               </div>
@@ -178,14 +178,14 @@ export default function MacTerminal({
         result = (
           <div className="font-mono text-xs pl-1 space-y-1">
             <p className="text-chrome-text/90">
-              <span className="text-chrome-text/60">Building now:</span> {siteConfig.building?.[0] || "Interactive 3D Workspace"}
+              <span className="text-chrome-text/65">Building now:</span> {siteConfig.building?.[0] || "Interactive 3D Workspace"}
             </p>
             {latestCommit && (
               <p className="text-chrome-text/90">
-                <span className="text-chrome-text/60">Latest commit:</span> {latestCommit.sha} - {latestCommit.message} ({latestCommit.relativeDate})
+                <span className="text-chrome-text/65">Latest commit:</span> {latestCommit.sha} - {latestCommit.message} ({latestCommit.relativeDate})
               </p>
             )}
-            <p className="text-chrome-text/60">Location: {siteConfig.location}</p>
+            <p className="text-chrome-text/65">Location: {siteConfig.location}</p>
           </div>
         );
         break;
@@ -196,7 +196,7 @@ export default function MacTerminal({
 
       default:
         result = (
-          <p className="text-chrome-text/60 text-xs pl-1 font-mono">
+          <p className="text-chrome-text/65 text-xs pl-1 font-mono">
             zsh: command not found: {command}. Type <span className="text-accent-signal font-bold">help</span> for commands.
           </p>
         );
@@ -227,7 +227,7 @@ export default function MacTerminal({
     <div className="p-4 sm:p-6 font-mono text-chrome-text flex-1 flex flex-col justify-between">
       {/* ── Terminal Header Info ────────────────────────────────────── */}
       <div className="space-y-4">
-        <p className="text-xs text-chrome-text/60 font-mono pb-2">
+        <p className="text-xs text-chrome-text/65 font-mono pb-2">
           Last login: Wed Oct 15 13:22:41 on ttys001
         </p>
 
@@ -237,7 +237,7 @@ export default function MacTerminal({
             {/* Prompt line */}
             <div className="flex items-center gap-2 text-sm font-semibold">
               <span className="text-accent-signal">rashmin@studio</span>
-              <span className="text-chrome-text/60">~</span>
+              <span className="text-chrome-text/65">~</span>
               <span className="text-accent-signal">%</span>
               <span className="text-chrome-text">{item.cmd}</span>
             </div>
@@ -249,7 +249,7 @@ export default function MacTerminal({
         {/* ── Active Prompt Input ───────────────────────────────────── */}
         <form onSubmit={handleSubmit} className="flex items-center gap-2 pt-2">
           <span className="text-accent-signal font-semibold text-sm">rashmin@studio</span>
-          <span className="text-chrome-text/60 text-sm">~</span>
+          <span className="text-chrome-text/65 text-sm">~</span>
           <span className="text-accent-signal text-sm">%</span>
           <div className="relative flex-1 flex items-center">
             <input
@@ -258,7 +258,7 @@ export default function MacTerminal({
               value={inputVal}
               onChange={(e) => setInputVal(e.target.value)}
               placeholder="type help to explore..."
-              className="w-full bg-transparent border-none outline-none text-sm text-chrome-text font-mono placeholder:text-chrome-text/60 p-0 focus:ring-0"
+              className="w-full bg-transparent border-none outline-none text-sm text-chrome-text font-mono placeholder:text-chrome-text/65 p-0 focus:ring-0"
               autoFocus
             />
           </div>
@@ -270,7 +270,7 @@ export default function MacTerminal({
       {/* ── Terminal Quick Command Chips & Server Content ──────────── */}
       <div className="mt-8 pt-4 border-t border-chrome-text/10">
         <div className="flex flex-wrap items-center gap-2 mb-4">
-          <span className="text-[11px] text-chrome-text/60 uppercase font-mono">Suggested:</span>
+          <span className="text-[11px] text-chrome-text/65 uppercase font-mono">Suggested:</span>
           {["whoami", "ls ~/work", "cat about.txt", "projects", "status", "help"].map((cmd) => (
             <button
               key={cmd}

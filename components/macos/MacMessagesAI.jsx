@@ -124,7 +124,7 @@ export default function MacMessagesAI({ isOpen, onClose }) {
           <button
             type="button"
             onClick={onClose}
-            className="text-xs font-mono text-chrome-text/60 hover:text-chrome-text"
+            className="text-xs font-mono text-chrome-text/65 hover:text-chrome-text"
           >
             Esc
           </button>
@@ -148,13 +148,13 @@ export default function MacMessagesAI({ isOpen, onClose }) {
                 >
                   {m.text}
                 </div>
-                <span className="text-[10px] text-chrome-text/60 mt-1 px-1">{m.timestamp}</span>
+                <span className="text-[10px] text-chrome-text/65 mt-1 px-1">{m.timestamp}</span>
               </div>
             );
           })}
 
           {isTyping && (
-            <div className="flex items-center gap-1.5 px-3 py-2 bg-chrome-text/10 rounded-lg text-chrome-text/60 text-xs w-20">
+            <div className="flex items-center gap-1.5 px-3 py-2 bg-chrome-text/10 rounded-lg text-chrome-text/65 text-xs w-20">
               <span className="animate-bounce">●</span>
               <span className="animate-bounce [animation-delay:150ms]">●</span>
               <span className="animate-bounce [animation-delay:300ms]">●</span>
@@ -196,7 +196,7 @@ export default function MacMessagesAI({ isOpen, onClose }) {
             value={inputVal}
             onChange={(e) => setInputVal(e.target.value)}
             placeholder="Ask Rashmin AI anything..."
-            className="flex-1 bg-chrome-text/5 border border-chrome-text/10 rounded-lg px-3 py-2 font-mono text-xs text-chrome-text placeholder:text-chrome-text/60 focus:outline-none focus:border-focus-ring"
+            className="flex-1 bg-chrome-text/5 border border-chrome-text/10 rounded-lg px-3 py-2 font-mono text-xs text-chrome-text placeholder:text-chrome-text/65 focus:outline-none focus:border-focus-ring"
           />
           <button
             type="submit"

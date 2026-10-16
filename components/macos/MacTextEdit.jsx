@@ -16,11 +16,11 @@ export default function MacTextEdit({
   return (
     <div className="flex-1 flex flex-col bg-chrome-inset text-chrome-text min-h-0">
       {/* ── TextEdit Ruler Bar ────────────────────────────────────────── */}
-      <div className="h-7 px-4 bg-chrome-bar border-b border-chrome-text/10 flex items-center justify-between select-none shrink-0 overflow-hidden font-mono text-[10px] text-chrome-text/60">
+      <div className="h-7 px-4 bg-chrome-bar border-b border-chrome-text/10 flex items-center justify-between select-none shrink-0 overflow-hidden font-mono text-[10px] text-chrome-text/65">
         {/* Left margin marker */}
         <div className="flex items-center gap-1 text-accent-signal">
           <span>▼</span>
-          <span className="text-[9px] text-chrome-text/60">0.0</span>
+          <span className="text-[9px] text-chrome-text/65">0.0</span>
         </div>
 
         {/* Ruler ticks & inches */}
@@ -36,9 +36,9 @@ export default function MacTextEdit({
 
         {/* Right margin marker & info */}
         <div className="flex items-center gap-3">
-          {wordCount && <span className="text-chrome-text/60 text-[10px] hidden md:inline">{wordCount} words</span>}
+          {wordCount && <span className="text-chrome-text/65 text-[10px] hidden md:inline">{wordCount} words</span>}
           <div className="flex items-center gap-1 text-accent-signal">
-            <span className="text-[9px] text-chrome-text/60">8.5</span>
+            <span className="text-[9px] text-chrome-text/65">8.5</span>
             <span>▼</span>
           </div>
         </div>

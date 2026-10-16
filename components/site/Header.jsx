@@ -91,7 +91,7 @@ export default function Header() {
           {/* System Menus */}
           <nav
             aria-label="System Navigation"
-            className="hidden md:flex items-center gap-1 text-chrome-text/60"
+            className="hidden md:flex items-center gap-1 text-chrome-text/65"
           >
             {[
               { href: "/", label: "Home" },
@@ -122,7 +122,7 @@ export default function Header() {
         </div>
 
         {/* Right: Status Indicators & Theme */}
-        <div className="flex items-center gap-2 sm:gap-3 text-chrome-text/60">
+        <div className="flex items-center gap-2 sm:gap-3 text-chrome-text/65">
           <span className="hidden sm:inline text-[10px]">Kathmandu, NP</span>
           {timeStr && <span className="text-chrome-text/90 text-[10px]">{timeStr} NPT</span>}
           <div className="scale-75 origin-right">

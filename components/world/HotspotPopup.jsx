@@ -212,7 +212,7 @@ export default function HotspotPopup({ hotspot, onClose, beaconRefs }) {
             <span>{meta.cat}</span>
           </div>
 
-          <span className="font-mono text-[10px] text-chrome-text/60">esc</span>
+          <span className="font-mono text-[10px] text-chrome-text/65">esc</span>
         </div>
 
         {/* Body */}
@@ -228,7 +228,7 @@ export default function HotspotPopup({ hotspot, onClose, beaconRefs }) {
               <h2 className="font-display font-bold text-lg text-chrome-text leading-tight tracking-tight">
                 {hotspot.label}
               </h2>
-              <p className="text-[11px] font-mono text-chrome-text/60 mt-0.5">{meta.tagline}</p>
+              <p className="text-[11px] font-mono text-chrome-text/65 mt-0.5">{meta.tagline}</p>
             </div>
           </div>
 

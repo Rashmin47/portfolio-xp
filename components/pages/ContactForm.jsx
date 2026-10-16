@@ -175,7 +175,7 @@ export default function ContactForm() {
 
       {/* ── Action Bar ──────────────────────────────────────────────────── */}
       <div className="mt-4 flex flex-col gap-3 border-t border-chrome-text/10 pt-4 sm:flex-row sm:items-center sm:justify-between">
-        <span className="text-[11px] text-chrome-text/60">
+        <span className="text-[11px] text-chrome-text/65">
           Sent directly to Rashmin&apos;s inbox.
         </span>
 
