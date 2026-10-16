@@ -1,10 +1,14 @@
 "use client";
 
-import { Component, useRef, useEffect, useMemo, useCallback } from "react";
+import { Component, useRef, useEffect, useMemo, useCallback, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { usePathname, useRouter } from "next/navigation";
 import { defaultPose, routePoses } from "@/data/hotspots";
+import { roadmap } from "@/data/roadmap";
+import { siteConfig } from "@/data/site";
+import { visibleItems } from "@/lib/content";
+import { nepalPhase } from "@/lib/nepal-time";
 
 // ─── Design token palette & material tones ────────────────────────────────────
 const C = {
@@ -20,16 +24,16 @@ const C = {
   nightSurf:   "#131D33",
   muted:       "#5B6578",
 
-  // Warm studio & workshop colors
-  wall:        "#1C2433",
-  wallTrim:    "#161E2C",
-  woodFloor:   "#2E211A",
-  floorPlank:  "#382920",
+  // Room tones — walls and floor sit darker so the desk stays the focal plane
+  wall:        "#171E2B",
+  wallTrim:    "#121926",
+  woodFloor:   "#241A14",
+  floorPlank:  "#2C2118",
   rug:         "#162032",
-  rugBorder:   "#24334C",
 
-  deskTop:     "#8A5734",
-  deskEdge:    "#6B3F21",
+  // Darker, desaturated desk wood (palette-adjacent: ink / cobalt / signal)
+  deskTop:     "#5B4839",
+  deskEdge:    "#3E3128",
   deskLeg:     "#151C28",
   deskMat:     "#182233",
   matStitch:   "#F2C81F",
@@ -50,13 +54,12 @@ const C = {
   lampBody:    "#2F5BEA",
   lampBrass:   "#F2C81F",
   lampLight:   "#FFF2D1",
+  lampCone:    "#FFE2B0",
+  rimCobalt:   "#3B6BFF",
+  poolWarm:    "#FFD9A0",
 
   wbFrame:     "#334155",
-  wbFace:      "#F1F5F9",
-  noteYellow:  "#FEF08A",
-  noteBlue:    "#BAE6FD",
-  noteGreen:   "#BBF7D0",
-  noteOrange:  "#FED7AA",
+  boardFace:   "#0E1A2E",
 
   book1:       "#2F5BEA",
   book2:       "#2EA84B",
@@ -89,21 +92,266 @@ function useMat(color, opts = {}) {
   );
 }
 
+// ─── Procedural textures & Kathmandu light phase (no external assets) ─────────
+// Radial falloff texture, shared by the desk light pool and the screen glow planes.
+let _radialTex = null;
+function radialTexture() {
+  if (_radialTex) return _radialTex;
+  const size = 128;
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext("2d");
+  const g = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+  g.addColorStop(0, "rgba(255,255,255,1)");
+  g.addColorStop(0.45, "rgba(255,255,255,0.38)");
+  g.addColorStop(1, "rgba(255,255,255,0)");
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, size, size);
+  _radialTex = new THREE.CanvasTexture(canvas);
+  _radialTex.colorSpace = THREE.SRGBColorSpace;
+  return _radialTex;
+}
+
+// Kathmandu day / evening / night phase comes from lib/nepal-time.js
+const PHASE_TINTS = {
+  day: {
+    sky: ["#5FA8E8", "#9CCBF2", "#DCEAF7"],
+    horizon: "#FFFFFF",
+    far: "#8FA8C4",
+    mid: "#6D86A6",
+    near: "#4E6683",
+  },
+  evening: {
+    sky: ["#21365F", "#5B5C86", "#E08A4B"],
+    horizon: "#FFC48A",
+    far: "#4A5478",
+    mid: "#333C5E",
+    near: "#1F2740",
+  },
+  night: {
+    sky: ["#050A17", "#0C1730", "#20304F"],
+    horizon: "#7FA8D8",
+    far: "#16213A",
+    mid: "#0F1830",
+    near: "#080E1F",
+  },
+};
+
+function hexToRgba(hex, alpha) {
+  const int = parseInt(hex.slice(1), 16);
+  return `rgba(${(int >> 16) & 255},${(int >> 8) & 255},${int & 255},${alpha})`;
+}
+
+// Dusk gradient pane for the studio window, tinted by the current phase.
+function duskTexture(phase) {
+  const tint = PHASE_TINTS[phase] || PHASE_TINTS.evening;
+  const w = 256;
+  const h = 256;
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext("2d");
+
+  const sky = ctx.createLinearGradient(0, 0, 0, h);
+  sky.addColorStop(0, tint.sky[0]);
+  sky.addColorStop(0.58, tint.sky[1]);
+  sky.addColorStop(1, tint.sky[2]);
+  ctx.fillStyle = sky;
+  ctx.fillRect(0, 0, w, h);
+
+  const glow = ctx.createRadialGradient(w * 0.5, h * 0.88, 0, w * 0.5, h * 0.88, h * 0.5);
+  glow.addColorStop(0, hexToRgba(tint.horizon, 0.3));
+  glow.addColorStop(1, hexToRgba(tint.horizon, 0));
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, w, h);
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
+// ─── Now / Next / Later wall board, projected from data/roadmap.js ───────────
+const BOARD_COLUMNS = [
+  { key: "now",   label: "NOW",   accent: C.signal },
+  { key: "next",  label: "NEXT",  accent: C.cobalt },
+  { key: "later", label: "LATER", accent: C.sky },
+];
+
+function makeBoardTexture(columns) {
+  const W = 1024;
+  const H = 560;
+  const canvas = document.createElement("canvas");
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext("2d");
+
+  ctx.fillStyle = C.boardFace;
+  ctx.fillRect(0, 0, W, H);
+
+  const colW = W / columns.length;
+  const padX = 42;
+  const textW = colW - padX * 2;
+
+  const fit = (text, maxWidth) => {
+    if (ctx.measureText(text).width <= maxWidth) return text;
+    let out = text;
+    while (out.length > 1 && ctx.measureText(`${out}…`).width > maxWidth) out = out.slice(0, -1);
+    return `${out.replace(/\s+$/, "")}…`;
+  };
+
+  ctx.textBaseline = "top";
+
+  columns.forEach((col, i) => {
+    const x = i * colW + padX;
+
+    ctx.font = "700 44px ui-monospace, SFMono-Regular, Menlo, monospace";
+    ctx.fillStyle = col.accent;
+    ctx.fillText(col.label, x, 42);
+
+    ctx.globalAlpha = 0.85;
+    ctx.fillRect(x, 104, textW, 5);
+    ctx.globalAlpha = 1;
+
+    ctx.font = '600 30px "Instrument Sans", system-ui, -apple-system, sans-serif';
+    col.titles.forEach((title, row) => {
+      const y = 152 + row * 104;
+      ctx.globalAlpha = 0.7;
+      ctx.fillStyle = col.accent;
+      ctx.fillRect(x, y + 11, 10, 10);
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = C.paper;
+      ctx.fillText(fit(title, textW - 30), x + 28, y);
+    });
+  });
+
+  ctx.strokeStyle = "rgba(244,246,251,0.10)";
+  ctx.lineWidth = 2;
+  for (let i = 1; i < columns.length; i += 1) {
+    ctx.beginPath();
+    ctx.moveTo(i * colW, 34);
+    ctx.lineTo(i * colW, H - 34);
+    ctx.stroke();
+  }
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 4;
+  return tex;
+}
+
+// ─── Neon wall sign texture (static, no animation) ───────────────────────────
+function makeSignTexture(word) {
+  const W = 1024;
+  const H = 226;
+  const canvas = document.createElement("canvas");
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext("2d");
+
+  ctx.fillStyle = C.night;
+  ctx.fillRect(0, 0, W, H);
+  ctx.strokeStyle = "rgba(242,200,31,0.22)";
+  ctx.lineWidth = 3;
+  ctx.strokeRect(14, 14, W - 28, H - 28);
+
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.font = "700 112px ui-monospace, SFMono-Regular, Menlo, monospace";
+
+  // Wide soft halo, then a warm crisp core
+  ctx.shadowColor = C.signal;
+  ctx.shadowBlur = 48;
+  ctx.fillStyle = C.signal;
+  ctx.fillText(word, W / 2, H / 2);
+  ctx.shadowBlur = 12;
+  ctx.fillStyle = "#FFF6D8";
+  ctx.fillText(word, W / 2, H / 2);
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 4;
+  return tex;
+}
+
+// ─── Laptop screen texture: real content from data/site.js ───────────────────
+function makeScreenTexture() {
+  const W = 512;
+  const H = 300;
+  const canvas = document.createElement("canvas");
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext("2d");
+
+  ctx.fillStyle = C.screen;
+  ctx.fillRect(0, 0, W, H);
+  ctx.font = "500 26px ui-monospace, SFMono-Regular, Menlo, monospace";
+  ctx.textBaseline = "top";
+
+  const lines = [
+    { text: "$ whoami", tone: C.sky },
+    { text: siteConfig.name, tone: C.paper },
+    { text: "$ role", tone: C.sky },
+    { text: siteConfig.role, tone: C.paper },
+    { text: "$ location", tone: C.sky },
+    { text: siteConfig.location, tone: C.paper },
+  ];
+
+  lines.forEach((line, i) => {
+    ctx.fillStyle = line.tone;
+    ctx.globalAlpha = line.tone === C.paper ? 0.92 : 1;
+    ctx.fillText(line.text, 22, 30 + i * 40, W - 44);
+  });
+
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = C.signal;
+  ctx.fillRect(22, 30 + lines.length * 40 - 6, 14, 26);
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 4;
+  return tex;
+}
+
+// ─── Faint additive glow plane (screen halos, wall panel, light pool) ────────
+function GlowPanel({ size, position, rotation, color, opacity = 0.12 }) {
+  const mat = useMemo(
+    () =>
+      new THREE.MeshBasicMaterial({
+        map: radialTexture(),
+        color,
+        transparent: true,
+        opacity,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        fog: false,
+        side: THREE.DoubleSide,
+      }),
+    [color, opacity]
+  );
+
+  return (
+    <mesh position={position} rotation={rotation} material={mat} renderOrder={2}>
+      <planeGeometry args={size} />
+    </mesh>
+  );
+}
+
 // ─── Warm, rich atmospheric lighting (Jesse Zhou inspired) ────────────────────
 function SceneLighting() {
   return (
     <>
-      {/* Soft warm hemisphere ambient light so surfaces are never pitch black */}
+      {/* Soft warm hemisphere ambient — trimmed slightly so walls and floor fall back */}
       <hemisphereLight
         color="#FFF6E8"
         groundColor="#2A1E18"
-        intensity={1.9}
+        intensity={1.65}
       />
 
       {/* Main sunbeam / studio directional key light */}
       <directionalLight
         position={[4, 6, 4]}
-        intensity={2.2}
+        intensity={1.9}
         color="#FFEAD1"
         castShadow
         shadow-mapSize={[1024, 1024]}
@@ -112,7 +360,7 @@ function SceneLighting() {
       {/* Cool sky fill from left window */}
       <directionalLight
         position={[-5, 4, 1]}
-        intensity={1.1}
+        intensity={0.85}
         color="#93C5FD"
       />
 
@@ -120,16 +368,36 @@ function SceneLighting() {
       <pointLight
         position={[-1.2, 1.4, 0.2]}
         color="#FFE4A0"
-        intensity={2.8}
+        intensity={2.0}
         distance={3.5}
         decay={2}
+      />
+
+      {/* Warm soft-coned SpotLight from the lamp shade — keeps the desk bright
+          while the surrounding room ambient comes down. No shadow maps. */}
+      <spotLight
+        position={[-1.28, 1.55, -0.14]}
+        target-position={[-0.7, 0.77, 0.1]}
+        color={C.lampCone}
+        intensity={2.1}
+        angle={0.62}
+        penumbra={1}
+        distance={4.5}
+        decay={1.6}
+      />
+
+      {/* Cool cobalt rim light from the window side (right) for edge separation */}
+      <directionalLight
+        position={[3.4, 2.4, -2.2]}
+        intensity={0.6}
+        color={C.rimCobalt}
       />
 
       {/* Soft screen glow for the laptop */}
       <pointLight
         position={[-0.05, 1.05, 0.25]}
         color="#62C0FF"
-        intensity={1.0}
+        intensity={0.8}
         distance={1.6}
         decay={2}
       />
@@ -138,7 +406,7 @@ function SceneLighting() {
       <pointLight
         position={[1.25, 0.95, 0.1]}
         color="#2EA84B"
-        intensity={1.2}
+        intensity={1.0}
         distance={1.2}
         decay={2}
       />
@@ -148,13 +416,40 @@ function SceneLighting() {
         position={[0, 4, -3.5]}
         target-position={[0, 0.8, 0]}
         color="#62C0FF"
-        intensity={1.4}
+        intensity={1.1}
         angle={Math.PI / 3}
         penumbra={0.6}
       />
+
+      {/* Dark exponential fog — low density, so only the far floor edge and the
+          back corners fall away; the desk sits well inside the near range. */}
+      <fogExp2 attach="fog" color={C.night} density={0.038} />
     </>
   );
 }
+
+// ─── Low-poly Himalayan ridge silhouettes for the studio window ──────────────
+function ridgeGeometry(baseY, points) {
+  const shape = new THREE.Shape();
+  shape.moveTo(-0.9, baseY);
+  points.forEach(([x, y]) => shape.lineTo(x, y));
+  shape.lineTo(0.9, baseY);
+  shape.closePath();
+  return new THREE.ShapeGeometry(shape);
+}
+
+const RIDGE_FAR = ridgeGeometry(-0.72, [
+  [-0.9, -0.24], [-0.58, -0.10], [-0.30, -0.22], [-0.02, -0.04],
+  [0.28, -0.18], [0.60, -0.08], [0.9, -0.26],
+]);
+const RIDGE_MID = ridgeGeometry(-0.72, [
+  [-0.9, -0.36], [-0.62, -0.18], [-0.34, -0.30], [-0.06, -0.12],
+  [0.24, -0.26], [0.56, -0.16], [0.9, -0.34],
+]);
+const RIDGE_NEAR = ridgeGeometry(-0.72, [
+  [-0.9, -0.44], [-0.60, -0.30], [-0.30, -0.40], [-0.02, -0.28],
+  [0.30, -0.38], [0.62, -0.30], [0.9, -0.46],
+]);
 
 // ─── Studio Room (Walls, Floorboards, Rug, Window) ───────────────────────────
 function Room() {
@@ -162,12 +457,46 @@ function Room() {
   const trimMat    = useMat(C.wallTrim, { roughness: 0.8 });
   const floorMat   = useMat(C.woodFloor, { roughness: 0.6 });
   const rugMat     = useMat(C.rug,      { roughness: 0.95 });
-  const rugBorderMat = useMat(C.cobalt, { roughness: 0.8 });
 
-  // Window materials
+  // Faint projected floor circle, replacing the old blue rug ring (<15% opacity)
+  const floorRingMat = useMemo(
+    () =>
+      new THREE.MeshBasicMaterial({
+        color: C.cobalt,
+        transparent: true,
+        opacity: 0.08,
+        depthWrite: false,
+        fog: false,
+      }),
+    []
+  );
+
+  // Window materials, tinted by the current Kathmandu day / evening / night phase
+  const phase       = useMemo(() => nepalPhase(), []);
+  const tint        = PHASE_TINTS[phase] || PHASE_TINTS.evening;
   const winFrameMat = useMat(C.wbFrame, { roughness: 0.5 });
-  const skyMat      = useMat("#38BDF8", { emissive: "#0284C7", emissiveIntensity: 0.6 });
-  const hillMat     = useMat("#0F172A", { roughness: 1.0 });
+  const skyTex      = useMemo(() => duskTexture(phase), [phase]);
+  const skyMat      = useMemo(
+    () =>
+      new THREE.MeshStandardMaterial({
+        map: skyTex,
+        emissive: new THREE.Color("#FFFFFF"),
+        emissiveMap: skyTex,
+        emissiveIntensity: 0.9,
+        roughness: 1,
+      }),
+    [skyTex]
+  );
+  const rangeMats   = useMemo(
+    () => ({
+      far:  new THREE.MeshBasicMaterial({ color: tint.far }),
+      mid:  new THREE.MeshBasicMaterial({ color: tint.mid }),
+      near: new THREE.MeshBasicMaterial({ color: tint.near }),
+    }),
+    [tint]
+  );
+
+  useEffect(() => () => skyTex.dispose(), [skyTex]);
 
   return (
     <group name="obj_room">
@@ -195,27 +524,33 @@ function Room() {
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.003, 0.2]} material={rugMat}>
         <circleGeometry args={[2.4, 48]} />
       </mesh>
-      {/* Rug border ring */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.004, 0.2]} material={rugBorderMat}>
+      {/* Faint projected circle on the rug (replaces the old blue rug ring) */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.004, 0.2]} material={floorRingMat}>
         <ringGeometry args={[2.35, 2.4, 48]} />
       </mesh>
 
-      {/* ── Studio Window looking out onto Kathmandu hill silhouette ──────── */}
+      {/* ── Studio Window: lit dusk sky over layered Himalayan silhouettes ── */}
       <group position={[2.0, 2.2, -2.55]}>
-        {/* Sky pane */}
-        <mesh position={[0, 0, 0.01]} material={skyMat}>
+        {/* Self-lit dusk gradient pane, tinted by the Kathmandu phase */}
+        <mesh position={[0, 0, 0.008]} material={skyMat}>
           <planeGeometry args={[1.8, 1.4]} />
         </mesh>
-        {/* Distant Kathmandu hills */}
-        <mesh position={[-0.3, -0.3, 0.02]} material={hillMat} rotation={[0, 0, 0.1]}>
-          <coneGeometry args={[0.9, 0.8, 5]} />
+        {/* 3 layered low-poly Himalayan ranges (far → near) */}
+        <mesh position={[0, 0, 0.014]} geometry={RIDGE_FAR}  material={rangeMats.far} />
+        <mesh position={[0, 0, 0.019]} geometry={RIDGE_MID}  material={rangeMats.mid} />
+        <mesh position={[0, 0, 0.024]} geometry={RIDGE_NEAR} material={rangeMats.near} />
+        {/* Window frame — four bars, so the sky is actually visible through it */}
+        <mesh position={[0, 0.71, 0.03]} material={winFrameMat}>
+          <boxGeometry args={[1.9, 0.08, 0.05]} />
         </mesh>
-        <mesh position={[0.4, -0.35, 0.02]} material={hillMat} rotation={[0, 0, -0.08]}>
-          <coneGeometry args={[0.8, 0.7, 5]} />
+        <mesh position={[0, -0.71, 0.03]} material={winFrameMat}>
+          <boxGeometry args={[1.9, 0.08, 0.05]} />
         </mesh>
-        {/* Window outer frame */}
-        <mesh position={[0, 0, 0.03]} material={winFrameMat}>
-          <boxGeometry args={[1.9, 1.5, 0.04]} />
+        <mesh position={[-0.91, 0, 0.03]} material={winFrameMat}>
+          <boxGeometry args={[0.08, 1.5, 0.05]} />
+        </mesh>
+        <mesh position={[0.91, 0, 0.03]} material={winFrameMat}>
+          <boxGeometry args={[0.08, 1.5, 0.05]} />
         </mesh>
         {/* Window cross dividers */}
         <mesh position={[0, 0, 0.04]} material={winFrameMat}>
@@ -280,6 +615,15 @@ function Desk() {
       <mesh position={[-0.05, 0.771, -0.215]} material={stitchMat}>
         <boxGeometry args={[1.48, 0.002, 0.008]} />
       </mesh>
+
+      {/* Warm radial light-pool decal from the lamp (additive, no shadow maps) */}
+      <GlowPanel
+        position={[-0.85, 0.7725, 0.03]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        size={[2.4, 1.1]}
+        color={C.poolWarm}
+        opacity={0.18}
+      />
     </group>
   );
 }
@@ -330,14 +674,22 @@ function Laptop({ hovered, onClick }) {
   const groupRef = useRef();
   const aluMat   = useMat(C.macAluminum, { roughness: 0.3, metalness: 0.7 });
   const darkMat  = useMat(C.macDark,     { roughness: 0.5, metalness: 0.2 });
-  const screenMat= useMat(C.screen,      {
-    roughness: 0.2,
-    emissive: C.screenGlow,
-    emissiveIntensity: hovered ? 1.0 : 0.6,
-  });
-  const codeLineMat1 = useMat(C.sky,    { emissive: C.sky, emissiveIntensity: 0.8 });
-  const codeLineMat2 = useMat(C.signal, { emissive: C.signal, emissiveIntensity: 0.8 });
-  const codeLineMat3 = useMat(C.board,  { emissive: C.board, emissiveIntensity: 0.8 });
+
+  // Screen texture is built once and disposed with the component
+  const screenTex = useMemo(() => makeScreenTexture(), []);
+  useEffect(() => () => screenTex.dispose(), [screenTex]);
+
+  const screenMat = useMemo(
+    () =>
+      new THREE.MeshStandardMaterial({
+        map: screenTex,
+        emissive: new THREE.Color("#FFFFFF"),
+        emissiveMap: screenTex,
+        emissiveIntensity: hovered ? 1.0 : 0.7,
+        roughness: 0.2,
+      }),
+    [screenTex, hovered]
+  );
 
   useFrame((_, delta) => {
     if (!groupRef.current) return;
@@ -379,27 +731,18 @@ function Laptop({ hovered, onClick }) {
         <mesh position={[0, 0.17, 0.007]} material={darkMat}>
           <boxGeometry args={[0.52, 0.32, 0.002]} />
         </mesh>
-        {/* Glowing code screen */}
+        {/* Glowing screen — real content from data/site.js */}
         <mesh position={[0, 0.17, 0.009]} material={screenMat}>
           <boxGeometry args={[0.48, 0.28, 0.002]} />
         </mesh>
 
-        {/* Stylized code lines on screen */}
-        <mesh position={[-0.05, 0.25, 0.011]} material={codeLineMat1}>
-          <boxGeometry args={[0.32, 0.012, 0.001]} />
-        </mesh>
-        <mesh position={[-0.08, 0.22, 0.011]} material={codeLineMat2}>
-          <boxGeometry args={[0.24, 0.012, 0.001]} />
-        </mesh>
-        <mesh position={[-0.02, 0.19, 0.011]} material={codeLineMat3}>
-          <boxGeometry args={[0.36, 0.012, 0.001]} />
-        </mesh>
-        <mesh position={[-0.1, 0.16, 0.011]} material={codeLineMat1}>
-          <boxGeometry args={[0.2, 0.012, 0.001]} />
-        </mesh>
-        <mesh position={[-0.04, 0.13, 0.011]} material={codeLineMat2}>
-          <boxGeometry args={[0.28, 0.012, 0.001]} />
-        </mesh>
+        {/* Faint additive halo around the display */}
+        <GlowPanel
+          position={[0, 0.17, 0.016]}
+          size={[0.8, 0.52]}
+          color={C.sky}
+          opacity={0.1}
+        />
       </group>
     </group>
   );
@@ -540,15 +883,40 @@ function RaspberryPi({ hovered, onClick }) {
   );
 }
 
-// ─── Roadmap Whiteboard (Wall-mounted above desk) ─────────────────────────────
+// ─── Roadmap Board (dark emissive wall panel: Now / Next / Later) ─────────────
 function RoadmapBoard({ hovered, onClick }) {
   const groupRef   = useRef();
   const frameMat   = useMat(C.wbFrame,    { roughness: 0.4, metalness: 0.5 });
-  const faceMat    = useMat(C.wbFace,     { roughness: 0.2 });
-  const yellowMat  = useMat(C.noteYellow, { roughness: 0.7 });
-  const blueMat    = useMat(C.noteBlue,   { roughness: 0.7 });
-  const greenMat   = useMat(C.noteGreen,  { roughness: 0.7 });
   const markerMat  = useMat(C.cobalt,     { roughness: 0.3 });
+
+  // Board content comes straight from data/roadmap.js via the visibility gate
+  const boardTex = useMemo(() => {
+    const items = visibleItems(roadmap);
+    return makeBoardTexture(
+      BOARD_COLUMNS.map((col) => ({
+        label: col.label,
+        accent: col.accent,
+        titles: items
+          .filter((item) => item.status === col.key)
+          .slice(0, 3)
+          .map((item) => item.title),
+      }))
+    );
+  }, []);
+
+  useEffect(() => () => boardTex.dispose(), [boardTex]);
+
+  const faceMat = useMemo(
+    () =>
+      new THREE.MeshStandardMaterial({
+        map: boardTex,
+        emissive: new THREE.Color("#FFFFFF"),
+        emissiveMap: boardTex,
+        emissiveIntensity: 0.55,
+        roughness: 0.5,
+      }),
+    [boardTex]
+  );
 
   useFrame((_, delta) => {
     if (!groupRef.current) return;
@@ -569,42 +937,18 @@ function RoadmapBoard({ hovered, onClick }) {
       <mesh material={frameMat}>
         <boxGeometry args={[1.5, 0.85, 0.04]} />
       </mesh>
-      {/* Whiteboard magnetic dry-erase surface */}
+      {/* Dark emissive Now / Next / Later panel */}
       <mesh position={[0, 0, 0.021]} material={faceMat}>
         <boxGeometry args={[1.42, 0.77, 0.004]} />
       </mesh>
 
-      {/* Header bar / title banner */}
-      <mesh position={[0, 0.32, 0.024]} material={useMat("#CBD5E1", { roughness: 0.5 })}>
-        <boxGeometry args={[1.34, 0.04, 0.002]} />
-      </mesh>
-
-      {/* Column 1: "NOW" sticky notes */}
-      <mesh position={[-0.42, 0.12, 0.026]} material={yellowMat}>
-        <boxGeometry args={[0.18, 0.14, 0.002]} />
-      </mesh>
-      <mesh position={[-0.42, -0.06, 0.026]} material={yellowMat}>
-        <boxGeometry args={[0.18, 0.14, 0.002]} />
-      </mesh>
-
-      {/* Column 2: "NEXT" sticky notes */}
-      <mesh position={[0, 0.12, 0.026]} material={blueMat}>
-        <boxGeometry args={[0.18, 0.14, 0.002]} />
-      </mesh>
-      <mesh position={[0, -0.06, 0.026]} material={blueMat}>
-        <boxGeometry args={[0.18, 0.14, 0.002]} />
-      </mesh>
-      <mesh position={[0, -0.22, 0.026]} material={blueMat}>
-        <boxGeometry args={[0.18, 0.1, 0.002]} />
-      </mesh>
-
-      {/* Column 3: "LATER" sticky notes */}
-      <mesh position={[0.42, 0.12, 0.026]} material={greenMat}>
-        <boxGeometry args={[0.18, 0.14, 0.002]} />
-      </mesh>
-      <mesh position={[0.42, -0.06, 0.026]} material={greenMat}>
-        <boxGeometry args={[0.18, 0.14, 0.002]} />
-      </mesh>
+      {/* Faint additive glow around the wall screen */}
+      <GlowPanel
+        position={[0, 0, 0.055]}
+        size={[2.0, 1.2]}
+        color={C.cobalt}
+        opacity={0.08}
+      />
 
       {/* Pen tray + markers at bottom */}
       <mesh position={[0, -0.44, 0.05]} material={frameMat}>
@@ -881,18 +1225,25 @@ function CoffeeMug() {
 }
 
 // ─── Wall Floating Shelf with Books & Model Quadcopter Drone ───────────────────
-function WallShelf() {
+function WallShelf({ spin, reducedMotion }) {
   const shelfMat = useMat(C.deskEdge, { roughness: 0.6 });
   const droneMat = useMat(C.signal,   { roughness: 0.3, metalness: 0.4 });
   const propMat  = useMat(C.ink,      { roughness: 0.5 });
-  const propRef  = useRef();
+  const { invalidate } = useThree();
+  const propA = useRef();
+  const propB = useRef();
 
+  // Two drone propellers spin only while the lab module is hovered/focused or
+  // /lab is the active route. Frames are requested while they spin, then stop.
   useFrame((_, delta) => {
-    if (propRef.current) propRef.current.rotation.y += delta * 4;
+    if (!spin || reducedMotion) return;
+    if (propA.current) propA.current.rotation.y += delta * 3.2;
+    if (propB.current) propB.current.rotation.y -= delta * 3.2;
+    invalidate();
   });
 
   return (
-    <group position={[1.8, 2.8, -2.48]}>
+    <group position={[-0.2, 2.8, -2.48]}>
       {/* Wooden floating wall shelf */}
       <mesh material={shelfMat}>
         <boxGeometry args={[1.6, 0.04, 0.28]} />
@@ -919,17 +1270,35 @@ function WallShelf() {
         <mesh material={droneMat}>
           <boxGeometry args={[0.1, 0.03, 0.1]} />
         </mesh>
-        {/* 4 drone arm rods */}
+        {/* Drone arm rods */}
         <mesh rotation={[0, Math.PI / 4, 0]} material={shelfMat}>
           <boxGeometry args={[0.24, 0.015, 0.015]} />
         </mesh>
         <mesh rotation={[0, -Math.PI / 4, 0]} material={shelfMat}>
           <boxGeometry args={[0.24, 0.015, 0.015]} />
         </mesh>
-        {/* Spinning propeller pair */}
-        <group ref={propRef} position={[0.08, 0.025, 0.08]}>
+
+        {/* Two drone propellers — still unless the lab module is active */}
+        <group ref={propA} position={[0.09, 0.028, 0.09]}>
           <mesh material={propMat}>
-            <boxGeometry args={[0.09, 0.003, 0.015]} />
+            <cylinderGeometry args={[0.008, 0.008, 0.012, 8]} />
+          </mesh>
+          <mesh material={propMat}>
+            <boxGeometry args={[0.11, 0.003, 0.014]} />
+          </mesh>
+          <mesh rotation={[0, Math.PI / 2, 0]} material={propMat}>
+            <boxGeometry args={[0.11, 0.003, 0.014]} />
+          </mesh>
+        </group>
+        <group ref={propB} position={[-0.09, 0.028, -0.09]}>
+          <mesh material={propMat}>
+            <cylinderGeometry args={[0.008, 0.008, 0.012, 8]} />
+          </mesh>
+          <mesh material={propMat}>
+            <boxGeometry args={[0.11, 0.003, 0.014]} />
+          </mesh>
+          <mesh rotation={[0, Math.PI / 2, 0]} material={propMat}>
+            <boxGeometry args={[0.11, 0.003, 0.014]} />
           </mesh>
         </group>
       </group>
@@ -937,75 +1306,80 @@ function WallShelf() {
   );
 }
 
-// ─── Floating 3D Beacon Indicator (Jesse Zhou inspired Pin) ───────────────────
-function HotspotBeacon({ position, hovered, onClick, reducedMotion }) {
-  const ringRef = useRef();
+// ─── Neon "RASHMIN" wall sign (static emissive texture + soft glow) ──────────
+function WallSign() {
+  const signTex = useMemo(() => makeSignTexture("RASHMIN"), []);
+  useEffect(() => () => signTex.dispose(), [signTex]);
 
-  useFrame(({ clock }) => {
-    if (reducedMotion || !ringRef.current) return;
-    const t = clock.elapsedTime * 2.5;
-    const scale = 1 + Math.sin(t) * 0.2;
-    ringRef.current.scale.set(scale, scale, scale);
-  });
+  const signMat = useMemo(
+    () =>
+      new THREE.MeshStandardMaterial({
+        map: signTex,
+        emissive: new THREE.Color("#FFFFFF"),
+        emissiveMap: signTex,
+        emissiveIntensity: 0.85,
+        roughness: 0.6,
+      }),
+    [signTex]
+  );
 
   return (
-    <group
-      position={position}
-      onClick={(e) => { e.stopPropagation(); onClick?.(); }}
-      onPointerOver={(e) => { e.stopPropagation(); document.body.style.cursor = "pointer"; }}
-      onPointerOut={() => { document.body.style.cursor = "auto"; }}
-    >
-      {/* Inner glowing signal core */}
-      <mesh>
-        <sphereGeometry args={[0.028, 16, 16]} />
-        <meshStandardMaterial
-          color={C.signal}
-          emissive={C.signal}
-          emissiveIntensity={hovered ? 2.8 : 1.6}
-          roughness={0.2}
-        />
+    <group position={[4.15, 2.55, -2.56]}>
+      <mesh material={signMat}>
+        <planeGeometry args={[1.9, 0.42]} />
       </mesh>
-      {/* Outer pulsing beacon ring */}
-      <mesh ref={ringRef} rotation={[-Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[0.045, 0.06, 24]} />
-        <meshBasicMaterial
-          color={C.signal}
-          transparent
-          opacity={hovered ? 0.9 : 0.55}
-          side={THREE.DoubleSide}
-        />
-      </mesh>
+      <GlowPanel position={[0, 0, 0.03]} size={[2.3, 0.86]} color={C.signal} opacity={0.1} />
     </group>
   );
 }
 
-// ─── 3D Coordinate Projector for screen-space labels (Zero createRoot / Zero unmount warning) ─
-function HotspotProjector({ hotspots, labelRefs }) {
+// ─── Projects hotspot 3D anchors into screen space for the DOM beacon layer ──
+function BeaconProjector({ hotspots, beaconRefs }) {
   const { camera, size } = useThree();
   const v = useMemo(() => new THREE.Vector3(), []);
 
-  useFrame(() => {
-    if (!labelRefs?.current) return;
+  const project = useCallback(() => {
+    const refs = beaconRefs?.current;
+    if (!refs) return;
+
+    // Keep projection matrices current so beacons track the camera exactly
+    camera.updateMatrixWorld();
+    camera.matrixWorldInverse.copy(camera.matrixWorld).invert();
+
     hotspots.forEach((hs) => {
-      const el = labelRefs.current[hs.id];
-      if (!el) return;
-      const pos = HOTSPOT_LABEL_POSITIONS[hs.id];
-      if (!pos) return;
-      v.set(pos[0], pos[1], pos[2]);
+      const el = refs[hs.id];
+      const anchor = HOTSPOT_ANCHORS[hs.id];
+      if (!el || !anchor) return;
+
+      v.set(anchor[0], anchor[1], anchor[2]);
       v.project(camera);
-      // Behind camera check
+
+      // Behind the camera → take it out of the layout and the tab order
       if (v.z > 1) {
         el.style.opacity = "0";
         el.style.pointerEvents = "none";
+        el.style.visibility = "hidden";
         return;
       }
+
+      el.style.visibility = "visible";
       el.style.opacity = "1";
       el.style.pointerEvents = "auto";
+
       const x = ((v.x + 1) * size.width) / 2;
       const y = ((-v.y + 1) * size.height) / 2;
       el.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`;
     });
-  });
+  }, [beaconRefs, camera, hotspots, size.width, size.height, v]);
+
+  // Only runs on frames the renderer actually produces (i.e. camera movement),
+  // and never asks for a frame itself.
+  useFrame(project);
+
+  // Initial placement and resize: reposition without requesting a frame
+  useEffect(() => {
+    project();
+  }, [project]);
 
   return null;
 }
@@ -1024,6 +1398,7 @@ function CameraRig({ targetPose: explicitPose, reducedMotion = false }) {
   const dragRot    = useRef({ x: 0, y: 0 });
   const prevDragRot= useRef({ x: 0, y: 0 });
   const introDone  = useRef(false);
+  const lastMouse  = useRef({ x: 0, y: 0 });
 
   // Target pose keyed by route
   const targetPose = explicitPose || routePoses[pathname] || defaultPose;
@@ -1054,7 +1429,8 @@ function CameraRig({ targetPose: explicitPose, reducedMotion = false }) {
         dragRot.current.x = Math.max(-0.25, Math.min(0.35, prevDragRot.current.x + dy * 1.0));
         dragRot.current.y = prevDragRot.current.y + dx * 2.2;
       }
-      invalidate();
+      // Parallax needs a frame to follow the pointer (not under reduced motion)
+      if (isDragging.current || !reducedMotion) invalidate();
     };
     const onPointerDown = (e) => {
       isDragging.current = true;
@@ -1071,7 +1447,7 @@ function CameraRig({ targetPose: explicitPose, reducedMotion = false }) {
       window.removeEventListener("pointerdown", onPointerDown);
       window.removeEventListener("pointerup",   onPointerUp);
     };
-  }, [invalidate]);
+  }, [invalidate, reducedMotion]);
 
   // Reset drag rotation when target pose changes
   useEffect(() => {
@@ -1088,15 +1464,26 @@ function CameraRig({ targetPose: explicitPose, reducedMotion = false }) {
     const py = p.y - dragRot.current.x * 0.5;
     const pz = p.z;
 
+    const mouseMoved =
+      mouse.current.x !== lastMouse.current.x || mouse.current.y !== lastMouse.current.y;
+
+    let settled = false;
+
     if (reducedMotion) {
       // Instant jump, no damp, no parallax
-      camera.position.set(px, py, pz);
+      settled = camera.position.x === px && camera.position.y === py && camera.position.z === pz;
+      if (!settled) camera.position.set(px, py, pz);
       _scratch.set(t.x, t.y, t.z);
       camera.lookAt(_scratch);
     } else {
-      camera.position.x = THREE.MathUtils.damp(camera.position.x, px, 5, delta);
-      camera.position.y = THREE.MathUtils.damp(camera.position.y, py, 5, delta);
-      camera.position.z = THREE.MathUtils.damp(camera.position.z, pz, 5, delta);
+      const nx = THREE.MathUtils.damp(camera.position.x, px, 5, delta);
+      const ny = THREE.MathUtils.damp(camera.position.y, py, 5, delta);
+      const nz = THREE.MathUtils.damp(camera.position.z, pz, 5, delta);
+      settled =
+        Math.abs(nx - px) < 1e-4 &&
+        Math.abs(ny - py) < 1e-4 &&
+        Math.abs(nz - pz) < 1e-4;
+      camera.position.set(nx, ny, nz);
 
       const parallaxX = mouse.current.x * DEG5;
       const parallaxY = mouse.current.y * DEG3;
@@ -1104,14 +1491,18 @@ function CameraRig({ targetPose: explicitPose, reducedMotion = false }) {
       camera.lookAt(_scratch);
     }
 
-    invalidate();
+    lastMouse.current.x = mouse.current.x;
+    lastMouse.current.y = mouse.current.y;
+
+    // Demand frames only while the camera is still moving — never continuously
+    if (!settled || mouseMoved) invalidate();
   });
 
   return null;
 }
 
-// ─── Coordinated, Spacious Hotspot Positions ──────────────────────────────────
-const HOTSPOT_BEACON_POSITIONS = {
+// ─── Coordinated, Spacious Hotspot Anchors (projected onto the DOM beacons) ───
+const HOTSPOT_ANCHORS = {
   plant:      [-1.78, 1.02, -0.08],
   notebook:   [-1.0,  0.86,  0.28],
   laptop:     [-0.1,  1.12,  0.08],
@@ -1121,15 +1512,23 @@ const HOTSPOT_BEACON_POSITIONS = {
   phone:      [ 1.82, 0.96,  0.2 ],
 };
 
-const HOTSPOT_LABEL_POSITIONS = {
-  plant:      [-1.78, 1.25, -0.08],
-  notebook:   [-1.0,  1.08,  0.28],
-  laptop:     [-0.1,  1.36,  0.08],
-  whiteboard: [-0.3,  2.42, -2.42],
-  book:       [ 0.68, 1.15,  0.28],
-  pi:         [ 1.25, 1.08, -0.05],
-  phone:      [ 1.82, 1.20,  0.2 ],
-};
+// ─── Hover Kick: a short burst of frames so hover transitions can settle ──────
+function HoverKick({ hoveredId }) {
+  const { invalidate } = useThree();
+  const until = useRef(0);
+
+  useEffect(() => {
+    // ~400ms is enough for the damped hover scales to converge
+    until.current = performance.now() + 400;
+    invalidate();
+  }, [hoveredId, invalidate]);
+
+  useFrame(() => {
+    if (performance.now() < until.current) invalidate();
+  });
+
+  return null;
+}
 
 // ─── Ready Notifier: calls onReady once first frame renders ───────────────────
 function ReadyNotifier({ onReady }) {
@@ -1143,9 +1542,81 @@ function ReadyNotifier({ onReady }) {
   return null;
 }
 
+// ─── Desktop-only bloom (emissives only); skipped entirely on mobile ─────────
+function ScenePostFX({ enabled }) {
+  const { gl, scene, camera, size, invalidate } = useThree();
+  const [composer, setComposer] = useState(null);
+
+  useEffect(() => {
+    if (!enabled) {
+      setComposer(null);
+      return undefined;
+    }
+
+    let cancelled = false;
+    let active = null;
+
+    Promise.all([
+      import("three/examples/jsm/postprocessing/EffectComposer.js"),
+      import("three/examples/jsm/postprocessing/RenderPass.js"),
+      import("three/examples/jsm/postprocessing/UnrealBloomPass.js"),
+      import("three/examples/jsm/postprocessing/OutputPass.js"),
+    ]).then(([composerMod, renderMod, bloomMod, outputMod]) => {
+      if (cancelled) return;
+      const next = new composerMod.EffectComposer(gl);
+      next.addPass(new renderMod.RenderPass(scene, camera));
+      // High threshold + low strength → only the bright emissive surfaces bloom
+      next.addPass(new bloomMod.UnrealBloomPass(new THREE.Vector2(1, 1), 0.2, 0.45, 0.92));
+      next.addPass(new outputMod.OutputPass());
+      active = next;
+      setComposer(next);
+      invalidate();
+    });
+
+    return () => {
+      cancelled = true;
+      if (active) {
+        active.passes.forEach((pass) => pass.dispose?.());
+        active.dispose();
+      }
+    };
+  }, [enabled, gl, scene, camera, invalidate]);
+
+  // Keep the composer in step with canvas size and pixel ratio
+  useEffect(() => {
+    if (!composer) return;
+    composer.setPixelRatio(gl.getPixelRatio());
+    composer.setSize(size.width, size.height);
+    invalidate();
+  }, [composer, gl, size.width, size.height, invalidate]);
+
+  // A positive priority takes render control from the default R3F loop
+  useFrame(() => {
+    if (composer) composer.render();
+  }, 1);
+
+  return null;
+}
+
+// ─── Desktop viewport check for post-processing (≥1024px) ────────────────────
+function useDesktopScene() {
+  const [desktop, setDesktop] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const sync = () => setDesktop(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
+  return desktop;
+}
+
 // ─── Inner Scene Assembler ────────────────────────────────────────────────────
-function SceneContent({ targetPose, hotspots, onSelect, hoveredId, labelRefs, reducedMotion }) {
+function SceneContent({ targetPose, hotspots, onSelect, hoveredId, beaconRefs, reducedMotion, desktopScene }) {
   const router = useRouter();
+  const pathname = usePathname();
 
   const handleSelectObject = useCallback((id) => {
     if (onSelect) {
@@ -1172,26 +1643,17 @@ function SceneContent({ targetPose, hotspots, onSelect, hoveredId, labelRefs, re
       <PhoneStand   hovered={hoveredId === "phone"} onClick={() => handleSelectObject("phone")} />
       <PottedPlant  hovered={hoveredId === "plant"} onClick={() => handleSelectObject("plant")} />
       <CoffeeMug />
-      <WallShelf />
+      <WallShelf spin={hoveredId === "pi" || pathname === "/lab"} reducedMotion={reducedMotion} />
+      <WallSign />
 
-      {/* Screen coordinate projector for DOM labels */}
-      <HotspotProjector hotspots={hotspots} labelRefs={labelRefs} />
+      {/* Screen-space projector for the DOM beacon layer */}
+      <BeaconProjector hotspots={hotspots} beaconRefs={beaconRefs} />
 
-      {/* 3D Pulsing Beacons on the desk objects */}
-      {hotspots.map((hs) => {
-        const beaconPos = HOTSPOT_BEACON_POSITIONS[hs.id];
-        if (!beaconPos) return null;
-        const isHovered = hoveredId === hs.id;
-        return (
-          <HotspotBeacon
-            key={hs.id}
-            position={beaconPos}
-            hovered={isHovered}
-            onClick={() => handleSelectObject(hs.id)}
-            reducedMotion={reducedMotion}
-          />
-        );
-      })}
+      {/* Short frame bursts for hover transitions (no continuous loop) */}
+      <HoverKick hoveredId={hoveredId} />
+
+      {/* Desktop-only bloom over the emissive surfaces */}
+      <ScenePostFX enabled={desktopScene} />
     </>
   );
 }
@@ -1248,11 +1710,13 @@ export default function Scene({
   hotspots,
   targetPose,
   onSelect,
-  onHover,
-  labelRefs,
+  beaconRefs,
+  hoveredId = null,
   onReady,
   reducedMotion = false,
 }) {
+  const desktopScene = useDesktopScene();
+
   return (
     <SceneErrorBoundary>
       <Canvas
@@ -1262,7 +1726,7 @@ export default function Scene({
           position: [defaultPose.position.x, defaultPose.position.y, defaultPose.position.z],
           fov: 46,
         }}
-        gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.1 }}
+        gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.0 }}
         style={{
           background: "radial-gradient(ellipse at 50% 30%, #172338 0%, #0B1220 100%)",
           width: "100%",
@@ -1275,9 +1739,10 @@ export default function Scene({
           targetPose={targetPose}
           hotspots={hotspots}
           onSelect={onSelect}
-          hoveredId={null}
-          labelRefs={labelRefs}
+          hoveredId={hoveredId}
+          beaconRefs={beaconRefs}
           reducedMotion={reducedMotion}
+          desktopScene={desktopScene}
         />
       </Canvas>
     </SceneErrorBoundary>

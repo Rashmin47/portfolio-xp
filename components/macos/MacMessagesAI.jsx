@@ -119,7 +119,7 @@ export default function MacMessagesAI({ isOpen, onClose }) {
 
           <div className="font-mono text-xs font-semibold text-paper flex items-center gap-2">
             <span className="text-board">●</span>
-            <span>Rashmin AI — Messages</span>
+            <span>Rashmin AI — Assistant</span>
           </div>
 
           <button

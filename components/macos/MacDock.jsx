@@ -2,34 +2,39 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import DockIcon from "@/components/ui/DockIcon";
 
 /**
  * MacDock
  * -------
- * Floating macOS application dock at bottom center of the viewport:
- *  - App icons with hover bounce / elevation
- *  - Active app indicator dot
- *  - Instant navigation between workshop apps
+ * Floating application dock at bottom center of the viewport:
+ *  - Custom inline SVG icons (1.5px stroke, currentColor)
+ *  - Label chip on hover and keyboard focus
+ *  - Active-route accent in signal
+ *  - Magnification on hover is desktop-only and off under reduced motion
  */
 export default function MacDock({ onOpenAI, onOpenTerminal }) {
   const pathname = usePathname();
 
   const DOCK_APPS = [
-    { href: "/", label: "Terminal", icon: "⬛", active: pathname === "/" },
-    { href: "/projects", label: "Projects", icon: "📁", active: pathname.startsWith("/projects") },
-    { href: "/lab", label: "Lab", icon: "🔬", active: pathname.startsWith("/lab") },
-    { href: "/experience", label: "Experience", icon: "💼", active: pathname.startsWith("/experience") },
-    { href: "/roadmap", label: "Roadmap", icon: "🗺️", active: pathname.startsWith("/roadmap") },
-    { href: "/notes", label: "Notes", icon: "📝", active: pathname.startsWith("/notes") },
-    { href: "/about", label: "About", icon: "👤", active: pathname.startsWith("/about") },
-    { href: "/contact", label: "Mail", icon: "✉️", active: pathname.startsWith("/contact") },
+    { href: "/", name: "terminal", label: "Terminal", active: pathname === "/" },
+    { href: "/projects", name: "folder", label: "Projects", active: pathname.startsWith("/projects") },
+    { href: "/lab", name: "flask", label: "Lab", active: pathname.startsWith("/lab") },
+    { href: "/experience", name: "briefcase", label: "Experience", active: pathname.startsWith("/experience") },
+    { href: "/roadmap", name: "board", label: "Roadmap", active: pathname.startsWith("/roadmap") },
+    { href: "/notes", name: "notes", label: "Notes", active: pathname.startsWith("/notes") },
+    { href: "/about", name: "person", label: "About", active: pathname.startsWith("/about") },
+    { href: "/contact", name: "mail", label: "Mail", active: pathname.startsWith("/contact") },
   ];
+
+  const buttonBase =
+    "dock-magnify w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center";
 
   return (
     <div
       className="fixed bottom-3 left-1/2 -translate-x-1/2 z-30 pointer-events-auto"
       role="toolbar"
-      aria-label="macOS Application Dock"
+      aria-label="Application dock"
     >
       <div
         className="flex items-end gap-1.5 sm:gap-2 px-3 py-2 rounded-2xl border border-paper/15 shadow-2xl backdrop-blur-xl"
@@ -38,67 +43,72 @@ export default function MacDock({ onOpenAI, onOpenTerminal }) {
           boxShadow: "0 20px 40px -10px rgba(0,0,0,0.7), inset 0 1px 0 0 rgba(255,255,255,0.1)",
         }}
       >
-        {DOCK_APPS.map((app) => (
-          <div key={app.href} className="relative group flex flex-col items-center">
-            {/* Tooltip */}
-            <span className="absolute -top-8 px-2 py-0.5 rounded bg-night-surface text-paper text-[10px] font-mono opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap border border-paper/10 shadow-lg">
-              {app.label}
-            </span>
+        {DOCK_APPS.map((app) => {
+          const tone = app.active ? "text-signal" : "text-paper/70 hover:text-paper";
 
-            {/* Icon Button — use button for Terminal on homepage to open window */}
-            {app.href === "/" && onOpenTerminal ? (
-              <button
-                type="button"
-                onClick={onOpenTerminal}
-                title="Open Terminal"
-                className={`w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center text-lg sm:text-xl transition-all duration-200 hover:-translate-y-2 hover:scale-110 active:scale-95 ${
-                  app.active
-                    ? "bg-paper/20 shadow-inner"
-                    : "bg-paper/5 hover:bg-paper/15"
-                }`}
+          return (
+            <div key={app.href} className="relative group flex flex-col items-center">
+              {/* Label chip */}
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute -top-8 px-2 py-0.5 rounded bg-night-surface text-paper text-[10px] font-mono whitespace-nowrap border border-paper/10 shadow-lg opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"
               >
-                <span>{app.icon}</span>
-              </button>
-            ) : (
-              <Link
-                href={app.href}
-                className={`w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center text-lg sm:text-xl transition-all duration-200 hover:-translate-y-2 hover:scale-110 active:scale-95 ${
-                  app.active
-                    ? "bg-paper/20 shadow-inner"
-                    : "bg-paper/5 hover:bg-paper/15"
-                }`}
-              >
-                <span>{app.icon}</span>
-              </Link>
-            )}
+                {app.label}
+              </span>
 
-            {/* Active app dot */}
-            <span
-              className={`w-1 h-1 rounded-full mt-1 transition-all ${
-                app.active ? "bg-signal shadow-[0_0_6px_#F2C81F]" : "bg-transparent"
-              }`}
-            />
-          </div>
-        ))}
+              {/* Terminal on the homepage opens the window instead of navigating */}
+              {app.href === "/" && onOpenTerminal ? (
+                <button
+                  type="button"
+                  onClick={onOpenTerminal}
+                  title="Open Terminal"
+                  aria-label={app.label}
+                  className={`${buttonBase} ${tone} ${app.active ? "bg-paper/20" : "bg-paper/5 hover:bg-paper/15"}`}
+                >
+                  <DockIcon name={app.name} />
+                </button>
+              ) : (
+                <Link
+                  href={app.href}
+                  aria-label={app.label}
+                  className={`${buttonBase} ${tone} ${app.active ? "bg-paper/20" : "bg-paper/5 hover:bg-paper/15"}`}
+                >
+                  <DockIcon name={app.name} />
+                </Link>
+              )}
+
+              {/* Active route dot */}
+              <span
+                className={`w-1 h-1 rounded-full mt-1 transition-all ${
+                  app.active ? "bg-signal" : "bg-transparent"
+                }`}
+              />
+            </div>
+          );
+        })}
 
         {/* Separator */}
         <div className="w-px h-7 bg-paper/15 mx-1 self-center" />
 
-        {/* AI Assistant (Messages) App */}
+        {/* Assistant */}
         <div className="relative group flex flex-col items-center">
-          <span className="absolute -top-8 px-2 py-0.5 rounded bg-night-surface text-paper text-[10px] font-mono opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap border border-paper/10 shadow-lg">
-            Rashmin AI
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute -top-8 px-2 py-0.5 rounded bg-night-surface text-paper text-[10px] font-mono whitespace-nowrap border border-paper/10 shadow-lg opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"
+          >
+            Assistant
           </span>
 
           <button
             type="button"
             onClick={onOpenAI}
-            title="Open Rashmin AI Messenger"
-            className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center text-lg sm:text-xl bg-cobalt/20 hover:bg-cobalt/40 border border-cobalt/40 transition-all duration-200 hover:-translate-y-2 hover:scale-110 active:scale-95"
+            title="Open Rashmin AI assistant"
+            aria-label="Assistant"
+            className={`${buttonBase} text-sky bg-cobalt/20 hover:bg-cobalt/40 border border-cobalt/40`}
           >
-            <span>💬</span>
+            <DockIcon name="assistant" />
           </button>
-          <span className="w-1 h-1 rounded-full mt-1 bg-board animate-pulse" />
+          <span className="w-1 h-1 rounded-full mt-1 bg-board" />
         </div>
       </div>
     </div>

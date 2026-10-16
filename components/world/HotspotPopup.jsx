@@ -173,6 +173,7 @@ export default function HotspotPopup({ hotspot, onClose }) {
               <Link
                 href={hotspot.href}
                 onClick={onClose}
+                autoFocus
                 className="inline-flex items-center gap-2 px-5 py-2 rounded-xl font-mono text-xs font-bold text-white bg-cobalt hover:bg-cobalt/90 shadow-lg shadow-cobalt/30 transition-all hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-signal"
               >
                 <span>Open {hotspot.label}</span>
