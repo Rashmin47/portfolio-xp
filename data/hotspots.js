@@ -57,8 +57,9 @@ export const hotspots = [
     description: "Who I am, what I care about.",
     objectId: "plant",
     pose: {
-      position: { x: -1.78, y: 1.3, z: 1.6 },
-      target:   { x: -1.78, y: 0.95, z: -0.08 },
+      // Framing tracks the pot, which now stands on the desk at x -1.5
+      position: { x: -1.5, y: 1.3, z: 1.93 },
+      target:   { x: -1.5, y: 0.95, z: 0.25 },
     },
   },
   {
@@ -68,8 +69,9 @@ export const hotspots = [
     description: "Say hello or collaborate.",
     objectId: "phone",
     pose: {
-      position: { x: 1.82, y: 1.3, z: 1.6 },
-      target:   { x: 1.82, y: 0.9, z: 0.2 },
+      // Framing tracks the handset, which now stands on the desk at x 1.5
+      position: { x: 1.5, y: 1.3, z: 1.65 },
+      target:   { x: 1.5, y: 0.9, z: 0.25 },
     },
   },
   {

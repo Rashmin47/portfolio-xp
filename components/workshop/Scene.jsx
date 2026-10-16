@@ -47,8 +47,6 @@ const C = {
   piSilver:    "#E2E8F0",
   piGold:      "#D4AF37",
 
-  mugCeramic:  "#F8FAFC",
-  mugCoffee:   "#3E2312",
   coasterCork: "#A2744B",
 
   lampBody:    "#2F5BEA",
@@ -86,9 +84,10 @@ function useMat(color, opts = {}) {
         metalness: opts.metalness ?? 0.0,
         emissive: opts.emissive ? new THREE.Color(opts.emissive) : undefined,
         emissiveIntensity: opts.emissiveIntensity ?? 0,
+        side: opts.side ?? THREE.FrontSide,
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [color, opts.roughness, opts.metalness, opts.emissive, opts.emissiveIntensity]
+    [color, opts.roughness, opts.metalness, opts.emissive, opts.emissiveIntensity, opts.side]
   );
 }
 
@@ -364,11 +363,13 @@ function SceneLighting() {
         color="#93C5FD"
       />
 
-      {/* Cozy warm desk lamp light pooling directly on the workspace */}
+      {/* Cozy warm desk lamp light pooling directly on the workspace.
+          Kept modest: the lamp sits close to the notebook, so a hot value
+          blows the paper out to pure white (and then blooms). */}
       <pointLight
         position={[-1.2, 1.4, 0.2]}
         color="#FFE4A0"
-        intensity={2.0}
+        intensity={1.15}
         distance={3.5}
         decay={2}
       />
@@ -377,9 +378,9 @@ function SceneLighting() {
           while the surrounding room ambient comes down. No shadow maps. */}
       <spotLight
         position={[-1.28, 1.55, -0.14]}
-        target-position={[-0.7, 0.77, 0.1]}
+        target-position={[-0.5, 0.77, 0.06]}
         color={C.lampCone}
-        intensity={2.1}
+        intensity={1.3}
         angle={0.62}
         penumbra={1}
         distance={4.5}
@@ -622,49 +623,94 @@ function Desk() {
         rotation={[-Math.PI / 2, 0, 0]}
         size={[2.4, 1.1]}
         color={C.poolWarm}
-        opacity={0.18}
+        opacity={0.12}
       />
     </group>
   );
 }
 
-// ─── Studio Chair (tucked at desk) ────────────────────────────────────────────
+// ─── Studio Task Chair (tucked at desk) ───────────────────────────────────────
 function Chair() {
-  const cushionMat = useMat("#1E293B", { roughness: 0.8 });
-  const frameMat   = useMat("#0F172A", { roughness: 0.4, metalness: 0.5 });
+  const cushionMat = useMat("#1E293B", { roughness: 0.85 });
+  const shellMat   = useMat("#141C2B", { roughness: 0.6, metalness: 0.1 });
+  const frameMat   = useMat("#0F172A", { roughness: 0.35, metalness: 0.6 });
+  const chromeMat  = useMat("#9BA6B8", { roughness: 0.28, metalness: 0.85 });
+  const casterMat  = useMat("#0B1220", { roughness: 0.55, metalness: 0.15 });
+
+  // 5-star base: spoke angle, plus the castor that caps each spoke
+  const STAR = [0, 1, 2, 3, 4].map((i) => {
+    const rad = (i * 2 * Math.PI) / 5;
+    return { rad, x: Math.cos(rad), z: Math.sin(rad) };
+  });
 
   return (
     <group position={[-0.05, 0, 0.85]} rotation={[0, -0.15, 0]}>
-      {/* Seat cushion */}
-      <mesh position={[0, 0.48, 0]} material={cushionMat}>
-        <boxGeometry args={[0.5, 0.08, 0.48]} />
+      {/* ── Seat: slim shell plate with a cambered cushion on top ───────── */}
+      <mesh position={[0, 0.402, 0]} material={shellMat}>
+        <boxGeometry args={[0.5, 0.022, 0.47]} />
       </mesh>
-      {/* Ergonomic curved backrest */}
-      <mesh position={[0, 0.82, 0.23]} rotation={[-0.1, 0, 0]} material={cushionMat}>
-        <boxGeometry args={[0.46, 0.45, 0.05]} />
+      <mesh position={[0, 0.442, 0]} material={cushionMat}>
+        <boxGeometry args={[0.47, 0.058, 0.44]} />
       </mesh>
-      {/* Back connector stem */}
-      <mesh position={[0, 0.62, 0.22]} material={frameMat}>
-        <cylinderGeometry args={[0.02, 0.02, 0.3, 8]} />
+      {/* Waterfall front lip so the seat edge reads soft, not sliced */}
+      <mesh position={[0, 0.424, -0.222]} rotation={[0.5, 0, 0]} material={cushionMat}>
+        <boxGeometry args={[0.47, 0.05, 0.03]} />
       </mesh>
-      {/* Central gas-lift cylinder */}
-      <mesh position={[0, 0.26, 0]} material={frameMat}>
-        <cylinderGeometry args={[0.035, 0.035, 0.38, 12]} />
+
+      {/* ── Back: frame plate + cushion + lumbar pad ────────────────────── */}
+      <group position={[0, 0, 0]} rotation={[-0.13, 0, 0]}>
+        <mesh position={[0, 0.735, 0.255]} material={shellMat}>
+          <boxGeometry args={[0.45, 0.4, 0.022]} />
+        </mesh>
+        <mesh position={[0, 0.74, 0.228]} material={cushionMat}>
+          <boxGeometry args={[0.42, 0.36, 0.045]} />
+        </mesh>
+        {/* Lumbar pad */}
+        <mesh position={[0, 0.59, 0.206]} material={cushionMat}>
+          <boxGeometry args={[0.38, 0.075, 0.05]} />
+        </mesh>
+      </group>
+      {/* Back upright spar, seat → back frame */}
+      <mesh position={[0, 0.53, 0.212]} rotation={[0.1, 0, 0]} material={frameMat}>
+        <boxGeometry args={[0.055, 0.24, 0.028]} />
       </mesh>
-      {/* 5-star base feet */}
-      {[0, 1, 2, 3, 4].map((i) => {
-        const rad = (i * 2 * Math.PI) / 5;
-        return (
-          <mesh
-            key={i}
-            position={[Math.cos(rad) * 0.16, 0.06, Math.sin(rad) * 0.16]}
-            rotation={[0, rad, 0]}
-            material={frameMat}
-          >
-            <boxGeometry args={[0.3, 0.03, 0.04]} />
+
+      {/* ── Tilt mechanism under the seat ───────────────────────────────── */}
+      <mesh position={[0, 0.372, 0.01]} material={frameMat}>
+        <boxGeometry args={[0.17, 0.04, 0.14]} />
+      </mesh>
+
+      {/* ── Gas lift: tapered shroud over a chrome column ───────────────── */}
+      <mesh position={[0, 0.18, 0]} material={shellMat}>
+        <cylinderGeometry args={[0.032, 0.042, 0.19, 16]} />
+      </mesh>
+      <mesh position={[0, 0.305, 0]} material={chromeMat}>
+        <cylinderGeometry args={[0.021, 0.021, 0.14, 12]} />
+      </mesh>
+
+      {/* ── 5-star base: hub, tapered spokes, castors ───────────────────── */}
+      <mesh position={[0, 0.075, 0]} material={shellMat}>
+        <cylinderGeometry args={[0.05, 0.062, 0.04, 16]} />
+      </mesh>
+      {STAR.map(({ rad, x, z }, i) => (
+        <group key={i}>
+          {/* Tapered spoke reaching out to the castor */}
+          <mesh position={[x * 0.135, 0.062, z * 0.135]} rotation={[0, -rad, 0]} material={shellMat}>
+            <boxGeometry args={[0.21, 0.024, 0.05]} />
           </mesh>
-        );
-      })}
+          {/* Castor housing + wheel sitting on the floor */}
+          <mesh position={[x * 0.245, 0.055, z * 0.245]} material={frameMat}>
+            <boxGeometry args={[0.03, 0.05, 0.03]} />
+          </mesh>
+          <mesh
+            position={[x * 0.245, 0.034, z * 0.245]}
+            rotation={[0, -rad - Math.PI / 2, 0]}
+            material={casterMat}
+          >
+            <cylinderGeometry args={[0.034, 0.034, 0.026, 14]} />
+          </mesh>
+        </group>
+      ))}
     </group>
   );
 }
@@ -685,7 +731,7 @@ function Laptop({ hovered, onClick }) {
         map: screenTex,
         emissive: new THREE.Color("#FFFFFF"),
         emissiveMap: screenTex,
-        emissiveIntensity: hovered ? 1.0 : 0.7,
+        emissiveIntensity: hovered ? 0.85 : 0.5,
         roughness: 0.2,
       }),
     [screenTex, hovered]
@@ -721,8 +767,8 @@ function Laptop({ hovered, onClick }) {
         <boxGeometry args={[0.16, 0.002, 0.1]} />
       </mesh>
 
-      {/* Display lid (opened at ~115 deg) */}
-      <group position={[0, 0.018, -0.175]} rotation={[-1.15, 0, 0]}>
+      {/* Display lid (opened to a natural ~107 deg) */}
+      <group position={[0, 0.018, -0.175]} rotation={[-1.28, 0, 0]}>
         {/* Back display shell */}
         <mesh position={[0, 0.17, 0]} material={aluMat}>
           <boxGeometry args={[0.54, 0.34, 0.012]} />
@@ -741,7 +787,7 @@ function Laptop({ hovered, onClick }) {
           position={[0, 0.17, 0.016]}
           size={[0.8, 0.52]}
           color={C.sky}
-          opacity={0.1}
+          opacity={0.07}
         />
       </group>
     </group>
@@ -965,9 +1011,10 @@ function RoadmapBoard({ hovered, onClick }) {
 function Notebook({ hovered, onClick }) {
   const groupRef = useRef();
   const coverMat = useMat(C.cobalt,    { roughness: 0.6 });
-  const paperMat = useMat("#FFFDF7",   { roughness: 0.8 });
+  const paperMat = useMat("#E9DFCB",   { roughness: 0.9 });
+  const pageMat  = useMat("#DED2B9",   { roughness: 0.9 });
   const penMat   = useMat(C.lampBrass, { roughness: 0.2, metalness: 0.85 });
-  const lineMat  = useMat("#94A3B8",   { roughness: 0.8 });
+  const lineMat  = useMat("#8C97A8",   { roughness: 0.85 });
 
   useFrame((_, delta) => {
     if (!groupRef.current) return;
@@ -989,29 +1036,33 @@ function Notebook({ hovered, onClick }) {
       <mesh position={[0, 0.008, 0]} material={coverMat}>
         <boxGeometry args={[0.34, 0.016, 0.24]} />
       </mesh>
-      {/* Cream paper pages */}
-      <mesh position={[0, 0.018, 0]} material={paperMat}>
-        <boxGeometry args={[0.32, 0.01, 0.22]} />
+      {/* Page block edge, so the book reads as paper not a slab */}
+      <mesh position={[0, 0.019, 0]} material={pageMat}>
+        <boxGeometry args={[0.322, 0.014, 0.226]} />
+      </mesh>
+      {/* Top sheet — matte cream, deliberately not paper-white */}
+      <mesh position={[0, 0.027, 0]} material={paperMat}>
+        <boxGeometry args={[0.32, 0.004, 0.224]} />
       </mesh>
       {/* Center spine gutter crease */}
-      <mesh position={[0, 0.024, 0]} material={useMat("#E2E8F0")}>
-        <boxGeometry args={[0.008, 0.002, 0.22]} />
+      <mesh position={[0, 0.0305, 0]} material={useMat("#CFC4AC")}>
+        <boxGeometry args={[0.008, 0.002, 0.224]} />
       </mesh>
 
       {/* Mock sketch/code lines on left page */}
       {[-0.06, -0.03, 0.0, 0.03, 0.06].map((z, i) => (
-        <mesh key={i} position={[-0.08, 0.024, z]} material={lineMat}>
+        <mesh key={i} position={[-0.08, 0.0305, z]} material={lineMat}>
           <boxGeometry args={[0.1, 0.001, 0.004]} />
         </mesh>
       ))}
 
-      {/* Brass executive pen resting beside notebook */}
-      <group position={[0.2, 0.016, 0]} rotation={[0, 0, 0.1]}>
+      {/* Brass executive pen lying flat on the desk, clear of the pages */}
+      <group position={[0.16, 0.0055, 0.185]} rotation={[0, 0.15, Math.PI / 2]}>
         <mesh material={penMat}>
-          <cylinderGeometry args={[0.006, 0.006, 0.2, 10]} />
+          <cylinderGeometry args={[0.0055, 0.0055, 0.19, 12]} />
         </mesh>
-        <mesh position={[0, 0.08, 0]} material={penMat}>
-          <coneGeometry args={[0.006, 0.03, 10]} />
+        <mesh position={[0, 0.108, 0]} material={penMat}>
+          <coneGeometry args={[0.0055, 0.03, 12]} />
         </mesh>
       </group>
     </group>
@@ -1084,9 +1135,9 @@ function PhoneStand({ hovered, onClick }) {
   const screenMat = useMat(C.phoneScreen, {
     roughness: 0.15,
     emissive: C.phoneGlow,
-    emissiveIntensity: hovered ? 1.5 : 0.8,
+    emissiveIntensity: hovered ? 1.1 : 0.5,
   });
-  const bubbleMat = useMat(C.signal, { emissive: C.signal, emissiveIntensity: 1.0 });
+  const bubbleMat = useMat(C.signal, { emissive: C.signal, emissiveIntensity: hovered ? 0.9 : 0.5 });
 
   useFrame((_, delta) => {
     if (!groupRef.current) return;
@@ -1098,7 +1149,7 @@ function PhoneStand({ hovered, onClick }) {
     <group
       ref={groupRef}
       name="obj_phone"
-      position={[1.82, 0.77, 0.2]}
+      position={[1.5, 0.77, 0.25]}
       rotation={[0, -0.3, 0]}
       onClick={(e) => { e.stopPropagation(); onClick?.(); }}
       onPointerOver={(e) => { e.stopPropagation(); document.body.style.cursor = "pointer"; }}
@@ -1136,9 +1187,12 @@ function PhoneStand({ hovered, onClick }) {
 function PottedPlant({ hovered, onClick }) {
   const groupRef = useRef();
   const potMat   = useMat(C.plantPot,   { roughness: 0.65 });
+  const rimMat   = useMat("#9A4708",    { roughness: 0.6 });
   const soilMat  = useMat(C.plantSoil,  { roughness: 0.95 });
-  const leafMat1 = useMat(C.plantLeaf1, { roughness: 0.4 });
-  const leafMat2 = useMat(C.plantLeaf2, { roughness: 0.4 });
+  const stemMat  = useMat(C.plantLeaf2, { roughness: 0.5 });
+  // Double-sided so leaves never vanish at grazing angles from the low camera
+  const leafMat1 = useMat(C.plantLeaf1, { roughness: 0.45, side: THREE.DoubleSide });
+  const leafMat2 = useMat(C.plantLeaf2, { roughness: 0.45, side: THREE.DoubleSide });
 
   useFrame((_, delta) => {
     if (!groupRef.current) return;
@@ -1150,44 +1204,49 @@ function PottedPlant({ hovered, onClick }) {
     <group
       ref={groupRef}
       name="obj_plant"
-      position={[-1.78, 0.77, -0.08]}
+      position={[-1.5, 0.77, 0.25]}
       onClick={(e) => { e.stopPropagation(); onClick?.(); }}
       onPointerOver={(e) => { e.stopPropagation(); document.body.style.cursor = "pointer"; }}
       onPointerOut={() => { document.body.style.cursor = "auto"; }}
     >
+      {/* Terracotta saucer so the pot sits on the desk, not in it */}
+      <mesh position={[0, 0.005, 0]} material={rimMat}>
+        <cylinderGeometry args={[0.105, 0.11, 0.01, 20]} />
+      </mesh>
       {/* Terracotta ceramic pot */}
-      <mesh position={[0, 0.07, 0]} material={potMat}>
-        <cylinderGeometry args={[0.09, 0.07, 0.14, 16]} />
+      <mesh position={[0, 0.072, 0]} material={potMat}>
+        <cylinderGeometry args={[0.09, 0.068, 0.13, 20]} />
       </mesh>
       {/* Pot rim collar */}
-      <mesh position={[0, 0.14, 0]} material={potMat}>
-        <cylinderGeometry args={[0.096, 0.096, 0.02, 16]} />
+      <mesh position={[0, 0.14, 0]} material={rimMat}>
+        <cylinderGeometry args={[0.096, 0.096, 0.022, 20]} />
       </mesh>
       {/* Dark rich potting soil */}
-      <mesh position={[0, 0.138, 0]} material={soilMat}>
-        <cylinderGeometry args={[0.085, 0.085, 0.01, 16]} />
+      <mesh position={[0, 0.139, 0]} material={soilMat}>
+        <cylinderGeometry args={[0.084, 0.084, 0.012, 18]} />
       </mesh>
 
       {/* Main plant stem */}
-      <mesh position={[0, 0.22, 0]} material={leafMat2}>
-        <cylinderGeometry args={[0.008, 0.01, 0.18, 8]} />
+      <mesh position={[0, 0.23, 0]} material={stemMat}>
+        <cylinderGeometry args={[0.008, 0.011, 0.19, 8]} />
       </mesh>
 
-      {/* 5 Broad organic Monstera leaves around the stem */}
-      {[0, 1, 2, 3, 4].map((i) => {
-        const rad = (i * 2 * Math.PI) / 5;
-        const cx = Math.cos(rad) * 0.06;
-        const cz = Math.sin(rad) * 0.06;
-        const elevation = 0.22 + (i % 2) * 0.05;
+      {/* Broad monstera leaves fanning out, held near-horizontal so they read
+          as foliage from the high camera rather than as edge-on slivers */}
+      {[0, 1, 2, 3, 4, 5].map((i) => {
+        const rad = (i * 2 * Math.PI) / 6;
+        const r = 0.055 + (i % 2) * 0.015;
+        const elevation = 0.235 + (i % 3) * 0.03;
+        const droop = 0.95 + (i % 2) * 0.22;
         return (
           <group
             key={i}
-            position={[cx, elevation, cz]}
-            rotation={[0.3, rad, -0.4 + (i % 2) * 0.2]}
-            scale={[1.6, 0.8, 1]}
+            position={[Math.cos(rad) * r, elevation, Math.sin(rad) * r]}
+            rotation={[droop, rad, -0.35 + (i % 2) * 0.18]}
+            scale={[1.55, 0.85, 1]}
           >
             <mesh material={i % 2 === 0 ? leafMat1 : leafMat2}>
-              <circleGeometry args={[0.06, 12]} />
+              <circleGeometry args={[0.062, 12]} />
             </mesh>
           </group>
         );
@@ -1198,27 +1257,35 @@ function PottedPlant({ hovered, onClick }) {
 
 // ─── Ceramic Coffee Mug on Cork Coaster ───────────────────────────────────────
 function CoffeeMug() {
-  const ceramicMat = useMat(C.mugCeramic, { roughness: 0.2 });
-  const coffeeMat  = useMat(C.mugCoffee,  { roughness: 0.3 });
+  // Warm bone china rather than studio white: the lamp no longer blows it out
+  const ceramicMat = useMat("#E8E2D6", { roughness: 0.42 });
+  const glazeMat   = useMat("#F1ECE2", { roughness: 0.28 });
+  const coffeeMat  = useMat("#2A1608", { roughness: 0.18, metalness: 0.05 });
   const coasterMat = useMat(C.coasterCork,{ roughness: 0.9 });
+
+  const bodyTop = 0.108;
 
   return (
     <group position={[-0.65, 0.77, 0.32]}>
       {/* Cork coaster */}
       <mesh position={[0, 0.004, 0]} material={coasterMat}>
-        <cylinderGeometry args={[0.065, 0.065, 0.008, 20]} />
+        <cylinderGeometry args={[0.07, 0.07, 0.008, 24]} />
       </mesh>
-      {/* White ceramic mug body */}
+      {/* Mug body: gently tapered walls */}
       <mesh position={[0, 0.058, 0]} material={ceramicMat}>
-        <cylinderGeometry args={[0.045, 0.04, 0.1, 18]} />
+        <cylinderGeometry args={[0.043, 0.038, 0.1, 24]} />
       </mesh>
-      {/* Steaming dark coffee surface */}
-      <mesh position={[0, 0.098, 0]} material={coffeeMat}>
-        <cylinderGeometry args={[0.042, 0.042, 0.004, 18]} />
+      {/* Thrown rim, slightly proud of the wall (torus lies flat in XZ) */}
+      <mesh position={[0, bodyTop, 0]} rotation={[Math.PI / 2, 0, 0]} material={glazeMat}>
+        <torusGeometry args={[0.043, 0.0032, 8, 24]} />
       </mesh>
-      {/* Mug handle */}
-      <mesh position={[0.048, 0.058, 0]} rotation={[0, 0, Math.PI / 2]} material={ceramicMat}>
-        <torusGeometry args={[0.024, 0.006, 8, 16, Math.PI]} />
+      {/* Dark coffee resting just inside the rim */}
+      <mesh position={[0, bodyTop - 0.006, 0]} material={coffeeMat}>
+        <cylinderGeometry args={[0.0405, 0.0405, 0.004, 24]} />
+      </mesh>
+      {/* Handle: vertical loop in the wall plane, open side facing the mug */}
+      <mesh position={[0.043, 0.062, 0]} material={ceramicMat}>
+        <torusGeometry args={[0.026, 0.0055, 8, 18, Math.PI * 1.05]} />
       </mesh>
     </group>
   );
@@ -1503,13 +1570,13 @@ function CameraRig({ targetPose: explicitPose, reducedMotion = false }) {
 
 // ─── Coordinated, Spacious Hotspot Anchors (projected onto the DOM beacons) ───
 const HOTSPOT_ANCHORS = {
-  plant:      [-1.78, 1.02, -0.08],
+  plant:      [-1.5,  1.02,  0.25],
   notebook:   [-1.0,  0.86,  0.28],
   laptop:     [-0.1,  1.12,  0.08],
   whiteboard: [-0.3,  2.15, -2.42],
   book:       [ 0.68, 0.92,  0.28],
   pi:         [ 1.25, 0.86, -0.05],
-  phone:      [ 1.82, 0.96,  0.2 ],
+  phone:      [ 1.5,  0.96,  0.25],
 };
 
 // ─── Hover Kick: a short burst of frames so hover transitions can settle ──────
