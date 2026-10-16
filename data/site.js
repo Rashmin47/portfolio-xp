@@ -32,7 +32,7 @@ export const siteConfig = {
   role: "Software developer",
   location: "Kathmandu, Nepal",
   github: "https://github.com/Rashmin47",
-  linkedin: "https://www.linkedin.com/in/rashmin-sharma-656bb332a/",
+  linkedin: "https://www.linkedin.com/in/rashmin-sharma/",
   skills: [
     "Full-Stack Web Development",
     "Next.js & React Development",

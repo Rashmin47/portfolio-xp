@@ -18,4 +18,4 @@ Personal portfolio of Rashmin Sharma, a software developer based in Kathmandu, N
 
 - Content is server-rendered HTML; the 3D workshop is only a way in.
 - Unknown facts are marked `[verify]` in the source data and are not published.
-- Profiles: https://github.com/Rashmin47 and https://www.linkedin.com/in/rashmin-sharma-656bb332a/
+- Profiles: https://github.com/Rashmin47 and https://www.linkedin.com/in/rashmin-sharma/
