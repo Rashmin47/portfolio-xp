@@ -26,13 +26,14 @@ export default function MacTerminal({
     {
       id: "init-1",
       cmd: "whoami",
+      // The homepage's single H1: plain, server-rendered, name + role + place.
       output: (
-        <div className="text-chrome-text/90 pl-1 font-mono text-sm">
+        <h1 className="text-chrome-text/90 pl-1 font-mono text-sm font-normal">
           {siteConfig.name || "Rashmin Sharma"}
           <span className="text-chrome-text/65 block text-xs mt-0.5">
             {siteConfig.role || "Software Developer"} · {siteConfig.location || "Kathmandu, Nepal"}
           </span>
-        </div>
+        </h1>
       ),
     },
     {

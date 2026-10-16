@@ -1,9 +1,10 @@
 import { roadmap } from "@/data/roadmap";
-import { buildMetadata } from "@/lib/seo";
+import { buildMetadata, pageBreadcrumb } from "@/lib/seo";
 import { visibleItems } from "@/lib/content";
 import SectionHeader from "@/components/ui/SectionHeader";
 import DummyBadge from "@/components/ui/DummyBadge";
 import MacFinder from "@/components/macos/MacFinder";
+import JsonLd from "@/components/seo/JsonLd";
 
 export async function generateMetadata() {
   const publishedRoadmap = visibleItems(roadmap);
@@ -85,6 +86,7 @@ export default function RoadmapPage() {
 
   return (
     <MacFinder sectionTitle="Roadmap" currentFolder="roadmap" itemCount={publishedRoadmap.length}>
+      <JsonLd data={pageBreadcrumb("Roadmap", "/roadmap")} />
       <SectionHeader number="01" label="ROADMAP" />
 
       <div className="mb-12">

@@ -20,6 +20,8 @@
  * @property {string} location - Location
  * @property {string} github - GitHub profile URL
  * @property {string} linkedin - LinkedIn profile URL
+ * @property {string[]} [profiles] - Extra public profile URLs for schema sameAs
+ * @property {string[]} [skills] - Capabilities, emitted as schema knowsAbout
  * @property {HeroConfig} hero - Homepage hero configuration
  * @property {string[]} building - List of active projects/initiatives currently building
  */
@@ -31,6 +33,18 @@ export const siteConfig = {
   location: "Kathmandu, Nepal",
   github: "https://github.com/Rashmin47",
   linkedin: "https://www.linkedin.com/in/rashmin-sharma-656bb332a/",
+  skills: [
+    "Full-Stack Web Development",
+    "Next.js & React Development",
+    "TypeScript & JavaScript",
+    "Node.js & REST API Development",
+    "Flutter & Dart App Development",
+    "Database Design & MongoDB",
+    "AI Integration & LLM-Powered Applications",
+    "IoT & Hardware Prototyping",
+    "Problem-Solving & Debugging",
+    "Technical Collaboration & Project Development",
+  ],
   hero: {
     h1: "Rashmin Sharma, software developer in Nepal",
     tagline: "Built on a desk. Aimed at a company.",

@@ -48,6 +48,7 @@
  * @property {string} [outcome] - Technical and business outcome
  * @property {ProjectArchitecture} [architecture] - Architecture {text, image}
  * @property {ProjectImage[]} [images] - Screenshots [{src, alt, width, height, caption}]
+ * @property {string} [updated] - Last updated ISO date (canonical; drives "Last updated" and sitemap lastModified)
  * @property {string} [updatedAt] - Last update ISO timestamp
  */
 

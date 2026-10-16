@@ -1,9 +1,10 @@
 import { ventures } from "@/data/ventures";
-import { buildMetadata } from "@/lib/seo";
+import { buildMetadata, pageBreadcrumb } from "@/lib/seo";
 import { visibleItems } from "@/lib/content";
 import SectionHeader from "@/components/ui/SectionHeader";
 import SpecTable, { SpecRow } from "@/components/ui/SpecTable";
 import DummyBadge from "@/components/ui/DummyBadge";
+import JsonLd from "@/components/seo/JsonLd";
 
 export async function generateMetadata() {
   const publishedVentures = visibleItems(ventures);
@@ -20,6 +21,7 @@ export default function VenturesPage() {
 
   return (
     <div className="w-full p-4 sm:p-6">
+      <JsonLd data={pageBreadcrumb("Ventures", "/ventures")} />
       <SectionHeader number="01" label="VENTURES" />
 
       <div className="mb-12">

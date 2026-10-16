@@ -1,0 +1,21 @@
+# Rashmin Sharma — The Workshop
+
+Personal portfolio of Rashmin Sharma, a software developer based in Kathmandu, Nepal, working across web applications, backend systems, applied AI and hardware prototyping.
+
+## Pages
+
+- / — Rashmin Sharma, software developer in Nepal: current focus, selected projects, roadmap and latest notes.
+- /about — Who he is, how he thinks about building software, what he is learning now and what he is looking for.
+- /projects — Engineering records: problem, constraints, decisions with trade-offs, what broke, and outcome.
+- /lab — Hardware, edge computing and applied AI experiments, with bench notes and hardware lists.
+- /roadmap — Open roadmap of engineering milestones, split into now, next and later.
+- /notes — Technical essays, post-mortems and engineering logs.
+- /ventures — Venture initiatives, product explorations and companies in progress.
+- /experience — The same venture and experience record presented in the Finder shell.
+- /contact — Direct contact, GitHub and LinkedIn.
+
+## Notes
+
+- Content is server-rendered HTML; the 3D workshop is only a way in.
+- Unknown facts are marked `[verify]` in the source data and are not published.
+- Profiles: https://github.com/Rashmin47 and https://www.linkedin.com/in/rashmin-sharma-656bb332a/

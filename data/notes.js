@@ -18,6 +18,7 @@
  * @property {boolean} published - Visibility flag
  * @property {boolean} [dummy] - Flag for dummy testing data
  * @property {string} [datePublished] - ISO date
+ * @property {string} [updated] - Last updated ISO date (canonical; drives "Last updated" and sitemap lastModified)
  * @property {string} [dateModified] - ISO date
  * @property {string} [readingTime] - Reading duration (e.g. "3 min read")
  * @property {string[]} [tags] - Topic tags

@@ -18,6 +18,7 @@ export default function MacWindow({
   title = "Terminal — zsh",
   appType = "terminal", // "terminal" | "textedit" | "finder" | "mail" | "messages"
   path = "~",
+  open = true,
   onOpenAI,
   onClose,
   children,
@@ -50,6 +51,7 @@ export default function MacWindow({
   return (
     <div
       className={`fixed z-20 flex flex-col pointer-events-none transition-all duration-300
+        ${open ? "" : "hidden"}
         /* Desktop: perfectly centered macOS window over 3D desk */
         md:top-11 md:bottom-22
         md:left-1/2 md:-translate-x-1/2 md:right-auto

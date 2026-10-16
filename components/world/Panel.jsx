@@ -72,17 +72,21 @@ export default function Panel({ children }) {
   return (
     <>
       {/* ── Application Window ──────────────────────────────────────────── */}
-      {windowOpen && (
-        <MacWindow
-          title={title}
-          appType={appType}
-          path={pathname}
-          onOpenAI={() => setIsAIOpen(true)}
-          onClose={handleCloseWindow}
-        >
-          {children}
-        </MacWindow>
-      )}
+      {/*
+       * Mounted even while closed on the homepage: the page's content must be
+       * in the server-rendered HTML. A closed window that renders nothing would
+       * take the whole homepage (H1, structured data, links) out of the document.
+       */}
+      <MacWindow
+        title={title}
+        appType={appType}
+        path={pathname}
+        open={windowOpen}
+        onOpenAI={() => setIsAIOpen(true)}
+        onClose={handleCloseWindow}
+      >
+        {children}
+      </MacWindow>
 
       {/* ── Bottom Dock ─────────────────────────────────────────────────── */}
       <MacDock

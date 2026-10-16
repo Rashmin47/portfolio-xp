@@ -1,7 +1,13 @@
 import Image from "next/image";
 import { siteConfig } from "@/data/site";
 import { about } from "@/data/about";
-import { buildMetadata, siteUrl } from "@/lib/seo";
+import {
+  buildMetadata,
+  siteUrl,
+  personId,
+  personNode,
+  pageBreadcrumb,
+} from "@/lib/seo";
 import JsonLd from "@/components/seo/JsonLd";
 import SectionHeader from "@/components/ui/SectionHeader";
 import SpecTable, { SpecRow } from "@/components/ui/SpecTable";
@@ -15,21 +21,19 @@ export const metadata = buildMetadata({
 });
 
 export default function AboutPage() {
-  const sameAsLinks = [siteConfig.github, siteConfig.linkedin].filter(Boolean);
+  const currentWork = (siteConfig.building || []).join(" · ");
 
-  const person = {
-    "@type": "Person",
-    name: siteConfig.name,
-    jobTitle: siteConfig.role,
-    url: `${siteUrl}/about`,
-    ...(sameAsLinks.length > 0 ? { sameAs: sameAsLinks } : {}),
-  };
-
-  const profilePageSchema = {
-    "@context": "https://schema.org",
-    "@type": "ProfilePage",
-    mainEntity: person,
-  };
+  // ProfilePage points at the shared Person @id instead of restating the person.
+  const profilePageSchema = [
+    {
+      "@type": "ProfilePage",
+      url: `${siteUrl}/about`,
+      name: `${siteConfig.name} — ${siteConfig.role}`,
+      mainEntity: { "@id": personId },
+    },
+    personNode(),
+    pageBreadcrumb("About", "/about"),
+  ];
 
   return (
     <MacTextEdit documentTitle="About Me.rtf">
@@ -101,6 +105,13 @@ export default function AboutPage() {
 
         {/* Right Column: Content */}
         <main className="@2xl:col-span-2 space-y-12 min-w-0">
+          {/* Answer-first intro: who he is, in the first two sentences */}
+          {about.intro && about.intro.length > 0 && (
+            <p className="text-xl sm:text-2xl font-display font-medium tracking-tight text-ink dark:text-paper leading-snug">
+              {about.intro.join(" ")}
+            </p>
+          )}
+
           {/* Bio Paragraphs */}
           {about.bio && about.bio.length > 0 && (
             <div className="space-y-4">
@@ -118,15 +129,61 @@ export default function AboutPage() {
           {/* SpecTable of Facts */}
           <div>
             <div className="font-mono text-xs uppercase tracking-wider text-muted mb-2">
-              FACTSHEET
+              FACTS
             </div>
             <SpecTable>
-              <SpecRow label="NAME" value={siteConfig.name} />
+              <SpecRow label="FULL NAME" value={siteConfig.name} />
               <SpecRow label="ROLE" value={siteConfig.role} />
               <SpecRow label="LOCATION" value={siteConfig.location} />
               {about.education && (
                 <SpecRow label="EDUCATION" value={about.education} />
               )}
+              {currentWork && (
+                <SpecRow label="CURRENT WORK" value={currentWork} />
+              )}
+              {siteConfig.github && (
+                <SpecRow
+                  label="GITHUB"
+                  value={
+                    <a
+                      href={siteConfig.github}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:underline text-cobalt dark:text-sky"
+                    >
+                      {siteConfig.github.replace(/^https?:\/\//, "")}
+                    </a>
+                  }
+                />
+              )}
+              {siteConfig.linkedin && (
+                <SpecRow
+                  label="LINKEDIN"
+                  value={
+                    <a
+                      href={siteConfig.linkedin}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:underline text-cobalt dark:text-sky"
+                    >
+                      {siteConfig.linkedin
+                        .replace(/^https?:\/\/(www\.)?/, "")
+                        .replace(/\/$/, "")}
+                    </a>
+                  }
+                />
+              )}
+              <SpecRow
+                label="WEBSITE"
+                value={
+                  <a
+                    href={siteUrl}
+                    className="hover:underline text-cobalt dark:text-sky"
+                  >
+                    {siteUrl.replace(/^https?:\/\//, "")}
+                  </a>
+                }
+              />
             </SpecTable>
           </div>
 

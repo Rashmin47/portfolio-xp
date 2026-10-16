@@ -1,8 +1,9 @@
 import ContactForm from "@/components/pages/ContactForm";
 import { siteConfig } from "@/data/site";
-import { buildMetadata } from "@/lib/seo";
+import { buildMetadata, pageBreadcrumb } from "@/lib/seo";
 import SectionHeader from "@/components/ui/SectionHeader";
 import Button from "@/components/ui/Button";
+import JsonLd from "@/components/seo/JsonLd";
 
 export const metadata = buildMetadata({
   title: "Contact",
@@ -14,6 +15,7 @@ export default function ContactPage() {
   return (
     // Same window gutter as the Finder/editor shells (p-4 sm:p-6)
     <div className="w-full p-4 sm:p-6">
+      <JsonLd data={pageBreadcrumb("Contact", "/contact")} />
       <SectionHeader number="01" label="CONTACT" />
 
       <div className="grid grid-cols-1 @2xl:grid-cols-12 @2xl:gap-0">

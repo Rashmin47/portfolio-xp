@@ -1,9 +1,10 @@
 import { projects } from "@/data/projects";
-import { buildMetadata } from "@/lib/seo";
+import { buildMetadata, pageBreadcrumb } from "@/lib/seo";
 import { visibleItems } from "@/lib/content";
 import SectionHeader from "@/components/ui/SectionHeader";
 import ProjectRow from "@/components/projects/ProjectRow";
 import MacFinder from "@/components/macos/MacFinder";
+import JsonLd from "@/components/seo/JsonLd";
 
 export async function generateMetadata() {
   const publishedProjects = visibleItems(projects);
@@ -20,6 +21,7 @@ export default function ProjectsPage() {
 
   return (
     <MacFinder sectionTitle="Projects" currentFolder="projects" itemCount={publishedProjects.length}>
+      <JsonLd data={pageBreadcrumb("Projects", "/projects")} />
       <SectionHeader number="01" label="INDEX" />
 
       <div className="mb-12">

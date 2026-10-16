@@ -1,11 +1,12 @@
 import { lab } from "@/data/lab";
-import { buildMetadata } from "@/lib/seo";
+import { buildMetadata, pageBreadcrumb } from "@/lib/seo";
 import { visibleItems } from "@/lib/content";
 import SectionHeader from "@/components/ui/SectionHeader";
 import Tag from "@/components/ui/Tag";
 import SpecTable, { SpecRow } from "@/components/ui/SpecTable";
 import DummyBadge from "@/components/ui/DummyBadge";
 import MacFinder from "@/components/macos/MacFinder";
+import JsonLd from "@/components/seo/JsonLd";
 
 export async function generateMetadata() {
   const publishedLab = visibleItems(lab);
@@ -22,6 +23,7 @@ export default function LabPage() {
 
   return (
     <MacFinder sectionTitle="The Lab" currentFolder="lab" itemCount={publishedLab.length}>
+      <JsonLd data={pageBreadcrumb("The Lab", "/lab")} />
       <SectionHeader number="01" label="THE LAB" />
 
       <div className="mb-12">

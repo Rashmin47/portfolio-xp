@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { notes } from "@/data/notes";
-import { buildMetadata } from "@/lib/seo";
+import { buildMetadata, pageBreadcrumb } from "@/lib/seo";
 import { visibleItems } from "@/lib/content";
 import SectionHeader from "@/components/ui/SectionHeader";
 import Tag from "@/components/ui/Tag";
 import DummyBadge from "@/components/ui/DummyBadge";
 import MacTextEdit from "@/components/macos/MacTextEdit";
+import JsonLd from "@/components/seo/JsonLd";
 
 export async function generateMetadata() {
   const publishedNotes = visibleItems(notes);
@@ -22,6 +23,7 @@ export default function NotesPage() {
 
   return (
     <MacTextEdit documentTitle="Notes.md">
+      <JsonLd data={pageBreadcrumb("Notes", "/notes")} />
       <SectionHeader number="01" label="NOTES" />
 
       <div className="mb-12">

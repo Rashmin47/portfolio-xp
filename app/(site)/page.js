@@ -3,7 +3,7 @@ import { projects } from "@/data/projects";
 import { visibleItems } from "@/lib/content";
 import { roadmap } from "@/data/roadmap";
 import { notes } from "@/data/notes";
-import { buildMetadata, siteUrl } from "@/lib/seo";
+import { buildMetadata, siteUrl, personNode } from "@/lib/seo";
 import JsonLd from "@/components/seo/JsonLd";
 import {
   SectionHeader,
@@ -83,18 +83,20 @@ export default async function HomePage() {
   const laterRoadmap = publishedRoadmap.filter((r) => r.status === "later");
   const publishedNotes = visibleItems(notes || []).slice(0, 2);
 
-  const personSchema = {
-    "@context": "https://schema.org",
-    "@type": "Person",
-    name: siteConfig.name,
-    jobTitle: siteConfig.role,
-    url: siteUrl,
-    sameAs: [siteConfig.github, siteConfig.linkedin].filter(Boolean),
-  };
+  // WebSite + Person: the site node carries the name/url pair, the Person node
+  // is referenced by @id from every other page's structured data.
+  const schema = [
+    {
+      "@type": "WebSite",
+      name: siteConfig.name,
+      url: siteUrl,
+    },
+    personNode(),
+  ];
 
   return (
     <div className="w-full flex flex-col">
-      <JsonLd data={personSchema} />
+      <JsonLd data={schema} />
 
       {/* ── Interactive macOS Terminal (hero) ──────────────────────────── */}
       <MacTerminal

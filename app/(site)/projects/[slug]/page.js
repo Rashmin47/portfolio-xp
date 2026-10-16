@@ -2,8 +2,15 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { projects } from "@/data/projects";
-import { buildMetadata } from "@/lib/seo";
+import {
+  buildMetadata,
+  absoluteUrl,
+  personId,
+  breadcrumbNode,
+  contentUpdated,
+} from "@/lib/seo";
 import { visibleItems } from "@/lib/content";
+import JsonLd from "@/components/seo/JsonLd";
 import SpecTable, { SpecRow } from "@/components/ui/SpecTable";
 import SectionHeader from "@/components/ui/SectionHeader";
 import Prose from "@/components/ui/Prose";
@@ -60,6 +67,7 @@ export default async function ProjectDetailPage({ params }) {
 
   const name = project.name || project.title;
   const summary = project.summary || project.description;
+  const updated = contentUpdated(project);
   const prevProject = currentIndex > 0 ? visible[currentIndex - 1] : null;
   const nextProject =
     currentIndex < visible.length - 1 ? visible[currentIndex + 1] : null;
@@ -107,8 +115,26 @@ export default async function ProjectDetailPage({ params }) {
     project.status ||
     (project.links && project.links.length > 0);
 
+  const schema = [
+    {
+      "@type": "CreativeWork",
+      name,
+      url: absoluteUrl(`/projects/${slug}`),
+      ...(summary ? { description: summary } : {}),
+      author: { "@id": personId },
+      ...(updated ? { dateModified: updated } : {}),
+    },
+    breadcrumbNode([
+      { name: "Home", path: "/" },
+      { name: "Projects", path: "/projects" },
+      { name, path: `/projects/${slug}` },
+    ]),
+  ];
+
   return (
     <article className="w-full p-4 sm:p-6">
+      <JsonLd data={schema} />
+
       {/* Back Link */}
       <div className="mb-6">
         <Link
@@ -131,6 +157,12 @@ export default async function ProjectDetailPage({ params }) {
         {summary && (
           <p className="text-lg sm:text-xl text-muted max-w-3xl leading-relaxed">
             {summary}
+          </p>
+        )}
+        {updated && (
+          <p className="font-mono text-xs uppercase tracking-wider text-muted mt-4">
+            Last updated{" "}
+            <time dateTime={updated}>{updated.slice(0, 10)}</time>
           </p>
         )}
       </header>

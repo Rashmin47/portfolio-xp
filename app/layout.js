@@ -31,6 +31,15 @@ export const metadata = {
   },
   description:
     "Portfolio of Rashmin Sharma, a software developer in Nepal: projects, experiments, roadmap and notes.",
+  // Default for every route; pages that set their own robots (the noindex
+  // empty-state and dummy pages) replace this object wholesale.
+  robots: {
+    index: true,
+    follow: true,
+    "max-snippet": -1,
+    "max-image-preview": "large",
+    "max-video-preview": -1,
+  },
 };
 
 export default function RootLayout({ children }) {

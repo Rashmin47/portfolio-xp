@@ -1,10 +1,11 @@
 import { ventures } from "@/data/ventures";
-import { buildMetadata } from "@/lib/seo";
+import { buildMetadata, pageBreadcrumb } from "@/lib/seo";
 import { visibleItems } from "@/lib/content";
 import SectionHeader from "@/components/ui/SectionHeader";
 import SpecTable, { SpecRow } from "@/components/ui/SpecTable";
 import DummyBadge from "@/components/ui/DummyBadge";
 import MacFinder from "@/components/macos/MacFinder";
+import JsonLd from "@/components/seo/JsonLd";
 
 export async function generateMetadata() {
   const publishedVentures = visibleItems(ventures);
@@ -21,6 +22,7 @@ export default function VenturesPage() {
 
   return (
     <MacFinder sectionTitle="Experience" currentFolder="experience" itemCount={publishedVentures.length}>
+      <JsonLd data={pageBreadcrumb("Experience", "/experience")} />
       <SectionHeader number="01" label="EXPERIENCE" />
 
       <div className="mb-12">

@@ -1,8 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { notes } from "@/data/notes";
-import { siteConfig } from "@/data/site";
-import { buildMetadata, siteUrl } from "@/lib/seo";
+import {
+  buildMetadata,
+  personId,
+  breadcrumbNode,
+  contentUpdated,
+} from "@/lib/seo";
 import { visibleItems } from "@/lib/content";
 import JsonLd from "@/components/seo/JsonLd";
 import Prose from "@/components/ui/Prose";
@@ -55,23 +59,27 @@ export default async function NoteDetailPage({ params }) {
     notFound();
   }
 
-  const articleSchema = {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: note.title,
-    ...(note.summary ? { description: note.summary } : {}),
-    ...(note.datePublished ? { datePublished: note.datePublished } : {}),
-    ...(note.dateModified ? { dateModified: note.dateModified } : {}),
-    author: {
-      "@type": "Person",
-      name: siteConfig.name,
-      url: `${siteUrl}/about`,
+  const updated = contentUpdated(note);
+
+  const schema = [
+    {
+      "@type": "Article",
+      headline: note.title,
+      ...(note.summary ? { description: note.summary } : {}),
+      author: { "@id": personId },
+      ...(note.datePublished ? { datePublished: note.datePublished } : {}),
+      ...(updated ? { dateModified: updated } : {}),
     },
-  };
+    breadcrumbNode([
+      { name: "Home", path: "/" },
+      { name: "Notes", path: "/notes" },
+      { name: note.title, path: `/notes/${slug}` },
+    ]),
+  ];
 
   return (
     <article className="w-full max-w-3xl mx-auto p-4 sm:p-6">
-      <JsonLd data={articleSchema} />
+      <JsonLd data={schema} />
 
       {/* Back Link */}
       <div className="mb-6">
@@ -97,6 +105,13 @@ export default async function NoteDetailPage({ params }) {
             </>
           )}
         </div>
+
+        {updated && (
+          <p className="font-mono text-xs uppercase tracking-wider text-muted">
+            Last updated{" "}
+            <time dateTime={updated}>{updated.slice(0, 10)}</time>
+          </p>
+        )}
 
         <div className="flex items-center gap-3 flex-wrap">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold tracking-tight text-ink dark:text-paper leading-tight">
