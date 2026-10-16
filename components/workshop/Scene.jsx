@@ -1516,13 +1516,22 @@ const DEG3 = (3 * Math.PI) / 180;
  * inside a fixed volume: nothing has to be modelled, loaded or rendered for a
  * range the visitor can reach. Both axes are clamped to these limits.
  */
-const DRAG_LIMIT_X = 0.45;   // yaw nudge    (camera x offset = value * 0.9)
-const DRAG_LIMIT_UP = 0.25;  // pitch nudge  (camera y offset = value * 0.5)
-const DRAG_LIMIT_DOWN = 0.35;
+const DRAG_LIMIT_X = 0.75;   // yaw nudge    (camera x offset = value * 0.9)
+const DRAG_LIMIT_UP = 0.32;  // pitch nudge  (camera y offset = value * 0.5)
+const DRAG_LIMIT_DOWN = 0.42;
+
+/**
+ * Zoom (dolly along the sight line from target to pose), in world units.
+ * Negative pulls the camera in, positive eases it back. The range is wide
+ * enough to take in the whole desk and still bounded, so the room shell the
+ * scene actually builds is always what the visitor sees.
+ */
+const ZOOM_MIN = -0.5;
+const ZOOM_MAX = 1.0;
 
 function CameraRig({ targetPose: explicitPose, reducedMotion = false }) {
   const pathname = usePathname();
-  const { camera, invalidate } = useThree();
+  const { camera, invalidate, gl } = useThree();
   const mouse      = useRef({ x: 0, y: 0 });
   const isDragging = useRef(false);
   const dragStart  = useRef({ x: 0, y: 0 });
@@ -1530,6 +1539,8 @@ function CameraRig({ targetPose: explicitPose, reducedMotion = false }) {
   const prevDragRot= useRef({ x: 0, y: 0 });
   const introDone  = useRef(false);
   const lastMouse  = useRef({ x: 0, y: 0 });
+  const zoom       = useRef(0);
+  const pinching   = useRef(false);
 
   // Target pose keyed by route
   const targetPose = explicitPose || routePoses[pathname] || defaultPose;
@@ -1554,7 +1565,7 @@ function CameraRig({ targetPose: explicitPose, reducedMotion = false }) {
     const onPointerMove = (e) => {
       mouse.current.x = (e.clientX / window.innerWidth) * 2 - 1;
       mouse.current.y = (e.clientY / window.innerHeight) * 2 - 1;
-      if (isDragging.current) {
+      if (isDragging.current && !pinching.current) {
         const dx = (e.clientX - dragStart.current.x) / window.innerWidth;
         const dy = (e.clientY - dragStart.current.y) / window.innerHeight;
         // Clamped on both axes: the view can be nudged, never flown away
@@ -1587,20 +1598,85 @@ function CameraRig({ targetPose: explicitPose, reducedMotion = false }) {
     };
   }, [invalidate, reducedMotion]);
 
-  // Reset drag rotation when target pose changes
+  // Reset drag rotation and zoom when target pose changes
   useEffect(() => {
     dragRot.current = { x: 0, y: 0 };
     prevDragRot.current = { x: 0, y: 0 };
+    zoom.current = 0;
     invalidate();
   }, [targetPose, invalidate]);
+
+  // Zoom: wheel (a trackpad pinch arrives as ctrl+wheel) and two-finger pinch.
+  // Bound to the canvas element so wheel events inside the macOS window still
+  // scroll that window's own content.
+  useEffect(() => {
+    const el = gl?.domElement;
+    if (!el) return undefined;
+
+    const clampZoom = (v) => Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, v));
+
+    const onWheel = (e) => {
+      e.preventDefault();
+      // Normalise line/page scroll modes so Firefox feels like Chrome
+      const unit = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? 400 : 1;
+      // Pinch deltas are far smaller than wheel notches, so they need a
+      // bigger multiplier to feel equally responsive.
+      zoom.current = clampZoom(
+        zoom.current + e.deltaY * unit * (e.ctrlKey ? 0.012 : 0.0025)
+      );
+      invalidate();
+    };
+
+    let pinch = null;
+    const spread = (touches) =>
+      Math.hypot(touches[0].clientX - touches[1].clientX, touches[0].clientY - touches[1].clientY);
+
+    const onTouchStart = (e) => {
+      if (e.touches.length !== 2) return;
+      pinching.current = true;
+      pinch = { spread: spread(e.touches), zoom: zoom.current };
+    };
+    const onTouchMove = (e) => {
+      if (e.touches.length !== 2 || !pinch) return;
+      e.preventDefault();
+      const next = spread(e.touches);
+      if (next <= 0) return;
+      // Fingers apart (next > start) → zoom in, so invert the ratio
+      zoom.current = clampZoom(pinch.zoom + (1 - next / pinch.spread) * 1.6);
+      invalidate();
+    };
+    const onTouchEnd = () => { pinch = null; pinching.current = false; };
+
+    el.addEventListener("wheel", onWheel, { passive: false });
+    el.addEventListener("touchstart", onTouchStart, { passive: true });
+    el.addEventListener("touchmove", onTouchMove, { passive: false });
+    el.addEventListener("touchend", onTouchEnd);
+    el.addEventListener("touchcancel", onTouchEnd);
+    return () => {
+      el.removeEventListener("wheel", onWheel);
+      el.removeEventListener("touchstart", onTouchStart);
+      el.removeEventListener("touchmove", onTouchMove);
+      el.removeEventListener("touchend", onTouchEnd);
+      el.removeEventListener("touchcancel", onTouchEnd);
+    };
+  }, [gl, invalidate]);
 
   useFrame((_, delta) => {
     const p = targetPose.position;
     const t = targetPose.target;
 
-    const px = p.x + dragRot.current.y * 0.9;
-    const py = p.y - dragRot.current.x * 0.5;
-    const pz = p.z;
+    // Dolly: push the authored pose along the target → camera sight line, so
+    // zooming keeps the subject framed instead of drifting off it.
+    const offX = p.x - t.x;
+    const offY = p.y - t.y;
+    const offZ = p.z - t.z;
+    const dist = Math.hypot(offX, offY, offZ) || 1;
+    const reach = Math.max(dist * 0.5, dist + zoom.current);
+    const scale = reach / dist;
+
+    const px = t.x + offX * scale + dragRot.current.y * 0.9;
+    const py = t.y + offY * scale - dragRot.current.x * 0.5;
+    const pz = t.z + offZ * scale;
 
     const mouseMoved =
       mouse.current.x !== lastMouse.current.x || mouse.current.y !== lastMouse.current.y;
