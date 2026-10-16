@@ -1516,9 +1516,9 @@ const DEG3 = (3 * Math.PI) / 180;
  * inside a fixed volume: nothing has to be modelled, loaded or rendered for a
  * range the visitor can reach. Both axes are clamped to these limits.
  */
-const DRAG_LIMIT_X = 0.75;   // yaw nudge    (camera x offset = value * 0.9)
-const DRAG_LIMIT_UP = 0.32;  // pitch nudge  (camera y offset = value * 0.5)
-const DRAG_LIMIT_DOWN = 0.42;
+const DRAG_LIMIT_X = 1.5;    // yaw nudge    (camera x offset = value * 0.9)
+const DRAG_LIMIT_UP = 0.5;   // pitch nudge  (camera y offset = value * 0.5)
+const DRAG_LIMIT_DOWN = 0.6;
 
 /**
  * Zoom (dolly along the sight line from target to pose), in world units.
