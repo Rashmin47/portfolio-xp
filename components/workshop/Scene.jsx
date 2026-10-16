@@ -852,8 +852,10 @@ function DeskLamp() {
           {/* Lamp head: a wide flaring shade, hung from the arm's end so the
               joint sphere reads as a finial on the crown. Double-sided so the
               open underside never reads as see-through, with a brass rim and a
-              warm diffuser at the mouth that stands in for the light source. */}
-          <group position={[0, 0.36, 0]} rotation={[0, 0, 0.44]}>
+              warm diffuser at the mouth that stands in for the light source.
+              The head rides 0.22 rad off the upper arm, so the mouth faces a
+              touch further left/down than it did at 0.44. */}
+          <group position={[0, 0.36, 0]} rotation={[0, 0, 0.22]}>
             {/* Shade wall — flares from a narrow crown to a wide mouth */}
             <mesh position={[0, -0.055, 0]} material={shadeMat}>
               <cylinderGeometry args={[0.045, 0.115, 0.12, 24, 1, true]} />
@@ -1277,8 +1279,11 @@ function PottedPlant({ hovered, onClick }) {
       {[0, 1, 2, 3, 4, 5].map((i) => {
         const rad = (i * 2 * Math.PI) / 6 + 0.22;
         const r = 0.03;
-        const elevation = 0.205 + (i % 3) * 0.028;
-        const droop = -0.1 + (i % 3) * 0.16;
+        // Every blade droops outward, and the lower it sits on the crown the
+        // further it reaches down. The two leaves that used to tip upward
+        // (indices 0 and 3, the odd ones out) now follow the same rule.
+        const elevation = 0.212 + (i % 3) * 0.028;
+        const droop = 0.2 - (i % 3) * 0.06;
         return (
           <group
             key={i}
