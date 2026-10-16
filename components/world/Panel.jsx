@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import MacWindow from "@/components/macos/MacWindow";
 import MacDock from "@/components/macos/MacDock";
 import MacMessagesAI from "@/components/macos/MacMessagesAI";
+import { checkWorldCapability } from "@/lib/world-capability";
 
 /**
  * Panel
@@ -33,6 +34,33 @@ export default function Panel({ children }) {
       setWindowOpen(true);
     }
   }, [pathname]);
+
+  // Devices without a usable 3D scene get the flat, full-screen sheet layout
+  // instead of a floating window. Unknown while server-rendering, so we assume
+  // the scene is available until the check runs on the client.
+  const [sceneAvailable, setSceneAvailable] = useState(true);
+  useEffect(() => {
+    setSceneAvailable(checkWorldCapability().ok);
+  }, []);
+  const sheet = !sceneAvailable;
+
+  // No scene, or a viewport under 768px: the terminal is open by default on the
+  // homepage so the content is on screen even with nothing to click in 3D.
+  useEffect(() => {
+    if (pathname !== "/") return;
+    const narrow =
+      typeof window !== "undefined" &&
+      window.matchMedia("(max-width: 767px)").matches;
+    if (narrow || !sceneAvailable) setWindowOpen(true);
+  }, [pathname, sceneAvailable]);
+
+  // The hero widget's "Open Terminal" control talks to the shell by event.
+  useEffect(() => {
+    const openTerminal = () => setWindowOpen(true);
+    window.addEventListener("workshop:open-terminal", openTerminal);
+    return () =>
+      window.removeEventListener("workshop:open-terminal", openTerminal);
+  }, []);
 
   // Compute window metadata by route
   const { title, appType } = useMemo(() => {
@@ -82,6 +110,7 @@ export default function Panel({ children }) {
         appType={appType}
         path={pathname}
         open={windowOpen}
+        sheet={sheet}
         onOpenAI={() => setIsAIOpen(true)}
         onClose={handleCloseWindow}
       >

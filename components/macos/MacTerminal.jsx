@@ -26,17 +26,16 @@ export default function MacTerminal({
     {
       id: "init-1",
       cmd: "whoami",
-      // The homepage's single H1: plain, server-rendered, name + role + place.
+      // Plain whoami output. The homepage's single H1 now lives in the hero
+      // widget (components/home/HeroWidget.jsx), outside this window.
       output: (
-        // Homepage H1: one clean sentence of name, role and place. The terminal
-        // prompt line ("rashmin@studio ~ % whoami") is a sibling element, so no
-        // prompt characters or command names can end up inside the heading.
-        <h1 className="text-chrome-text/90 pl-1 font-mono text-sm font-normal">
-          {siteConfig.hero?.h1 ||
-            `${siteConfig.name || "Rashmin Sharma"}, ${(
-              siteConfig.role || "Software Developer"
-            ).toLowerCase()} in ${siteConfig.location || "Kathmandu, Nepal"}`}
-        </h1>
+        <p className="text-chrome-text/90 pl-1 font-mono text-sm font-normal">
+          {siteConfig.name || "Rashmin Sharma"}
+          <span className="block text-xs text-chrome-text/65 mt-0.5 font-mono">
+            {(siteConfig.role || "Software Developer")} ·{" "}
+            {siteConfig.location || "Kathmandu, Nepal"}
+          </span>
+        </p>
       ),
     },
     {

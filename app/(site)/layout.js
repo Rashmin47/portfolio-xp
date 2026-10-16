@@ -7,7 +7,7 @@ import Panel from "@/components/world/Panel";
  *  - Route-aware macOS Application Window (Panel) over the persistent 3D desk
  *  - Bottom macOS Dock launcher
  */
-export default function SiteLayout({ children }) {
+export default function SiteLayout({ children, hero }) {
   return (
     <>
       {/* Top macOS System Menu Bar */}
@@ -20,6 +20,9 @@ export default function SiteLayout({ children }) {
           {children}
         </main>
       </Panel>
+
+      {/* Homepage hero widget, outside the window (null on other routes) */}
+      {hero}
     </>
   );
 }

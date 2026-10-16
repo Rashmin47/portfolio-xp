@@ -19,6 +19,7 @@ export default function MacWindow({
   appType = "terminal", // "terminal" | "textedit" | "finder" | "mail" | "messages"
   path = "~",
   open = true,
+  sheet = false,
   onOpenAI,
   onClose,
   children,
@@ -48,9 +49,15 @@ export default function MacWindow({
     setExpanded((e) => !e);
   };
 
-  return (
-    <div
-      className={`fixed z-20 flex flex-col pointer-events-none transition-all duration-300
+  // Sheet mode: the window is the page. Mobile is always a full-screen sheet
+  // under the menu bar; `sheet` (no 3D scene) extends that to every viewport.
+  const frame = sheet
+    ? `fixed z-20 flex flex-col pointer-events-none transition-all duration-300
+        ${open ? "" : "hidden"}
+        top-7 bottom-0 left-0 right-0 md:bottom-22
+        ${collapsed ? "h-[52px]" : "h-auto"}
+      `
+    : `fixed z-20 flex flex-col pointer-events-none transition-all duration-300
         ${open ? "" : "hidden"}
         /* Desktop: perfectly centered macOS window over 3D desk */
         md:top-11 md:bottom-22
@@ -60,14 +67,18 @@ export default function MacWindow({
             ? "md:w-[calc(100vw-64px)] md:max-w-6xl"
             : "md:w-[calc(100vw-64px)] md:max-w-4xl"
         }
-        /* Mobile: responsive bottom sheet */
-        left-0 right-0 bottom-0 max-md:translate-x-0 max-md:border-t max-md:border-chrome-text/10 max-md:rounded-t-2xl
-        ${collapsed ? "max-md:h-[64px] md:!bottom-auto md:!h-[52px]" : "max-md:h-[72vh] md:h-auto"}
-      `}
-    >
+        /* Mobile (<768px): full-screen sheet below the menu bar */
+        left-0 right-0 top-7 bottom-0 max-md:translate-x-0
+        ${collapsed ? "max-md:h-[64px] md:!bottom-auto md:!h-[52px]" : "md:h-auto"}
+      `;
+
+  return (
+    <div className={frame}>
       {/* Outer macOS Window Card */}
       <div
-        className="flex-1 flex flex-col w-full h-full rounded-[14px] overflow-hidden border border-chrome-text/15 bg-chrome text-chrome-text shadow-2xl backdrop-blur-xl pointer-events-auto"
+        className={`flex-1 flex flex-col w-full h-full overflow-hidden border border-chrome-text/15 bg-chrome text-chrome-text shadow-2xl backdrop-blur-xl pointer-events-auto ${
+          sheet ? "rounded-none" : "rounded-[14px] max-md:rounded-none"
+        }`}
         style={{
           boxShadow:
             "0 25px 50px -12px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.08)",
