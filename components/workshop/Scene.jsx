@@ -810,7 +810,7 @@ function Laptop({ hovered, onClick }) {
 function DeskLamp() {
   const bodyMat  = useMat(C.lampBody,  { roughness: 0.3, metalness: 0.4 });
   const brassMat = useMat(C.lampBrass, { roughness: 0.2, metalness: 0.8 });
-  const shadeMat = useMat(C.lampBody,  { roughness: 0.4 });
+  const shadeMat = useMat(C.lampBody,  { roughness: 0.4, side: THREE.DoubleSide });
   const bulbMat  = useMat("#FFFBEB",   { emissive: "#FDE047", emissiveIntensity: 2.0 });
 
   return (
@@ -844,14 +844,19 @@ function DeskLamp() {
             <sphereGeometry args={[0.022, 12, 12]} />
           </mesh>
 
-          {/* Cone shade */}
-          <group position={[0, 0.38, 0]} rotation={[0, 0, 0.7]}>
+          {/* Cone shade — double-sided so the open underside never shows
+              through it, with a rim and a bulb that clears the inner wall */}
+          <group position={[0, 0.38, 0]} rotation={[0, 0, 0.28]}>
             <mesh position={[0, 0.05, 0]} material={shadeMat}>
               <coneGeometry args={[0.08, 0.14, 16, 1, true]} />
             </mesh>
-            {/* Glowing bulb */}
-            <mesh position={[0, 0.02, 0]} material={bulbMat}>
-              <sphereGeometry args={[0.03, 12, 12]} />
+            {/* Shade rim at the opening */}
+            <mesh position={[0, -0.018, 0]} rotation={[Math.PI / 2, 0, 0]} material={brassMat}>
+              <torusGeometry args={[0.079, 0.004, 8, 24]} />
+            </mesh>
+            {/* Glowing bulb, sized to sit inside the cone */}
+            <mesh position={[0, -0.004, 0]} material={bulbMat}>
+              <sphereGeometry args={[0.025, 12, 12]} />
             </mesh>
           </group>
         </group>
@@ -1069,8 +1074,9 @@ function Notebook({ hovered, onClick }) {
         </mesh>
       ))}
 
-      {/* Brass executive pen lying flat on the desk, clear of the pages */}
-      <group position={[0.16, 0.0055, 0.185]} rotation={[0, 0.15, Math.PI / 2]}>
+      {/* Brass executive pen lying flat and parallel to the notebook, shifted
+          left so it lines up with the pages instead of hanging off the edge */}
+      <group position={[0.07, 0.0055, 0.165]} rotation={[0, 0, Math.PI / 2]}>
         <mesh material={penMat}>
           <cylinderGeometry args={[0.0055, 0.0055, 0.19, 12]} />
         </mesh>
@@ -1244,23 +1250,31 @@ function PottedPlant({ hovered, onClick }) {
         <cylinderGeometry args={[0.008, 0.011, 0.19, 8]} />
       </mesh>
 
-      {/* Broad monstera leaves fanning out, held near-horizontal so they read
-          as foliage from the high camera rather than as edge-on slivers */}
+      {/* Leaves fanning out radially from the stem. The outward yaw and the
+          tip droop are separate frames, so each blade tips away from the
+          crown instead of every blade leaning the same way (the previous
+          single-group version applied one world-space tilt to all of them). */}
       {[0, 1, 2, 3, 4, 5].map((i) => {
-        const rad = (i * 2 * Math.PI) / 6;
-        const r = 0.055 + (i % 2) * 0.015;
-        const elevation = 0.235 + (i % 3) * 0.03;
-        const droop = 0.95 + (i % 2) * 0.22;
+        const rad = (i * 2 * Math.PI) / 6 + 0.22;
+        const r = 0.03;
+        const elevation = 0.205 + (i % 3) * 0.028;
+        const droop = -0.1 + (i % 3) * 0.16;
         return (
           <group
             key={i}
             position={[Math.cos(rad) * r, elevation, Math.sin(rad) * r]}
-            rotation={[droop, rad, -0.35 + (i % 2) * 0.18]}
-            scale={[1.55, 0.85, 1]}
+            rotation={[0, -rad, 0]}
           >
-            <mesh material={i % 2 === 0 ? leafMat1 : leafMat2}>
-              <circleGeometry args={[0.062, 12]} />
-            </mesh>
+            <group rotation={[0, 0, -droop]}>
+              <group position={[0.05, 0, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+                <mesh
+                  scale={[1.5, 0.82, 1]}
+                  material={i % 2 === 0 ? leafMat1 : leafMat2}
+                >
+                  <circleGeometry args={[0.05, 14]} />
+                </mesh>
+              </group>
+            </group>
           </group>
         );
       })}
@@ -1296,9 +1310,11 @@ function CoffeeMug() {
       <mesh position={[0, bodyTop - 0.006, 0]} material={coffeeMat}>
         <cylinderGeometry args={[0.0405, 0.0405, 0.004, 24]} />
       </mesh>
-      {/* Handle: vertical loop in the wall plane, open side facing the mug */}
-      <mesh position={[0.043, 0.062, 0]} material={ceramicMat}>
-        <torusGeometry args={[0.026, 0.0055, 8, 18, Math.PI * 1.05]} />
+      {/* Handle: a full loop, so it reads as a mug handle rather than a half
+          arc. The inner part of the ring sits inside the wall, the outer half
+          forms the grip; scaled tall for an oval handle. */}
+      <mesh position={[0.044, 0.062, 0]} scale={[1, 1.15, 1]} material={ceramicMat}>
+        <torusGeometry args={[0.027, 0.0056, 8, 20]} />
       </mesh>
     </group>
   );
